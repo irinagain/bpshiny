@@ -1,21 +1,21 @@
+library(shiny)
+library(bp)
+
 ui <- fluidPage(
   
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
+  titlePanel("Shiny BP"),
   
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
-    ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
-    )
+  # Create tabset for Panel layout of Data, Metrics, and Plots
+  
+  tabsetPanel(
+    tabPanel("Data", fluid = T, 
+             "hello world"),
+    tabPanel("Metrics", fluid = T, 
+             "hello world"),
+    tabPanel("Plots", fluid = T,
+             "hello world")
   )
 )
+
+
