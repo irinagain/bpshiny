@@ -97,6 +97,56 @@ output$metric <- DT::renderDataTable(metric_table(), extensions = "Buttons",
                                                     scrollX = TRUE))
 
   ######PLOT######
+  bp_ghana <- bp::bp_ghana
+  bp_hypnos <- bp::bp_hypnos
+  bp_jhs <- bp::bp_jhs
+  
+  hypnos_proc <- process_data(bp_hypnos,
+                              bp_type = 'abpm',
+                              sbp = "syst",
+                              dbp = "DIAST",
+                              date_time = "date.time",
+                              id = "id",
+                              wake = "wake",
+                              visit = "visit",
+                              hr = "hr",
+                              map = "map",
+                              rpp = "rpp",
+                              pp = "pp",
+                              ToD_int = c(5, 13, 18, 23))
+  
+  jhs_proc <- process_data(bp_jhs,
+                           sbp = "Sys.mmHg.",
+                           dbp = "Dias.mmHg.",
+                           date_time = "DateTime",
+                           hr = "pulse.bpm.")
+  
+  
+  plot.datasetInput <- reactive({
+    if (input$dataSet == "bp_ghana"){
+      plot.dataset <- bp_ghana
+    }
+    else if (input$dataSet == "bp_hypnos"){
+      plot.dataset <- hypnos_proc
+    }
+    else if (input$dataSet == "bp_jhs"){
+      plot.dataset <- jhs_proc
+    }
+    return(plot.dataset)
+  })
+  
+  output$bp.scatter <- renderPlot({bp_scatter(plot.datasetInput(),
+                                  plot_type = input$plotType,
+                                  subj = NULL,
+                                  wrap_var = NULL,
+                                  group_var = {
+                                    if (input$dataSet == "bp_ghana"){input$group_var_ghana}
+                                    else if (input$dataSet == "bp_jhs"){input$group_var_jhs}
+                                    else if (input$dataSet == "bp_hypnos"){input$group_var_hypnos}
+                                    },
+                                  inc_crisis = input$inc.crisis,
+                                  inc_low = input$inc.low
+                                  )})
   
 })
   
