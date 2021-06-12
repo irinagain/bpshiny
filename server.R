@@ -15,12 +15,25 @@ shinyServer(function(input,output) {
   ######DATA######
   output$contents <- renderTable({
     file <- input$file1
-    ext <- tools::file_ext(file$datapath)
     
+    #Ensuring file extension is .csv
+    ext <- tools::file_ext(file$datapath)
     req(file)
     validate(need(ext == "csv", "Please upload a csv file"))
+
+    #Assigning data to variable 'bpdata1'
+    bpdata1 = read.csv(file$datapath,header=T)
     
-    read.csv(file$datapath, header = input$header)
+    #Assigning the input of column names to variables 
+    sys = input$syst
+    dias = input$diast 
+    Date1 = input$date 
+    hr = input$hr
+    
+    #Using process_data function
+    bpdata1 = process_data(data = bpdata1,sbp = sys,dbp = dias,bp_datetime = Date1,hr = hr)
+    bpdata1
+
   })
 
   

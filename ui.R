@@ -11,7 +11,17 @@ ui <- fluidPage(
   
   tabsetPanel(
     tabPanel("Data", fluid = T, 
-             "hello world"),
+             sidebarLayout(
+               sidebarPanel(
+                 fileInput("file1", "Choose CSV File", multiple = FALSE, accept = ".csv"),
+                 textInput('syst',label = "Enter column name corresponding to systolic values"),
+                 textInput('diast',label = "Enter column name corresponding to diastolic values"),
+                 textInput('date',label = "Enter column name corresponding to date/time"),
+                 textInput('hr',label = "Enter column name corresponding to Heart Rate")
+               ),
+               mainPanel(tableOutput("contents"))
+             ),
+    ),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
                sidebarPanel(selectInput('matric', 'Choose Matric', choices = c('Average Real Variability (ARV)' = 'arv'
