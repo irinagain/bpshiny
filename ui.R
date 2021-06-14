@@ -14,10 +14,22 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  fileInput("file1", "Choose CSV File", multiple = FALSE, accept = ".csv"),
-                 textInput('syst',label = "Enter column name corresponding to systolic values"),
-                 textInput('diast',label = "Enter column name corresponding to diastolic values"),
-                 textInput('date',label = "Enter column name corresponding to date/time"),
-                 textInput('hr',label = "Enter column name corresponding to Heart Rate")
+                 checkboxGroupInput('bpcolnames',label = "Please select all column names included in the data",
+                                    choices = list('Systolic' = 'syst', 'Diastolic' = 'diast',"Date/Time" = 'date',"ID" = 'id', 'Wake' = 'wake', 
+                                                   'Visit' = 'visit', 'Heart Rate' = 'heart', 'Pulse Pressure' = 'pp', 'Mean Arterial Pressure' = 'map',
+                                                   'Rate Pulse Pressure' = 'rpp', 'Day of the Week' = 'dow'), selected = c('syst','diast')),
+                 actionButton('submit','Submit'),
+                 textInput('sys','Systolic'),
+                 textInput('dias','Diastolic'),
+                 uiOutput('new1'),
+                 uiOutput('new2'),
+                 uiOutput('new3'),
+                 uiOutput('new4'),
+                 uiOutput('new5'),
+                 uiOutput('new6'),
+                 uiOutput('new7'),
+                 uiOutput('new8'),
+                 uiOutput('new9')
                ),
                mainPanel(tableOutput("contents"))
              ),
