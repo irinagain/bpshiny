@@ -13,14 +13,103 @@
 
 shinyServer(function(input,output) {
   ######DATA######
+  observeEvent(input$submit,{
+  #Creates textInput() based on what column names were selected 
+    output$new1 <- renderUI({
+      if(!'date' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("date", "Date")
+      }
+      })
+    output$new2 <- renderUI({
+      if(!'id' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("id", "ID")
+      }
+    })
+    output$new3 <- renderUI({
+      if(!'wake' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("wake", "Wake")
+      }
+    })
+    output$new4 <- renderUI({
+      if(!'visit' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("visit", "Visit")
+      }
+    })
+    output$new5 <- renderUI({
+      if(!'heart' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("hr", "Heart Rate")
+      }
+    })
+    output$new6 <- renderUI({
+      if(!'pp' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("pp", "Pulse Pressure")
+      }
+    })
+    output$new7 <- renderUI({
+      if(!'map' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("map", "Mean Arterial Pressure")
+      }
+    })
+    output$new8 <- renderUI({
+      if(!'rpp' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("rpp", "Rate Pulse Pressure")
+      }
+    })
+    output$new9 <- renderUI({
+      if(!'dow' %in% input$bpcolnames){
+        return(NULL)
+      }else{
+        textInput("dow", "Day of the Week")
+      }
+    })
+  })
+  ## Displaying Data Table
   output$contents <- renderTable({
     file <- input$file1
-    ext <- tools::file_ext(file$datapath)
     
+    #Ensuring file extension is .csv
+    ext <- tools::file_ext(file$datapath)
     req(file)
     validate(need(ext == "csv", "Please upload a csv file"))
+
+    #Assigning data to variable 'bpdata1'
+    bpdata1 = read.csv(file$datapath,header=T)
     
-    read.csv(file$datapath, header = input$header)
+    #Transforming Variable names to usable form 
+    sys = input$sys
+    dias = input$dias
+    date = input$date
+    id = input$id
+    wake = input$wake
+    visit = input$visit
+    hr = input$hr
+    pp = input$pp
+    map = input$map
+    rpp = input$rpp
+    dow = input$dow
+    
+    #Using process_data function
+    bpdata1 = process_data(data = bpdata1,sbp = sys,dbp = dias,bp_datetime = date,id = id, wake = wake, visit = visit,
+                           hr=hr,pp=pp,map=map,rpp=rpp,DoW=dow)
+
+    bpdata1
+
   })
 
   

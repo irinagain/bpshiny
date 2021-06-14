@@ -11,7 +11,29 @@ ui <- fluidPage(
   
   tabsetPanel(
     tabPanel("Data", fluid = T, 
-             "hello world"),
+             sidebarLayout(
+               sidebarPanel(
+                 fileInput("file1", "Choose CSV File", multiple = FALSE, accept = ".csv"),
+                 checkboxGroupInput('bpcolnames',label = "Please select all column names included in the data",
+                                    choices = list('Systolic' = 'syst', 'Diastolic' = 'diast',"Date/Time" = 'date',"ID" = 'id', 'Wake' = 'wake', 
+                                                   'Visit' = 'visit', 'Heart Rate' = 'heart', 'Pulse Pressure' = 'pp', 'Mean Arterial Pressure' = 'map',
+                                                   'Rate Pulse Pressure' = 'rpp', 'Day of the Week' = 'dow'), selected = c('syst','diast')),
+                 actionButton('submit','Submit'),
+                 textInput('sys','Systolic'),
+                 textInput('dias','Diastolic'),
+                 uiOutput('new1'),
+                 uiOutput('new2'),
+                 uiOutput('new3'),
+                 uiOutput('new4'),
+                 uiOutput('new5'),
+                 uiOutput('new6'),
+                 uiOutput('new7'),
+                 uiOutput('new8'),
+                 uiOutput('new9')
+               ),
+               mainPanel(tableOutput("contents"))
+             ),
+    ),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
                sidebarPanel(selectInput('matric', 'Choose Matric', choices = c('Average Real Variability (ARV)' = 'arv'
