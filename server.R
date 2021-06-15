@@ -105,7 +105,7 @@ shinyServer(function(input,output) {
     dow = input$dow
     
     #Using process_data function
-    bpdata1 = process_data(data = bpdata1,sbp = sys,dbp = dias,bp_datetime = date,id = id, wake = wake, visit = visit,
+    bpdata1 = process_data(data = bpdata1,sbp = sys,dbp = dias,date_time = date,id = id, wake = wake, visit = visit,
                            hr=hr,pp=pp,map=map,rpp=rpp,DoW=dow)
     
     bpdata1
