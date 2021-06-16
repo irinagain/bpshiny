@@ -113,7 +113,7 @@ shinyServer(function(input,output) {
   })
   
   
-  ######MATRIC######
+  ######METRICS######
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
@@ -145,7 +145,7 @@ shinyServer(function(input,output) {
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = transform_data()
+    data = output$contents(bpdata1)
     
     if (is.null(input$parameter)) {
       validate(
