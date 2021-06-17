@@ -203,12 +203,55 @@ shinyServer(function(input,output) {
   
   output$bp.scatter <- renderPlot({bp_scatter(plot.datasetInput(),
                                               plot_type = input$plotType,
-                                              subj = NULL,
-                                              wrap_var = NULL,
+                                              subj = {
+                                                if (input$dataSet == "bp_ghana"){input$subj_ghana}
+                                                else(subj <- NULL)
+                                              }
+                                                    ,
+                                              wrap_var = {
+                                                if (input$dataSet == "bp_ghana"){
+                                                  if(!is.null(input$wrap_vars_ghana)){
+                                                    if(nchar(input$wrap_vars_ghana)>1){
+                                                      input$wrap_vars_ghana
+                                                    }
+                                                  }
+                                                }
+                                                else if (input$dataSet == "bp_jhs"){
+                                                  if(!is.null(input$wrap_vars_jhs)){
+                                                  if(nchar(input$wrap_vars_jhs)>1){
+                                                    input$wrap_vars_jhs
+                                                  }
+                                                }}
+                                                else if (input$dataSet == "bp_hypnos"){
+                                                  if(!is.null(input$wrap_vars_hypnos)){
+                                                    if(nchar(input$wrap_vars_hypnos)>1){
+                                                      input$wrap_vars_hypnos
+                                                    }
+                                                  }
+                                                }
+                                              },
                                               group_var = {
-                                                if (input$dataSet == "bp_ghana"){c(NULL,input$group_var_ghana)}
-                                                else if (input$dataSet == "bp_jhs"){c(NULL,input$group_var_jhs)}
-                                                else if (input$dataSet == "bp_hypnos"){c(NULL,input$group_var_hypnos)}
+                                                if (input$dataSet == "bp_ghana"){
+                                                  if(!is.null(input$group_var_ghana)){
+                                                    if(nchar(input$group_var_ghana)>1){
+                                                      input$group_var_ghana
+                                                    }
+                                                  }
+                                                }
+                                                else if (input$dataSet == "bp_jhs"){
+                                                  if(!is.null(input$group_var_jhs)){
+                                                    if(nchar(input$group_var_jhs)>1){
+                                                      input$group_var_jhs
+                                                    }
+                                                  }
+                                                }
+                                                else if (input$dataSet == "bp_hypnos"){
+                                                  if(!is.null(input$group_var_hypnos)){
+                                                    if(nchar(input$group_var_hypnos)>1){
+                                                      input$group_var_hypnos
+                                                    }
+                                                  }
+                                                }
                                               },
                                               inc_crisis = input$inc.crisis,
                                               inc_low = input$inc.low
