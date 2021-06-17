@@ -105,7 +105,7 @@ shinyServer(function(input,output) {
     dow = input$dow
     
     #Using process_data function
-    bpdata1 = process_data(data = bpdata1,sbp = sys,dbp = dias,bp_datetime = date,id = id, wake = wake, visit = visit,
+    bpdata1 <<- process_data(data = bpdata1,sbp = sys,dbp = dias,date_time = date,id = id, wake = wake, visit = visit,
                            hr=hr,pp=pp,map=map,rpp=rpp,DoW=dow)
     
     bpdata1
@@ -113,7 +113,7 @@ shinyServer(function(input,output) {
   })
   
   
-  ######MATRIC######
+  ######METRICS######
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
@@ -145,44 +145,13 @@ shinyServer(function(input,output) {
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = transform_data()
-    
-    if (is.null(input$parameter)) {
-      validate(
-        need(!is.null(input$parameter), "Please wait - Rendering")
-      )
-    } else if (grepl(',', input$parameter) & !grepl("\\(", input$parameter)) {
-      if (length(strsplit(input$parameter, split = ",")[[1]]) != 2) {
-        validate (
-          need(parameter_type %in% c("list", "none","time"), "Please wait - Rendering")
-        )
-      } else {
-        validate(
-          need(parameter_type %in% c("list", "lwrupr","lwrupr1","none","time"), "Please wait - Rendering")
-        )
-      }
-    } else if (grepl("\\(", input$parameter)) {
-      validate(
-        need(parameter_type %in% c("nested", "none","time"), "Please wait - Rendering")
-      )
-    } else if (!grepl(',', input$parameter)) {
-      print(input$parameter)
-      validate(
-        need(parameter_type %in% c("value","value1","value_time", "none","time"), "Please wait - Rendering")
-      )
-      
-    }
+    data = bpdata1
     
     #loading bp library and using metric function
     if(is.null(input$parameter) | parameter_type == "none"){
       string = paste("bp::", input$metric, "(data)", sep = "")
     }
-    if (input$filter_sleep_wake) {
-      if (parameter_type == "none") {
-        out_str = paste0("bp::calculate_sleep_wake(data, FUN = ", input$metric, ", calculate = \'", input$sleep_or_wake, "\', sleep_start = ", input$sleep_start, ", sleep_end = ", input$sleep_end, ")")
-      }
-      string = out_str
-    }
+
     eval(parse(text = string))
     
   })

@@ -36,7 +36,7 @@ library(bp)
       ),
       tabPanel("Metrics", fluid = T, 
                sidebarLayout(
-                 sidebarPanel(selectInput('matric', 'Choose Matric', choices = c('Average Real Variability (ARV)' = 'arv'
+                 sidebarPanel(selectInput('metric', 'Choose Metric', choices = c('Average Real Variability (ARV)' = 'arv'
                  )),
                  uiOutput("select_parameter"),
                  uiOutput("help_text"),
