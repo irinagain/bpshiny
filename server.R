@@ -7,9 +7,9 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
-library(DT)
-library(bp)
+#library(shiny)
+#library(DT)
+#library(bp)
 
 shinyServer(function(input,output) {
   ######DATA######
@@ -105,7 +105,7 @@ shinyServer(function(input,output) {
     dow = input$dow
     
     #Using process_data function
-    bpdata1 = process_data(data = bpdata1,sbp = sys,dbp = dias,date_time = date,id = id, wake = wake, visit = visit,
+    bpdata1 <<- process_data(data = bpdata1,sbp = sys,dbp = dias,date_time = date,id = id, wake = wake, visit = visit,
                            hr=hr,pp=pp,map=map,rpp=rpp,DoW=dow)
     
     bpdata1
@@ -145,7 +145,7 @@ shinyServer(function(input,output) {
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = bp_ghana
+    data = bpdata1
     
     #loading bp library and using metric function
     if(is.null(input$parameter) | parameter_type == "none"){
