@@ -36,7 +36,7 @@ bp_ghana <- bp::bp_ghana
       tabPanel("Data", fluid = T, 
                sidebarLayout(
                  sidebarPanel(
-                   fileInput("file1", "Choose CSV File", multiple = FALSE, accept = ".csv"),
+                   fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv"),
                    checkboxGroupInput('bpcolnames',label = "Please select all column names included in the data",
                                       choices = list('Systolic' = 'syst', 'Diastolic' = 'diast',"Date/Time" = 'date',"ID" = 'id', 'Wake' = 'wake', 
                                                      'Visit' = 'visit', 'Heart Rate' = 'heart', 'Pulse Pressure' = 'pp', 'Mean Arterial Pressure' = 'map',

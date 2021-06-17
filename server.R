@@ -81,7 +81,7 @@ shinyServer(function(input,output) {
   })
   ## Displaying Data Table
   output$contents <- renderTable({
-    file <- input$file1
+    file <- input$datafile
     
     #Ensuring file extension is .csv
     ext <- tools::file_ext(file$datapath)
