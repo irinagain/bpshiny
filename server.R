@@ -11,6 +11,9 @@
 #library(DT)
 #library(bp)
 
+
+
+
 shinyServer(function(input,output) {
   ######DATA######
   observeEvent(input$submit,{
@@ -106,7 +109,7 @@ shinyServer(function(input,output) {
     
     #Using process_data function
     bpdata1 <<- process_data(data = bpdata1,sbp = sys,dbp = dias,date_time = date,id = id, wake = wake, visit = visit,
-                           hr=hr,pp=pp,map=map,rpp=rpp,DoW=dow)
+                             hr=hr,pp=pp,map=map,rpp=rpp,DoW=dow)
     
     bpdata1
     
@@ -151,7 +154,7 @@ shinyServer(function(input,output) {
     if(is.null(input$parameter) | parameter_type == "none"){
       string = paste("bp::", input$metric, "(data)", sep = "")
     }
-
+    
     eval(parse(text = string))
     
   })
@@ -163,6 +166,7 @@ shinyServer(function(input,output) {
                                                       scrollX = TRUE))
   
   ######PLOT######
+  
   plot.datasetInput <- reactive({
     if (input$dataSet == "bp_ghana"){
       plot.dataset <- bp_ghana
@@ -180,9 +184,10 @@ shinyServer(function(input,output) {
                                               plot_type = input$plotType,
                                               subj = {
                                                 if (input$dataSet == "bp_ghana"){input$subj_ghana}
-                                                else(subj <- NULL)
+                                                else if (input$dataSet == "bp_hypnos"){input$subj_hypnos}
+                                                else (subj <- NULL)
                                               }
-                                                    ,
+                                              ,
                                               wrap_var = {
                                                 if (input$dataSet == "bp_ghana"){
                                                   if(!is.null(input$wrap_vars_ghana)){
@@ -193,10 +198,10 @@ shinyServer(function(input,output) {
                                                 }
                                                 else if (input$dataSet == "bp_jhs"){
                                                   if(!is.null(input$wrap_vars_jhs)){
-                                                  if(nchar(input$wrap_vars_jhs)>1){
-                                                    input$wrap_vars_jhs
-                                                  }
-                                                }}
+                                                    if(nchar(input$wrap_vars_jhs)>1){
+                                                      input$wrap_vars_jhs
+                                                    }
+                                                  }}
                                                 else if (input$dataSet == "bp_hypnos"){
                                                   if(!is.null(input$wrap_vars_hypnos)){
                                                     if(nchar(input$wrap_vars_hypnos)>1){
@@ -233,9 +238,3 @@ shinyServer(function(input,output) {
   )})
   
 })
-
-
-
-  
-  
-  

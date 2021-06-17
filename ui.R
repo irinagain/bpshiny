@@ -3,34 +3,35 @@ library(DT)
 library(bp)
 
 bp_ghana <- bp::bp_ghana
-  bp_hypnos <- bp::bp_hypnos
-  bp_jhs <- bp::bp_jhs
+bp_hypnos <- bp::bp_hypnos
+bp_jhs <- bp::bp_jhs
+
+hypnos_proc <- process_data(bp_hypnos,
+                            bp_type = 'abpm',
+                            sbp = "syst",
+                            dbp = "DIAST",
+                            date_time = "date.time",
+                            id = "id",
+                            wake = "wake",
+                            visit = "visit",
+                            hr = "hr",
+                            map = "map",
+                            rpp = "rpp",
+                            pp = "pp",
+                            ToD_int = c(5, 13, 18, 23))
+
+jhs_proc <- process_data(bp_jhs,
+                         sbp = "Sys.mmHg.",
+                         dbp = "Dias.mmHg.",
+                         date_time = "DateTime",
+                         hr = "pulse.bpm.")
+
+ui <- fluidPage(
   
-  hypnos_proc <- process_data(bp_hypnos,
-                              bp_type = 'abpm',
-                              sbp = "syst",
-                              dbp = "DIAST",
-                              date_time = "date.time",
-                              id = "id",
-                              wake = "wake",
-                              visit = "visit",
-                              hr = "hr",
-                              map = "map",
-                              rpp = "rpp",
-                              pp = "pp",
-                              ToD_int = c(5, 13, 18, 23))
+  # Application title
+  titlePanel("Shiny BP"),
   
-  jhs_proc <- process_data(bp_jhs,
-                           sbp = "Sys.mmHg.",
-                           dbp = "Dias.mmHg.",
-                           date_time = "DateTime",
-                           hr = "pulse.bpm.")
-  ui <- fluidPage(
-    
-    # Application title
-    titlePanel("Shiny BP"),
-    
-    # Create tabset for Panel layout of Data, Metrics, and Plots
+# Create tabset for Panel layout of Data, Metrics, and Plots
     
     tabsetPanel(
       tabPanel("Data", fluid = T, 
@@ -55,22 +56,21 @@ bp_ghana <- bp::bp_ghana
                    uiOutput('new9')
                  ),
                  mainPanel(tableOutput("contents"))
+    ),
+    tabPanel("Metrics", fluid = T, 
+             sidebarLayout(
+               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c('Average Real Variability (ARV)' = 'arv'
+               )),
+               uiOutput("select_parameter"),
+               uiOutput("help_text"),
+               uiOutput("select_second_parameter"),
+               uiOutput("second_parameter_helptext"),
+               uiOutput("select_third_parameter"),
+               uiOutput("third_parameter_helptext"),
                ),
-      ),
-      tabPanel("Metrics", fluid = T, 
-               sidebarLayout(
-                 sidebarPanel(selectInput('metric', 'Choose Metric', choices = c('Average Real Variability (ARV)' = 'arv'
-                 )),
-                 uiOutput("select_parameter"),
-                 uiOutput("help_text"),
-                 uiOutput("select_second_parameter"),
-                 uiOutput("second_parameter_helptext"),
-                 uiOutput("select_third_parameter"),
-                 uiOutput("third_parameter_helptext"),
-                 ),
-                 mainPanel(DT::dataTableOutput("metric")))
-      ),
-tabPanel("Plots", fluid = T,
+               mainPanel(DT::dataTableOutput("metric")))
+    ),
+    tabPanel("Plots", fluid = T,
              sidebarLayout(
                sidebarPanel = sidebarPanel(
                  #Select Data Set from BP Ghana, BP Hypnos, or BP JHS
@@ -81,17 +81,17 @@ tabPanel("Plots", fluid = T,
                                   
                                   #Subject customization
                                   selectInput(inputId = "subj_ghana", label = "Subject", choices = c("", as.character(factor(bp_ghana$ID))), selected = NULL, multiple = T),
-                                
+                                  
                                   #Group_var customization, c(2,6,7,..., 19) are the columns that can be applied to group_var (levels must be less than 10)
                                   selectInput(inputId = "group_var_ghana", label = "Grouping Variable (1):", choices = c("", names(bp_ghana[,c(2,6,7,8,9,10,11,13,15,17,18,19)])), selected = NULL, multiple = T),
                                   
                                   #Wrap_var customization
                                   selectInput(inputId = "wrap_vars_ghana",label = "Wrapping Variable (1):", choices = c("", names(bp_ghana[,c(2,6,7,8,9,10,11,13,15,17,18,19)])), selected = NULL, multiple = T) 
-                                  ), 
+                 ), 
                  
                  #if BP JHS is selected, customize bp_scatter() plot accordingly
                  conditionalPanel(condition = "input.dataSet == 'bp_jhs'", 
-                                
+                                  
                                   #No Subject customization necessary
                                   
                                   #Group_var customization
@@ -108,7 +108,7 @@ tabPanel("Plots", fluid = T,
                                   
                                   #group_var customization
                                   selectInput(inputId = "group_var_hypnos", label = "Grouping Variable (1)", choices = c("", as.character(names(hypnos_proc[,c(4,5,6,10,15,16,17,18,19,20)]))), selected = NULL, multiple = T),
-                 
+                                  
                                   #wrap_var customization
                                   selectInput(inputId = "wrap_vars_hypnos", label = "Wrapping Variable (1)", choices = c("", as.character(names(hypnos_proc[,c(4,5,6,10,15,16,17,18,19,20)]))), selected = NULL, multiple = T)),
                  
@@ -119,7 +119,7 @@ tabPanel("Plots", fluid = T,
                  conditionalPanel(condition = "input.plotType == 'stages2020'",
                                   checkboxInput(inputId = "inc.crisis", label = "Include Hypersensitive Crisis?", value = T), #include Crisis category
                                   checkboxInput(inputId = "inc.low", label = "Include Low Hypotension?", value = T) #include "low" category
-                 )
+                 ),
                  
                  
                ),
@@ -127,4 +127,5 @@ tabPanel("Plots", fluid = T,
                mainPanel = mainPanel(plotOutput(outputId = "bp.scatter"))
              ))
   )
+)
 )
