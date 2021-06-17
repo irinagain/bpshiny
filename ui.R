@@ -56,7 +56,7 @@ ui <- fluidPage(
                    uiOutput('new9')
                  ),
                  mainPanel(tableOutput("contents"))
-    ),
+    )),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
                sidebarPanel(selectInput('metric', 'Choose Metric', choices = c('Average Real Variability (ARV)' = 'arv'
@@ -127,5 +127,4 @@ ui <- fluidPage(
                mainPanel = mainPanel(plotOutput(outputId = "bp.scatter"))
              ))
   )
-)
 )
