@@ -7,9 +7,9 @@
 #    http://shiny.rstudio.com/
 #
 
-#library(shiny)
-#library(DT)
-#library(bp)
+library(shiny)
+library(DT)
+library(bp)
 
 shinyServer(function(input,output) {
   ######DATA######
@@ -145,44 +145,13 @@ shinyServer(function(input,output) {
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = output$contents(bpdata1)
-    
-    if (is.null(input$parameter)) {
-      validate(
-        need(!is.null(input$parameter), "Please wait - Rendering")
-      )
-    } else if (grepl(',', input$parameter) & !grepl("\\(", input$parameter)) {
-      if (length(strsplit(input$parameter, split = ",")[[1]]) != 2) {
-        validate (
-          need(parameter_type %in% c("list", "none","time"), "Please wait - Rendering")
-        )
-      } else {
-        validate(
-          need(parameter_type %in% c("list", "lwrupr","lwrupr1","none","time"), "Please wait - Rendering")
-        )
-      }
-    } else if (grepl("\\(", input$parameter)) {
-      validate(
-        need(parameter_type %in% c("nested", "none","time"), "Please wait - Rendering")
-      )
-    } else if (!grepl(',', input$parameter)) {
-      print(input$parameter)
-      validate(
-        need(parameter_type %in% c("value","value1","value_time", "none","time"), "Please wait - Rendering")
-      )
-      
-    }
+    data = bp_ghana
     
     #loading bp library and using metric function
     if(is.null(input$parameter) | parameter_type == "none"){
       string = paste("bp::", input$metric, "(data)", sep = "")
     }
-    if (input$filter_sleep_wake) {
-      if (parameter_type == "none") {
-        out_str = paste0("bp::calculate_sleep_wake(data, FUN = ", input$metric, ", calculate = \'", input$sleep_or_wake, "\', sleep_start = ", input$sleep_start, ", sleep_end = ", input$sleep_end, ")")
-      }
-      string = out_str
-    }
+
     eval(parse(text = string))
     
   })
