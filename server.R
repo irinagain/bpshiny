@@ -22,63 +22,63 @@ shinyServer(function(input,output) {
       if(!'date' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("date", "Date")
+        textInput("date", "Date", value = 'date')
       }
     })
     output$new2 <- renderUI({
       if(!'id' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("id", "ID")
+        textInput("id", "ID", value = 'id')
       }
     })
     output$new3 <- renderUI({
       if(!'wake' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("wake", "Wake")
+        textInput("wake", "Wake", value = 'wake')
       }
     })
     output$new4 <- renderUI({
       if(!'visit' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("visit", "Visit")
+        textInput("visit", "Visit", value = 'visit')
       }
     })
     output$new5 <- renderUI({
       if(!'heart' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("hr", "Heart Rate")
+        textInput("hr", "Heart Rate", value = 'hr')
       }
     })
     output$new6 <- renderUI({
       if(!'pp' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("pp", "Pulse Pressure")
+        textInput("pp", "Pulse Pressure", value = 'pp')
       }
     })
     output$new7 <- renderUI({
       if(!'map' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("map", "Mean Arterial Pressure")
+        textInput("map", "Mean Arterial Pressure", value = 'map')
       }
     })
     output$new8 <- renderUI({
       if(!'rpp' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("rpp", "Rate Pulse Pressure")
+        textInput("rpp", "Rate Pulse Pressure", value = 'rpp')
       }
     })
     output$new9 <- renderUI({
       if(!'dow' %in% input$bpcolnames){
         return(NULL)
       }else{
-        textInput("dow", "Day of the Week")
+        textInput("dow", "Day of the Week", value = 'dow')
       }
     })
   })
