@@ -38,24 +38,32 @@ ui <- fluidPage(
                sidebarLayout(
                  sidebarPanel(
                    fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv"),
-                   checkboxGroupInput('bpcolnames',label = "Select information available and enter the corresponding column names",
-                                      choices = list('Systolic' = 'syst', 'Diastolic' = 'diast',"Date/Time" = 'date',"ID" = 'id', 'Wake' = 'wake', 
-                                                     'Visit' = 'visit', 'Heart Rate' = 'heart', 'Pulse Pressure' = 'pp', 'Mean Arterial Pressure' = 'map',
-                                                     'Rate Pulse Pressure' = 'rpp', 'Day of the Week' = 'dow'), selected = c('syst','diast')),
-                   actionButton('submit','Submit'),
-                   textInput('sys','Systolic', value = 'sys'),
-                   textInput('dias','Diastolic', value = 'dias'),
-                   uiOutput('new1'),
-                   uiOutput('new2'),
-                   uiOutput('new3'),
-                   uiOutput('new4'),
-                   uiOutput('new5'),
-                   uiOutput('new6'),
-                   uiOutput('new7'),
-                   uiOutput('new8'),
-                   uiOutput('new9')
+                   textInput('sys', 'Systolic'),
+                   textInput('dias', 'Diastolic'),
+                   checkboxInput('date1', 'Date'),
+                   uiOutput('dateinput'),
+                   checkboxInput('id1', 'ID'),
+                   uiOutput('idinput'),
+                   checkboxInput('wake1', 'Wake'),
+                   uiOutput('wakeinput'),
+                   checkboxInput('visit1', 'Visit'),
+                   uiOutput('visitinput'),
+                   checkboxInput('heart1', 'Heart Rate'),
+                   uiOutput('heartinput'),
+                   checkboxInput('pp1','Pulse Pressure'),
+                   uiOutput('ppinput'),
+                   checkboxInput('map1','Mean Arterial Pressure'),
+                   uiOutput('mapinput'),
+                   checkboxInput('rpp1','Rate Pulse Pressure'),
+                   uiOutput('rppinput'),
+                   checkboxInput('dow1','Day of the Week'),
+                   uiOutput('dowinput'),
+                   actionButton('submit','Submit')
                  ),
                  mainPanel(tableOutput("contents"))
+                 
+                 
+                 
     )),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(

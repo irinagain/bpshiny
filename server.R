@@ -12,108 +12,108 @@
 #library(bp)
 
 
-
-
 shinyServer(function(input,output) {
   ######DATA######
-  observeEvent(input$submit,{
-    #Creates textInput() based on what column names were selected 
-    output$new1 <- renderUI({
-      if(!'date' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("date", "Date", value = 'date')
-      }
-    })
-    output$new2 <- renderUI({
-      if(!'id' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("id", "ID", value = 'id')
-      }
-    })
-    output$new3 <- renderUI({
-      if(!'wake' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("wake", "Wake", value = 'wake')
-      }
-    })
-    output$new4 <- renderUI({
-      if(!'visit' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("visit", "Visit", value = 'visit')
-      }
-    })
-    output$new5 <- renderUI({
-      if(!'heart' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("hr", "Heart Rate", value = 'hr')
-      }
-    })
-    output$new6 <- renderUI({
-      if(!'pp' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("pp", "Pulse Pressure", value = 'pp')
-      }
-    })
-    output$new7 <- renderUI({
-      if(!'map' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("map", "Mean Arterial Pressure", value = 'map')
-      }
-    })
-    output$new8 <- renderUI({
-      if(!'rpp' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("rpp", "Rate Pulse Pressure", value = 'rpp')
-      }
-    })
-    output$new9 <- renderUI({
-      if(!'dow' %in% input$bpcolnames){
-        return(NULL)
-      }else{
-        textInput("dow", "Day of the Week", value = 'dow')
-      }
-    })
+  
+  #Creates textInput() based on what column names were selected 
+  output$dateinput <- renderUI({
+    if(input$date1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("date", "Date",value=NULL)
+    }
   })
-  ## Displaying Data Table
-  output$contents <- renderTable({
-    file <- input$datafile
-    
-    #Ensuring file extension is .csv
-    ext <- tools::file_ext(file$datapath)
-    req(file)
-    validate(need(ext == "csv", "Please upload a csv file"))
-    
-    #Assigning data to variable 'bpdata1'
-    bpdata1 = read.csv(file$datapath,header=T)
-    
-    #Transforming Variable names to usable form 
-    sys = input$sys
-    dias = input$dias
-    date = input$date
-    id = input$id
-    wake = input$wake
-    visit = input$visit
-    hr = input$hr
-    pp = input$pp
-    map = input$map
-    rpp = input$rpp
-    dow = input$dow
-    
-    #Using process_data function
-    bpdata1 <<- process_data(data = bpdata1, sbp = sys, dbp = dias, date_time = date, id = id, wake = wake, visit = visit,
-                             hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
-    
-    bpdata1
-    
+  output$idinput <- renderUI({
+    if(input$id1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("id", "ID",value=NULL)
+    }
   })
+  output$wakeinput <- renderUI({
+    if(input$wake1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("wake", "Wake",value=NULL)
+    }
+  })
+  output$visitinput <- renderUI({
+    if(input$visit1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("visit", "Visit",value = NULL)
+    }
+  })
+  output$heartinput <- renderUI({
+    if(input$heart1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("hr", "Heart Rate",value = NULL)
+    }
+  })
+  output$ppinput <- renderUI ({
+    if(input$pp1 == FALSE){
+      return(NULL)
+    }else{
+      textInput('pp', 'Pulse Pressure',value = NULL)
+    }
+  })
+  output$mapinput <- renderUI({
+    if(input$map1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("map", "Mean Arterial Pressure",value = NULL)
+    }
+  })
+  output$rppinput <- renderUI({
+    if(input$rpp1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("rpp", "Rate Pulse Pressure",value = NULL)
+    }
+  })
+  output$dowinput <- renderUI({
+    if(input$dow1 == FALSE){
+      return(NULL)
+    }else{
+      textInput("dow", "Day of the Week",value = NULL)
+    }
+  })
+  
+output$contents <- renderTable({
+  file <- input$datafile
+  
+  #Ensuring uploaded file is .csv format
+  ext <- tools::file_ext(file$datapath)
+  req(file)
+  validate(need(ext == "csv", "Please upload a csv file"))
+  
+  #Assigning data to variable 'bpdata'
+  bpdata = read.csv(file$datapath, header=T)
+  
+  #Transforming Variable names to usable form 
+  sys = input$sys
+  dias = input$dias
+  date = input$date
+  id = input$id
+  wake = input$wake
+  visit = input$visit
+  hr = input$hr
+  pp = input$pp
+  map = input$map
+  rpp = input$rpp
+  dow = input$dow
+  
+  #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
+  if(input$submit == FALSE){
+    bpdata
+  }else{
+    bpdata.final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
+    bpdata.final
+
+  }
+})
   
   
   ######METRICS######
