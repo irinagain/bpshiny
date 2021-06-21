@@ -80,7 +80,7 @@ shinyServer(function(input,output) {
     }
   })
   
-output$contents <- renderTable({
+data <- reactive({
   file <- input$datafile
   
   #Ensuring uploaded file is .csv format
@@ -115,7 +115,11 @@ output$contents <- renderTable({
   }
 })
   
-  
+output$contents <- renderTable({
+  data()
+})
+
+
   ######METRICS######
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
@@ -148,7 +152,7 @@ output$contents <- renderTable({
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = bpdata1
+    data = data()
     
     #loading bp library and using metric function
     if(is.null(input$parameter) | parameter_type == "none"){
