@@ -15,6 +15,13 @@
 shinyServer(function(input,output) {
   ######DATA######
   
+  #Creates fileInput() if User Datafile is selected
+  output$file_input <- renderUI({
+    if(input$fileselect == 'input_data'){
+      fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv")
+    }
+  })
+  
   #Creates textInput() based on what column names were selected 
   output$dateinput <- renderUI({
     if(input$date1 == FALSE){
@@ -80,7 +87,8 @@ shinyServer(function(input,output) {
     }
   })
   
-data <- reactive({
+#Reactive Expression if user inputs their own data
+input_data <- reactive({
   file <- input$datafile
   
   #Ensuring uploaded file is .csv format
@@ -111,9 +119,52 @@ data <- reactive({
     bpdata.final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
                                 hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
     bpdata.final
-
   }
 })
+
+#Reactive Expression if users selects hypnos_data
+hypnos_data <- reactive({
+  bp_hypnos <- bp::bp_hypnos
+  hypnos_proc <- process_data(bp_hypnos,
+                              bp_type = 'abpm',
+                              sbp = "syst",
+                              dbp = "DIAST",
+                              date_time = "date.time",
+                              id = "id",
+                              wake = "wake",
+                              visit = "visit",
+                              hr = "hr",
+                              map = "map",
+                              rpp = "rpp",
+                              pp = "pp",
+                              ToD_int = c(5, 13, 18, 23))
+hypnos_proc
+})
+
+#Reactive Expression if users selects jhs_data
+jhs_data <- reactive ({
+  bp_jhs <- bp::bp_jhs
+  jhs_proc <- process_data(bp_jhs,
+                           sbp = "Sys.mmHg.",
+                           dbp = "Dias.mmHg.",
+                           date_time = "DateTime",
+                           hr = "pulse.bpm.")
+  jhs_proc
+})
+
+#Reactive Expression if users selects ghana_data
+ghana_data <- reactive ({
+  bp_ghana <- bp::bp_ghana
+  ghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP')
+  ghana_proc
+})
+
+#switch() function that will output table according to selected dataset 
+data <- reactive ({
+  datachoice = input$fileselect
+  switch(datachoice,'ghana_data' = ghana_data(),'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'input_data' = input_data())
+})
+
   
 output$contents <- renderTable({
   data()

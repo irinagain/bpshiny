@@ -37,7 +37,9 @@ ui <- fluidPage(
       tabPanel("Data", fluid = T, 
                sidebarLayout(
                  sidebarPanel(
-                   fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv"),
+                   selectInput('fileselect', label = 'Select Dataset',
+                               choices = list('','bp_ghana' = 'ghana_data', 'bp_hypnos' = 'hypnos_data','jhs_proc' = 'jhsproc_data','User Datafile' = 'input_data' )),
+                   uiOutput('file_input'),
                    textInput('sys', 'Systolic'),
                    textInput('dias', 'Diastolic'),
                    checkboxInput('date1', 'Date'),
