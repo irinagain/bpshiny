@@ -87,90 +87,90 @@ shinyServer(function(input,output) {
     }
   })
   
-#Reactive Expression if user inputs their own data
-input_data <- reactive({
-  file <- input$datafile
+  #Reactive Expression if user inputs their own data
+  input_data <- reactive({
+    file <- input$datafile
+    
+    #Ensuring uploaded file is .csv format
+    ext <- tools::file_ext(file$datapath)
+    req(file)
+    validate(need(ext == "csv", "Please upload a csv file"))
+    
+    #Assigning data to variable 'bpdata'
+    bpdata = read.csv(file$datapath, header=T)
+    
+    #Transforming Variable names to usable form 
+    sys = input$sys
+    dias = input$dias
+    date = input$date
+    id = input$id
+    wake = input$wake
+    visit = input$visit
+    hr = input$hr
+    pp = input$pp
+    map = input$map
+    rpp = input$rpp
+    dow = input$dow
+    
+    #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
+    if(input$submit == FALSE){
+      bpdata
+    }else{
+      bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
+      bpdata_final
+    }
+  })
   
-  #Ensuring uploaded file is .csv format
-  ext <- tools::file_ext(file$datapath)
-  req(file)
-  validate(need(ext == "csv", "Please upload a csv file"))
+  #Reactive Expression if users selects hypnos_data
+  hypnos_data <- reactive({
+    bp_hypnos <- bp::bp_hypnos
+    hypnos_proc <- process_data(bp_hypnos,
+                                bp_type = 'abpm',
+                                sbp = "syst",
+                                dbp = "DIAST",
+                                date_time = "date.time",
+                                id = "id",
+                                wake = "wake",
+                                visit = "visit",
+                                hr = "hr",
+                                map = "map",
+                                rpp = "rpp",
+                                pp = "pp",
+                                ToD_int = c(5, 13, 18, 23))
+    hypnos_proc
+  })
   
-  #Assigning data to variable 'bpdata'
-  bpdata = read.csv(file$datapath, header=T)
+  #Reactive Expression if users selects jhs_data
+  jhs_data <- reactive ({
+    bp_jhs <- bp::bp_jhs
+    jhs_proc <- process_data(bp_jhs,
+                             sbp = "Sys.mmHg.",
+                             dbp = "Dias.mmHg.",
+                             date_time = "DateTime",
+                             hr = "pulse.bpm.")
+    jhs_proc
+  })
   
-  #Transforming Variable names to usable form 
-  sys = input$sys
-  dias = input$dias
-  date = input$date
-  id = input$id
-  wake = input$wake
-  visit = input$visit
-  hr = input$hr
-  pp = input$pp
-  map = input$map
-  rpp = input$rpp
-  dow = input$dow
+  #Reactive Expression if users selects ghana_data
+  ghana_data <- reactive ({
+    bp_ghana <- bp::bp_ghana
+    ghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP')
+    ghana_proc
+  })
   
-  #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
-  if(input$submit == FALSE){
-    bpdata
-  }else{
-    bpdata.final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
-    bpdata.final
-  }
-})
-
-#Reactive Expression if users selects hypnos_data
-hypnos_data <- reactive({
-  bp_hypnos <- bp::bp_hypnos
-  hypnos_proc <- process_data(bp_hypnos,
-                              bp_type = 'abpm',
-                              sbp = "syst",
-                              dbp = "DIAST",
-                              date_time = "date.time",
-                              id = "id",
-                              wake = "wake",
-                              visit = "visit",
-                              hr = "hr",
-                              map = "map",
-                              rpp = "rpp",
-                              pp = "pp",
-                              ToD_int = c(5, 13, 18, 23))
-hypnos_proc
-})
-
-#Reactive Expression if users selects jhs_data
-jhs_data <- reactive ({
-  bp_jhs <- bp::bp_jhs
-  jhs_proc <- process_data(bp_jhs,
-                           sbp = "Sys.mmHg.",
-                           dbp = "Dias.mmHg.",
-                           date_time = "DateTime",
-                           hr = "pulse.bpm.")
-  jhs_proc
-})
-
-#Reactive Expression if users selects ghana_data
-ghana_data <- reactive ({
-  bp_ghana <- bp::bp_ghana
-  ghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP')
-  ghana_proc
-})
-
-#switch() function that will output table according to selected dataset 
-data <- reactive ({
-  datachoice = input$fileselect
-  switch(datachoice,'ghana_data' = ghana_data(),'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'input_data' = input_data())
-})
-
+  #switch() function that will output table according to selected dataset 
+  user_data <- reactive ({
+    datachoice = input$fileselect
+    switch(datachoice,'ghana_data' = ghana_data(),'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'input_data' = input_data())
+  })
   
-output$contents <- renderTable({
-  data()
-})
-
-
+  
+  output$contents <- renderTable({
+    user_data()
+  })
+  
+  
   ######METRICS######
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
@@ -203,7 +203,7 @@ output$contents <- renderTable({
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = data()
+    data = user_data()
     
     #loading bp library and using metric function
     if(is.null(input$parameter) | parameter_type == "none"){
@@ -219,45 +219,42 @@ output$contents <- renderTable({
                                        options = list(dom = "Btip",
                                                       buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                       scrollX = TRUE))
-  
   ######PLOT######
   
-  plot.datasetInput <- reactive({
-    if (input$dataSet == "bp_ghana"){
-      plot.dataset <- bp_ghana
-    }
-    else if (input$dataSet == "bp_hypnos"){
-      plot.dataset <- hypnos_proc
-    }
-    else if (input$dataSet == "bp_jhs"){
-      plot.dataset <- jhs_proc
-    }
-    return(plot.dataset)
-  })
+  output$plotName <- renderText(input$fileselect)
   
-  output$bp.scatter <- renderPlot({bp_scatter(plot.datasetInput(),
+  output$bp.scatter <- renderPlot({bp_scatter(user_data(),
                                               plot_type = input$plotType,
                                               subj = {
-                                                if (input$dataSet == "bp_ghana"){input$subj_ghana}
-                                                else if (input$dataSet == "bp_hypnos"){input$subj_hypnos}
+                                                if (input$fileselect == "ghana_data"){input$subj_ghana}
+                                                else if (input$fileselect == "hypnos_data"){input$subj_hypnos}
+                                                else if(input$fileselect == "input_data" && length(factor(input$subj_input_data)) >1){input$subj_input_data}
                                                 else (subj <- NULL)
                                               }
                                               ,
                                               wrap_var = {
-                                                if (input$dataSet == "bp_ghana"){
+                                                if(input$fileselect == "input_data"){
+                                                  if(!is.null(input$wrap_vars_input_data)){
+                                                    if(nchar(input$wrap_vars_input_data)>1){
+                                                      input$wrap_vars_input_data
+                                                    }
+                                                  }
+                                                }
+                                              
+                                                else if (input$fileselect == "ghana_data"){
                                                   if(!is.null(input$wrap_vars_ghana)){
                                                     if(nchar(input$wrap_vars_ghana)>1){
                                                       input$wrap_vars_ghana
                                                     }
                                                   }
                                                 }
-                                                else if (input$dataSet == "bp_jhs"){
+                                                else if (input$fileselect == "jhsproc_data"){
                                                   if(!is.null(input$wrap_vars_jhs)){
                                                     if(nchar(input$wrap_vars_jhs)>1){
                                                       input$wrap_vars_jhs
                                                     }
                                                   }}
-                                                else if (input$dataSet == "bp_hypnos"){
+                                                else if (input$fileselect == "hypnos_data"){
                                                   if(!is.null(input$wrap_vars_hypnos)){
                                                     if(nchar(input$wrap_vars_hypnos)>1){
                                                       input$wrap_vars_hypnos
@@ -266,21 +263,29 @@ output$contents <- renderTable({
                                                 }
                                               },
                                               group_var = {
-                                                if (input$dataSet == "bp_ghana"){
+                                                if(input$fileselect == "input_data"){
+                                                  if(!is.null(input$group_var_input_data)){
+                                                    if(nchar(input$group_var_input_data)>1){
+                                                      input$group_var_input_data
+                                                    }
+                                                  }
+                                                }
+                                                
+                                               else if (input$fileselect == "ghana_data"){
                                                   if(!is.null(input$group_var_ghana)){
                                                     if(nchar(input$group_var_ghana)>1){
                                                       input$group_var_ghana
                                                     }
                                                   }
                                                 }
-                                                else if (input$dataSet == "bp_jhs"){
+                                                else if (input$fileselect == "jhsproc_data"){
                                                   if(!is.null(input$group_var_jhs)){
                                                     if(nchar(input$group_var_jhs)>1){
                                                       input$group_var_jhs
                                                     }
                                                   }
                                                 }
-                                                else if (input$dataSet == "bp_hypnos"){
+                                                else if (input$fileselect == "hypnos_data"){
                                                   if(!is.null(input$group_var_hypnos)){
                                                     if(nchar(input$group_var_hypnos)>1){
                                                       input$group_var_hypnos
