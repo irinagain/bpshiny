@@ -69,7 +69,12 @@ ui <- fluidPage(
     )),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
-               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c('Average Real Variability (ARV)' = 'arv'
+               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c('Average Real Variability (ARV)' = 'arv',
+                                                                               'Measures of Center' = 'bp_center', 
+                                                                               'Blood Pressure Magnitude (Peak and Trough)' = 'bp_mag',
+                                                                               'Blood Pressure Range' = 'bp_range', 
+                                                                               'Aggregated BP Summary Statistics' = 'bp_stats'
+                                                                               
                )),
                uiOutput("select_parameter"),
                uiOutput("help_text"),

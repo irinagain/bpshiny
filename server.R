@@ -175,7 +175,7 @@ output$contents <- renderTable({
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
-    if(input$metric %in% c("arv")){
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats')){
       return("none")
     }
   })
