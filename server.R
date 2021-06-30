@@ -12,6 +12,8 @@
 #library(bp)
 
 
+
+
 shinyServer(function(input,output) {
   ######DATA######
   
@@ -87,6 +89,36 @@ shinyServer(function(input,output) {
     }
   })
   
+   #Reactive Expression if users selects hypnos_data
+  hypnos_data <- reactive({
+    bp_hypnos <- bp::bp_hypnos
+    hypnos_proc <- process_data(bp_hypnos,
+                                bp_type = 'abpm',
+                                sbp = "syst",
+                                dbp = "DIAST",
+                                date_time = "date.time",
+                                id = "id",
+                                wake = "wake",
+                                visit = "visit",
+                                hr = "hr",
+                                map = "map",
+                                rpp = "rpp",
+                                pp = "pp",
+                                ToD_int = c(5, 13, 18, 23))
+    hypnos_proc
+  })
+
+  #Reactive Expression if users selects jhs_data
+  jhs_data <- reactive ({
+    bp_jhs <- bp::bp_jhs
+    jhs_proc <- process_data(bp_jhs,
+                             sbp = "Sys.mmHg.",
+                             dbp = "Dias.mmHg.",
+                             date_time = "DateTime",
+                             hr = "pulse.bpm.")
+    jhs_proc
+  })
+  
   #Reactive Expression if user inputs their own data
   input_data <- reactive({
     file <- input$datafile
@@ -122,47 +154,10 @@ shinyServer(function(input,output) {
     }
   })
   
-  #Reactive Expression if users selects hypnos_data
-  hypnos_data <- reactive({
-    bp_hypnos <- bp::bp_hypnos
-    hypnos_proc <- process_data(bp_hypnos,
-                                bp_type = 'abpm',
-                                sbp = "syst",
-                                dbp = "DIAST",
-                                date_time = "date.time",
-                                id = "id",
-                                wake = "wake",
-                                visit = "visit",
-                                hr = "hr",
-                                map = "map",
-                                rpp = "rpp",
-                                pp = "pp",
-                                ToD_int = c(5, 13, 18, 23))
-    hypnos_proc
-  })
-  
-  #Reactive Expression if users selects jhs_data
-  jhs_data <- reactive ({
-    bp_jhs <- bp::bp_jhs
-    jhs_proc <- process_data(bp_jhs,
-                             sbp = "Sys.mmHg.",
-                             dbp = "Dias.mmHg.",
-                             date_time = "DateTime",
-                             hr = "pulse.bpm.")
-    jhs_proc
-  })
-  
-  #Reactive Expression if users selects ghana_data
-  ghana_data <- reactive ({
-    bp_ghana <- bp::bp_ghana
-    ghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP')
-    ghana_proc
-  })
-  
-  #switch() function that will output table according to selected dataset 
+    #switch() function that will output table according to selected dataset 
   user_data <- reactive ({
     datachoice = input$fileselect
-    switch(datachoice,'ghana_data' = ghana_data(),'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'input_data' = input_data())
+    switch(datachoice,'ghana_data' = bp::bp_ghana,'hypnos_data' = hypnos_proc, 'jhsproc_data' = jhs_proc, 'input_data' = input_data())
   })
   
   
@@ -221,6 +216,20 @@ shinyServer(function(input,output) {
                                                       scrollX = TRUE))
   ######PLOT######
   
+  
+  
+  output$input_data_subj <- renderUI({
+    selectInput(inputId = "subj_input_data", label = "Subject", choices = c("", as.character(factor(user_data()$ID))), selected = NULL, multiple = T)
+  })
+  
+  output$input_data_group_var <- renderUI({
+    selectInput(inputId = "group_var_input_data", label = "Grouping Variable (1):", choices = c("", names(user_data()[,1:ncol(user_data())])),selected = NULL, multiple = T)
+  })
+  
+  output$input_data_wrap_vars <- renderUI({
+    selectInput(inputId = "wrap_vars_input_data", label = "Wrapping Variable (1):", choices = c("", names(user_data()[,1:ncol(user_data())])), selected = NULL, multiple = T)
+  })
+  
   output$plotName <- renderText(input$fileselect)
   
   output$bp.scatter <- renderPlot({bp_scatter(user_data(),
@@ -240,7 +249,7 @@ shinyServer(function(input,output) {
                                                     }
                                                   }
                                                 }
-                                              
+                                                
                                                 else if (input$fileselect == "ghana_data"){
                                                   if(!is.null(input$wrap_vars_ghana)){
                                                     if(nchar(input$wrap_vars_ghana)>1){
@@ -271,7 +280,7 @@ shinyServer(function(input,output) {
                                                   }
                                                 }
                                                 
-                                               else if (input$fileselect == "ghana_data"){
+                                                else if (input$fileselect == "ghana_data"){
                                                   if(!is.null(input$group_var_ghana)){
                                                     if(nchar(input$group_var_ghana)>1){
                                                       input$group_var_ghana
