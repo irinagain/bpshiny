@@ -22,10 +22,81 @@ shinyServer(function(input,output) {
     if(input$fileselect == 'input_data'){
       fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv")
     }
+  })  
+  
+  
+  #Creates Systolic/Diastolic text boxes if user datafile is selected
+  output$sys_input <- renderUI({
+    if(input$fileselect == 'input_data'){
+      textInput('sys', 'Systolic', value = NULL)
+    }
   })
+  
+  output$dias_input <- renderUI({
+    if(input$fileselect == 'input_data'){
+      textInput('dias', 'Diastolic', value = NULL)
+    }
+  })
+  
+  #Creates checkbox based on if User Datafile is selected
+  output$date_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('date1', 'Date')
+    }
+  })
+  
+  output$id_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('id1', 'ID')
+    }
+  })
+  
+  output$wake_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('wake1', 'Wake')
+    }
+  })
+  
+  output$visit_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('visit1', 'Visit')
+    }
+  })
+  
+  output$hr_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('heart1', 'Heart Rate')
+    }
+  })
+  
+  output$pp_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('pp1','Pulse Pressure')
+    }
+  })
+  
+  output$map_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('map1','Mean Arterial Pressure')
+    }
+  })
+  
+  output$rpp_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('rpp1','Rate Pulse Pressure')
+    }
+  })
+  
+  output$dow_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('dow1','Day of the Week')
+    }
+  })
+  
   
   #Creates textInput() based on what column names were selected 
   output$dateinput <- renderUI({
+    req(input$date1)
     if(input$date1 == FALSE){
       return(NULL)
     }else{
@@ -33,6 +104,7 @@ shinyServer(function(input,output) {
     }
   })
   output$idinput <- renderUI({
+    req(input$id1)
     if(input$id1 == FALSE){
       return(NULL)
     }else{
@@ -40,6 +112,7 @@ shinyServer(function(input,output) {
     }
   })
   output$wakeinput <- renderUI({
+    req(input$wake1)
     if(input$wake1 == FALSE){
       return(NULL)
     }else{
@@ -47,6 +120,7 @@ shinyServer(function(input,output) {
     }
   })
   output$visitinput <- renderUI({
+    req(input$visit1)
     if(input$visit1 == FALSE){
       return(NULL)
     }else{
@@ -54,6 +128,7 @@ shinyServer(function(input,output) {
     }
   })
   output$heartinput <- renderUI({
+    req(input$heart1)
     if(input$heart1 == FALSE){
       return(NULL)
     }else{
@@ -61,6 +136,7 @@ shinyServer(function(input,output) {
     }
   })
   output$ppinput <- renderUI ({
+    req(input$pp1)
     if(input$pp1 == FALSE){
       return(NULL)
     }else{
@@ -68,6 +144,7 @@ shinyServer(function(input,output) {
     }
   })
   output$mapinput <- renderUI({
+    req(input$map1)
     if(input$map1 == FALSE){
       return(NULL)
     }else{
@@ -75,6 +152,7 @@ shinyServer(function(input,output) {
     }
   })
   output$rppinput <- renderUI({
+    req(input$rpp1)
     if(input$rpp1 == FALSE){
       return(NULL)
     }else{
@@ -82,6 +160,7 @@ shinyServer(function(input,output) {
     }
   })
   output$dowinput <- renderUI({
+    req(input$dow1)
     if(input$dow1 == FALSE){
       return(NULL)
     }else{
