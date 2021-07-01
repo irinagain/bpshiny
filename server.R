@@ -198,6 +198,24 @@ shinyServer(function(input,output) {
     jhs_proc
   })
   
+  #Reactive Expression if user selects bp_children
+  children_data <- reactive({
+    bp_children <- bp::bp_children
+    children_proc <- process_data(bp_children, 
+                                  sbp = 'sbp', dbp = 'dbp',
+                                  id = 'id', visit = 'visit')
+    children_proc
+  })
+  
+  #Reactive Expression if user selects bp_preg
+  preg_data <- reactive({
+    bp_preg <- bp::bp_preg
+    bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
+                                id = 'ID')
+    bppreg_proc
+  })
+
+  
   #Reactive Expression if user inputs their own data
   input_data <- reactive({
     file <- input$datafile
@@ -236,7 +254,8 @@ shinyServer(function(input,output) {
     #switch() function that will output table according to selected dataset 
   user_data <- reactive ({
     datachoice = input$fileselect
-    switch(datachoice,'ghana_data' = bp::bp_ghana,'hypnos_data' = hypnos_proc, 'jhsproc_data' = jhs_proc, 'input_data' = input_data())
+    switch(datachoice,'ghana_data' = bp::bp_ghana, 'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'bpchildren_data' = children_data(),
+           'bppreg_data' = preg_data(), 'input_data' = input_data())
   })
   
   
