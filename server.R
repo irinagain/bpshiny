@@ -12,8 +12,6 @@
 #library(bp)
 
 
-
-
 shinyServer(function(input,output,session) {
   ######DATA######
   
@@ -112,18 +110,14 @@ shinyServer(function(input,output,session) {
   #Creates textInput() based on what column names were selected 
   output$dateinput <- renderUI({
     req(input$date1)
-    if(input$date1 == FALSE){
-      return(NULL)
-    }else{
-      textInput("date", "Date",value=NULL)
-    }
+    selectInput('date', 'Date', names(dataset()))
   })
   output$idinput <- renderUI({
     req(input$id1)
     if(input$id1 == FALSE){
       return(NULL)
     }else{
-      textInput("id", "ID",value=NULL)
+      selectInput('id', 'ID', names(dataset()))
     }
   })
   output$wakeinput <- renderUI({
@@ -131,7 +125,7 @@ shinyServer(function(input,output,session) {
     if(input$wake1 == FALSE){
       return(NULL)
     }else{
-      textInput("wake", "Wake",value=NULL)
+      selectInput('wake', 'Wake', names(dataset()))
     }
   })
   output$visitinput <- renderUI({
@@ -139,7 +133,7 @@ shinyServer(function(input,output,session) {
     if(input$visit1 == FALSE){
       return(NULL)
     }else{
-      textInput("visit", "Visit",value = NULL)
+      selectInput('visit', 'Visit', names(dataset()))
     }
   })
   output$heartinput <- renderUI({
@@ -147,7 +141,7 @@ shinyServer(function(input,output,session) {
     if(input$heart1 == FALSE){
       return(NULL)
     }else{
-      textInput("hr", "Heart Rate",value = NULL)
+      selectInput('hr', 'Heart Rate', names(dataset()))
     }
   })
   output$ppinput <- renderUI ({
@@ -155,7 +149,7 @@ shinyServer(function(input,output,session) {
     if(input$pp1 == FALSE){
       return(NULL)
     }else{
-      textInput('pp', 'Pulse Pressure',value = NULL)
+      selectInput('pp', 'Pulse Pressure', names(dataset()))
     }
   })
   output$mapinput <- renderUI({
@@ -163,7 +157,7 @@ shinyServer(function(input,output,session) {
     if(input$map1 == FALSE){
       return(NULL)
     }else{
-      textInput("map", "Mean Arterial Pressure",value = NULL)
+      selectInput('map', 'Mean Arterial Pressure', names(dataset()))
     }
   })
   output$rppinput <- renderUI({
@@ -171,7 +165,7 @@ shinyServer(function(input,output,session) {
     if(input$rpp1 == FALSE){
       return(NULL)
     }else{
-      textInput("rpp", "Rate Pulse Pressure",value = NULL)
+      selectInput('rpp', 'Rate Pulse Pressure', names(dataset()))
     }
   })
   output$dowinput <- renderUI({
@@ -179,7 +173,7 @@ shinyServer(function(input,output,session) {
     if(input$dow1 == FALSE){
       return(NULL)
     }else{
-      textInput("dow", "Day of the Week",value = NULL)
+      selectInput('dow', 'Day of the Week', names(dataset()))
     }
   })
   
