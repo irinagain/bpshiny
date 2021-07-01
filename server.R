@@ -241,14 +241,23 @@ shinyServer(function(input,output,session) {
     sys = input$sys
     dias = input$dias
     date = input$date
+    if(input$date1 == FALSE){date = NULL}
     id = input$id
+    if(input$id1 == FALSE){id = NULL}
     wake = input$wake
+    if(input$wake1 == FALSE){wake = NULL}
     visit = input$visit
+    if(input$visit1 == FALSE){visit = NULL}
     hr = input$hr
+    if(input$heart1 == FALSE){hr = NULL}
     pp = input$pp
+    if(input$pp1 == FALSE){pp = NULL}
     map = input$map
+    if(input$map1 == FALSE){map = NULL}
     rpp = input$rpp
+    if(input$rpp1 == FALSE){rpp = NULL}
     dow = input$dow
+    if(input$dow1 == FALSE){dow = NULL}
     
     #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
     if(input$submit == FALSE){
