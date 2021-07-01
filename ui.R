@@ -38,7 +38,7 @@ ui <- fluidPage(
                  uiOutput('rppinput'),
                  uiOutput('dow_checkbox'),
                  uiOutput('dowinput'),
-                 actionButton('submit','Submit')
+                 uiOutput('dataviewer')
                ),
                mainPanel(tableOutput("contents"))
                
