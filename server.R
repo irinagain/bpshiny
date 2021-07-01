@@ -56,7 +56,7 @@ shinyServer(function(input,output,session) {
   #Creates checkbox based on if User Datafile is selected
   output$date_checkbox <- renderUI({
     if(input$fileselect == 'input_data'){
-      checkboxInput('date1', 'Date')
+      checkboxInput('date1', 'Date/Time')
     }
   })
   
