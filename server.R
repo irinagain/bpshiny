@@ -14,7 +14,7 @@
 
 
 
-shinyServer(function(input,output) {
+shinyServer(function(input,output,session) {
   ######DATA######
   
   #Creates fileInput() if User Datafile is selected
@@ -23,20 +23,35 @@ shinyServer(function(input,output) {
       fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv")
     }
   })  
+
+  #Reactive function to read datafile
+  dataset <- reactive({
+    inFile <- input$datafile
+    if(is.null(inFile)){
+      return(NULL)
+    }
+    read.csv(inFile$datapath, header = T)
+  })
+  #Updates selectInput() value 
+  observe({
+    updateSelectInput(session,'sys', choices = names(dataset()))
+    updateSelectInput(session, 'dias', choices = names(dataset()))
+  })
   
   
   #Creates Systolic/Diastolic text boxes if user datafile is selected
   output$sys_input <- renderUI({
     if(input$fileselect == 'input_data'){
-      textInput('sys', 'Systolic', value = NULL)
+      selectInput('sys', 'Systolic', '')
     }
   })
   
   output$dias_input <- renderUI({
     if(input$fileselect == 'input_data'){
-      textInput('dias', 'Diastolic', value = NULL)
+      selectInput('dias', 'Diastolic', '')
     }
   })
+  
   
   #Creates checkbox based on if User Datafile is selected
   output$date_checkbox <- renderUI({
