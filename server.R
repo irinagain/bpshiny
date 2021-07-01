@@ -277,10 +277,23 @@ shinyServer(function(input,output,session) {
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats')){
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'bp_tables', 'cv', 'sv', 'dip_calc')){
       return("none")
     }
+    else if(input$metric %in% c("dip_calc")){
+      return("time")
+    }
   })
+  
+  output_type <- reactive({
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')){
+      return("none")
+    }
+    if(input$metric %in% c("bp_tables")){
+      return("tables")
+    }
+  })
+  
   #specify first parameter and the default values
   
   #add description of first parameter
@@ -291,36 +304,53 @@ shinyServer(function(input,output,session) {
     if(parameter_type == "none"){
       helpText("No parameters need to be specified.")
     }
+    else if(parameter_type == "time"){
+      helpText("Enter the sleep and wake times (24-hour)")
+    }
   })
   
-  #specify second parameter and its default values
-  
-  #add description of second parameter
-  
-  #specify third parameter and its default value
-  
-  #add description on third parameter
+  output$select_parameter <- renderUI({
+    parameter_type = parameter_type()
+    if(parameter_type == "time"){
+        textInput("Sleep Time", "Wake Time", value = "23, 6")
+    }
+  })
   
   #reactive function
-  
-  metric_table <- reactive({
-    parameter_type = parameter_type()
-    data = user_data()
+
+    metric_table <- reactive({
+      parameter_type = parameter_type()
+      output_type = output_type()
+      data = user_data()
     
     #loading bp library and using metric function
-    if(is.null(input$parameter) | parameter_type == "none"){
-      string = paste("bp::", input$metric, "(data)", sep = "")
-    }
-    
-    eval(parse(text = string))
-    
-  })
+      if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
+        string = paste("bp::", input$metric, "(data)", sep = "")
+      }
+      
+      eval(parse(text = string))
+    })
+
+    metric_bp_tables <- reactive({
+      parameter_type = parameter_type()
+      output_type = output_type()
+      data = user_data()
+      if(output_type == "tables"){
+        tables_output = bp::bp_tables(data)
+
+        
+      }
+      tables_output
+    })
   
-  
+
   output$metric <- DT::renderDataTable(metric_table(), extensions = "Buttons",
-                                       options = list(dom = "Btip",
-                                                      buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                      scrollX = TRUE))
+                                      options = list(dom = "Btip",
+                                                    buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                    scrollX = TRUE))
+  
+
+
   ######PLOT######
   
   

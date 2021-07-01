@@ -51,7 +51,11 @@ ui <- fluidPage(
                                                                                'Measures of Center' = 'bp_center', 
                                                                                'Blood Pressure Magnitude (Peak and Trough)' = 'bp_mag',
                                                                                'Blood Pressure Range' = 'bp_range', 
-                                                                               'Aggregated BP Summary Statistics' = 'bp_stats'
+                                                                               'Aggregated BP Summary Statistics' = 'bp_stats', 
+                                                                               'Blood Pressure Tables' = 'bp_tables', 
+                                                                               'Coefficient of Variation (CV)' = 'cv',
+                                                                               'Successive Variation (SV)' = 'sv', 
+                                                                               'Nocturnal Blood Pressure Dipping Calculation' = 'dip_calc'
                                                                                
                )),
                uiOutput("select_parameter"),
