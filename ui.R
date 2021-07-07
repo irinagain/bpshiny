@@ -63,29 +63,26 @@ ui <- fluidPage(
                ),
                mainPanel(DT::dataTableOutput("metric")))
     ),
-    tabPanel("Plots", fluid = T,
-             sidebarLayout(
-               sidebarPanel = sidebarPanel(
-                 
-                uiOutput("input_data_subj"),
-                uiOutput("input_data_group_var"),
-                uiOutput("input_data_wrap_vars"),
-
-                 
-                 #Select Plot Type from Stages 2020 or AHA
-                 radioButtons(inputId = "plotType", label = "Plot Type", choices = c("stages2020", "AHA"), selected = "stages2020"),
-                 
-                 #Further customization can be made if stages 2020 plot type is chosen
-                 conditionalPanel(condition = "input.plotType == 'stages2020'",
-                                  checkboxInput(inputId = "inc.crisis", label = "Include Hypersensitive Crisis?", value = T), #include Crisis category
-                                  checkboxInput(inputId = "inc.low", label = "Include Low Hypotension?", value = T) #include "low" category
-                 ),
-                 
-                 
-               ),
-               #draw the scatter plot
-               mainPanel = mainPanel(plotOutput(outputId = "bp.scatter"),
-                                     textOutput(outputId = "plotName"))
-             ))
+    tabPanel("Plots", fluid = T, 
+      sidebarLayout(
+        sidebarPanel = sidebarPanel(
+        radioButtons("plottype",  "Plot Type",
+                       choices = c(`Scatter Plot` = 'bp_scatter',
+                                   `Histogram` = 'bp_hist'
+                                    )
+                       ),
+        uiOutput("subj_for_scatter_and_hist"),
+        uiOutput("group_var_for_scatter"),
+        uiOutput("wrap_var_for_scatter"),
+        uiOutput("plot_type_for_scatter"),
+        uiOutput("include_crisis_stages2020"),
+        uiOutput("include_low_stages2020")),
+        mainPanel = 
+          mainPanel(plotOutput("plot"),
+                    hr(),
+                    textOutput(outputId = "plotName"))
+        
+      )
+    )
   )
 )
