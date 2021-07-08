@@ -300,16 +300,15 @@ shinyServer(function(input,output,session) {
       return("time")
     }
   })
-  
-  output_type <- reactive({
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')){
-      return("none")
-    }
-    if(input$metric %in% c("bp_tables")){
-      return("tables")
-    }
-  })
-  
+
+  #output_type <- reactive({
+    #if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')){
+      #return("none")
+    #}
+    #if(input$metric %in% c("bp_tables")){
+      #return("tables") 
+    #}
+  #})
   #specify first parameter and the default values
   
   #add description of first parameter
@@ -334,39 +333,65 @@ shinyServer(function(input,output,session) {
   
   #reactive function
 
-    metric_table <- reactive({
-      parameter_type = parameter_type()
-      output_type = output_type()
-      data = user_data()
+
+
+
+    #final_table <- reactive({
+      #if (input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')) {
+       # metric_table()
+      #}
+      #if (input$metric == "bp_tables"){
+       # metric_bp_tables()
+      #}
+    #})  
+    #output$metric <- DT::renderDataTable(final_table(), extensions = "Buttons",
+     #                                options = list(dom = "Btip",
+      #                                              buttons = c("copy", "csv", "excel", "pdf", "print"),
+       #                                             scrollX = TRUE))
+
+    observeEvent(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc'), {
+      metric_table <- reactive({
+        parameter_type = parameter_type()
+        #output_type = output_type()
+        data = user_data()
+        
+        #loading bp library and using metric function
+        if(is.null(input$parameter) | (parameter_type == "none" )){
+          #& output_type == "none"
+          string = paste("bp::", input$metric, "(data)", sep = "")
+        }
+        
+        eval(parse(text = string))
+      })
+      output$metric <- DT::renderDataTable(metric_table(), extensions = "Buttons",
+                                           options = list(dom = "Btip",
+                                                          buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                          scrollX = TRUE))
+    })
     
-    #loading bp library and using metric function
-      if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
-        string = paste("bp::", input$metric, "(data)", sep = "")
+    observeEvent(input$metric == "bp_tables", {
+      metric_bp_tables <- reactive({
+        parameter_type = parameter_type()
+        #output_type = output_type()
+        data = user_data()
+        #if(output_type == "tables"){
+        tables_output = bp::bp_tables(data)
+        #}
+        # for (i in sequence(length(tables_output))){
+        #   final_output <- as.data.frame(tables_output[i])
+        # }
+        # final_output
+        tables_output
+      })
+      # bp_tables_output = metric_bp_tables()
+      for (i in sequence(16)){
+        output$metric <- DT::renderDataTable(as.data.frame(metric_bp_tables())[i], extensions = "Buttons",
+                                             options = list(dom = "Btip",
+                                                            buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                            scrollX = TRUE))
       }
       
-      eval(parse(text = string))
     })
-
-    metric_bp_tables <- reactive({
-      parameter_type = parameter_type()
-      output_type = output_type()
-      data = user_data()
-      if(output_type == "tables"){
-        tables_output = bp::bp_tables(data)
-
-        
-      }
-      tables_output
-    })
-  
-
-  output$metric <- DT::renderDataTable(metric_table(), extensions = "Buttons",
-                                      options = list(dom = "Btip",
-                                                    buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                    scrollX = TRUE))
-  
-
-
   ######PLOT######
   
   
