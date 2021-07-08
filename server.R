@@ -333,34 +333,18 @@ shinyServer(function(input,output,session) {
   
   #reactive function
 
-
-
-
-    #final_table <- reactive({
-      #if (input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')) {
-       # metric_table()
-      #}
-      #if (input$metric == "bp_tables"){
-       # metric_bp_tables()
-      #}
-    #})  
-    #output$metric <- DT::renderDataTable(final_table(), extensions = "Buttons",
-     #                                options = list(dom = "Btip",
-      #                                              buttons = c("copy", "csv", "excel", "pdf", "print"),
-       #                                             scrollX = TRUE))
-
     observeEvent(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc'), {
       metric_table <- reactive({
         parameter_type = parameter_type()
         #output_type = output_type()
         data = user_data()
-        
+
         #loading bp library and using metric function
         if(is.null(input$parameter) | (parameter_type == "none" )){
           #& output_type == "none"
           string = paste("bp::", input$metric, "(data)", sep = "")
         }
-        
+
         eval(parse(text = string))
       })
       output$metric <- DT::renderDataTable(metric_table(), extensions = "Buttons",
@@ -381,16 +365,16 @@ shinyServer(function(input,output,session) {
         #   final_output <- as.data.frame(tables_output[i])
         # }
         # final_output
-        tables_output
+        tables_output$SBP_Counts_by_Stage
       })
       # bp_tables_output = metric_bp_tables()
-      for (i in sequence(16)){
-        output$metric <- DT::renderDataTable(as.data.frame(metric_bp_tables())[i], extensions = "Buttons",
+      # for (i in sequence(16)){
+      output$metric <- DT::renderDataTable(metric_bp_tables(), extensions = "Buttons",
                                              options = list(dom = "Btip",
                                                             buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                             scrollX = TRUE))
-      }
-      
+      # }
+
     })
   ######PLOT######
   
