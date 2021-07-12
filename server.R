@@ -348,44 +348,311 @@ shinyServer(function(input,output,session) {
         eval(parse(text = string))
       })
 
-      output$metric <- DT::renderDataTable(metric_table(), extensions = "Buttons",
+      output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
                                            options = list(dom = "Btip",
                                                           buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                           scrollX = TRUE))
-      
-    })
-    
-    #outputting several tables (when 'bp_tables' is chosen as the metric)
-    observeEvent((req(input$metric == "bp_tables")), {
-        metric_bp_tables <- reactive({
-        #parameter_type = parameter_type()
-        #output_type = output_type()
-          data = user_data()
-        #if(output_type == "tables"){
-          tables_output = bp::bp_tables(data)
-        #}
-        # for (i in sequence(length(tables_output))){
-        #   final_output <- as.data.frame(tables_output[i])
-        # }
-        # final_output
-        tables_output$SBP_Counts_by_Stage
-        })
-      
 
-      # bp_tables_output = metric_bp_tables()
-      # for (i in sequence(16)){
-      output$metric <- DT::renderDataTable(metric_bp_tables(), extensions = "Buttons",
-                                              options = list(dom = "Btip",
-                                                             buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                             scrollX = TRUE))
-      # }
     })
+
+    # #outputting several tables (when 'bp_tables' is chosen as the metric)
+    # observeEvent((req(input$metric == "bp_tables")), {
+    #     metric_bp_tables <- reactive({
+    #     #parameter_type = parameter_type()
+    #     #output_type = output_type()
+    #       data = user_data()
+    #     #if(output_type == "tables"){
+    #       tables_output = bp::bp_tables(data)
+    #     #}
+    #     # for (i in sequence(length(tables_output))){
+    #     #   final_output <- as.data.frame(tables_output[i])
+    #     # }
+    #     # final_output
+    #       tables_output$SBP_Counts_by_Stage
+    #     })
+    # 
+    # 
+    #   # bp_tables_output = metric_bp_tables()
+    #   # for (i in sequence(16)){
+    #   output$metric_bp_tables <- DT::renderDataTable(metric_bp_tables(), extensions = "Buttons",
+    #                                           options = list(dom = "Btip",
+    #                                                          buttons = c("copy", "csv", "excel", "pdf", "print"),
+    #                                                          scrollX = TRUE))
+    #   # }
+    # })
     # output$metric <- DT::renderDataTable(final_table, extensions = "Buttons",
     #                                      options = list(dom = "Btip",
     #                                                     buttons = c("copy", "csv", "excel", "pdf", "print"),
     #                                                     scrollX = TRUE))
-  ######PLOT######
   
+  
+  metric_table <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
+      string = paste("bp::", input$metric, "(data)", sep = "")
+    }
+    eval(parse(text = string))
+  })
+  output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
+                                       options = list(dom = "Btip",
+                                                      buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                      scrollX = TRUE))
+  metric_bp_table_1 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$SBP_Counts_by_Stage
+  })
+  output$text_1 <- renderText({"Table 1. SBP Counts by Stage"})
+  
+  metric_bp_table_2 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$DBP_Counts_by_Stage
+  })
+  output$text_2 <- renderText({"\n Table 2. DBP Counts by Stage"})
+  
+  metric_bp_table_3 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$CLASS_Counts
+  })
+  output$text_3 <- renderText({"\n Table 3. CLASS Counts"})
+  
+  metric_bp_table_4 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$All_BP_Stage_Combinations
+  })
+  output$text_4 <- renderText({"\n Table 4. All BP Stage Combinations"})
+  
+  metric_bp_table_5 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$BP_contingency_count
+  })
+  output$text_5 <- renderText({"\n Table 5. BP_contingency_count"})
+  
+  metric_bp_table_6 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$BP_contingency_percent
+  })
+  output$text_6 <- renderText({"\n Table 6. BP_contingency_percent"})
+  
+  metric_bp_table_7 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$SBP_by_Day_of_Week
+  })
+  output$text_7 <- renderText({"\n Table 7. SBP_by_Day_of_Week"})
+  
+  metric_bp_table_8 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$DBP_by_Day_of_Week
+  })
+  output$text_8 <- renderText({"\n Table 8. DBP_by_Day_of_Week"})
+  
+  metric_bp_table_9 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$CLASS_Day_of_Week
+  })
+  output$text_9 <- renderText({"\n Table 9. CLASS_Day_of_Week"})
+  
+  metric_bp_table_10 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$SBP_by_Time_of_Day
+  })
+  output$text_10 <- renderText({"\n Table 10. SBP_by_Time_of_Day"})
+  
+  metric_bp_table_11 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$DBP_by_Time_of_Day
+  })
+  output$text_11 <- renderText({"\n Table 11. DBP_by_Time_of_Day"})
+  
+  metric_bp_table_12 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$CLASS_Time_of_Day
+  })
+  output$text_12 <- renderText({"\n Table 12. CLASS_Time_of_Day"})
+  
+  metric_bp_table_13 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$SBP_by_WAKE_status
+  })
+  output$text_13 <- renderText({"\n Table 13. SBP_by_WAKE_status"})
+  
+  metric_bp_table_14 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$DBP_by_WAKE_status
+  })
+  output$text_14 <- renderText({"\n Table 14. DBP_by_WAKE_status"})
+  
+  metric_bp_table_15 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$SBP_by_WAKE_perc
+  })
+  output$text_15 <- renderText({"\n Table 15. SBP_by_WAKE_perc"})
+  
+  metric_bp_table_16 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
+      tables_output = bp::bp_tables(data)
+    }
+    tables_output$DBP_by_WAKE_perc
+  })
+  output$text_16 <- renderText({"\n Table 16. DBP_by_WAKE_perc"})
+  
+  
+  output$metric_bp_table_1 <- DT::renderDataTable(metric_bp_table_1(), extensions = "Buttons",
+                                                 options = list(dom = "Btip",
+                                                                buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                scrollX = TRUE))
+  output$metric_bp_table_2 <- DT::renderDataTable(metric_bp_table_2(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_3 <- DT::renderDataTable(metric_bp_table_3(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_4 <- DT::renderDataTable(metric_bp_table_4(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_5 <- DT::renderDataTable(metric_bp_table_5(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_6 <- DT::renderDataTable(metric_bp_table_6(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_7 <- DT::renderDataTable(metric_bp_table_7(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_8 <- DT::renderDataTable(metric_bp_table_8(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_9 <- DT::renderDataTable(metric_bp_table_9(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_10 <- DT::renderDataTable(metric_bp_table_10(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_11 <- DT::renderDataTable(metric_bp_table_11(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_12 <- DT::renderDataTable(metric_bp_table_12(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_13 <- DT::renderDataTable(metric_bp_table_13(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_14 <- DT::renderDataTable(metric_bp_table_14(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_15 <- DT::renderDataTable(metric_bp_table_15(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  output$metric_bp_table_16 <- DT::renderDataTable(metric_bp_table_16(), extensions = "Buttons",
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
+  
+  
+  output$one_table <- reactive({
+    input$metric %in% c('arv', 'bp_center', 'bp_mag', 'bp_range', 'bp_stats', 'cv', 'sv', 'dip_calc')
+  })
+  outputOptions(output, 'one_table', suspendWhenHidden = FALSE)
+  
+  output$several_tables <- reactive({
+    input$metric == "bp_tables"
+  })
+  outputOptions(output, 'several_tables', suspendWhenHidden = FALSE)
+
+  ######PLOT######
   
   
   output$input_data_subj <- renderUI({

@@ -65,8 +65,30 @@ ui <- fluidPage(
                uiOutput("select_third_parameter"),
                uiOutput("third_parameter_helptext"),
                ),
-               mainPanel(DT::dataTableOutput("metric")))
-    ),
+               mainPanel(conditionalPanel(condition = "output.one_table",
+                                          DT::dataTableOutput("metric_table")),
+                         conditionalPanel(condition = "output.several_tables",
+                                          textOutput("text_1"), DT::dataTableOutput("metric_bp_table_1"),
+                                          textOutput("text_2"), DT::dataTableOutput("metric_bp_table_2"), 
+                                          textOutput("text_3"), DT::dataTableOutput("metric_bp_table_3"),
+                                          textOutput("text_4"), DT::dataTableOutput("metric_bp_table_4"),
+                                          textOutput("text_5"), DT::dataTableOutput("metric_bp_table_5"),
+                                          textOutput("text_6"), DT::dataTableOutput("metric_bp_table_6"),
+                                          textOutput("text_7"), DT::dataTableOutput("metric_bp_table_7"),
+                                          textOutput("text_8"), DT::dataTableOutput("metric_bp_table_8"),
+                                          textOutput("text_9"), DT::dataTableOutput("metric_bp_table_9"),
+                                          textOutput("text_10"), DT::dataTableOutput("metric_bp_table_10"),
+                                          textOutput("text_11"), DT::dataTableOutput("metric_bp_table_11"),
+                                          textOutput("text_12"), DT::dataTableOutput("metric_bp_table_12"),
+                                          textOutput("text_13"), DT::dataTableOutput("metric_bp_table_13"),
+                                          textOutput("text_14"), DT::dataTableOutput("metric_bp_table_14"),
+                                          textOutput("text_15"), DT::dataTableOutput("metric_bp_table_15"),
+                                          textOutput("text_16"), DT::dataTableOutput("metric_bp_table_16")
+                                          )
+                         )
+               
+               #mainPanel(DT::dataTableOutput("metric")))
+             )),
     tabPanel("Plots", fluid = T, 
       sidebarLayout(
         sidebarPanel = sidebarPanel(
