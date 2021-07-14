@@ -60,14 +60,14 @@ ui <- fluidPage(
                )),
                uiOutput("select_parameter"),
                uiOutput("help_text"),
-               uiOutput("select_second_parameter"),
-               uiOutput("second_parameter_helptext"),
-               uiOutput("select_third_parameter"),
-               uiOutput("third_parameter_helptext"),
+               # uiOutput("select_second_parameter"),
+               # uiOutput("second_parameter_helptext"),
+               # uiOutput("select_third_parameter"),
+               # uiOutput("third_parameter_helptext"),
                ),
                mainPanel(conditionalPanel(condition = "output.one_table",
                                           DT::dataTableOutput("metric_table")),
-                         conditionalPanel(condition = "output.several_tables",
+                         conditionalPanel(condition = "output.bp_tables_tables",
                                           textOutput("text_1"), DT::dataTableOutput("metric_bp_table_1"),
                                           textOutput("text_2"), DT::dataTableOutput("metric_bp_table_2"), 
                                           textOutput("text_3"), DT::dataTableOutput("metric_bp_table_3"),
@@ -84,7 +84,10 @@ ui <- fluidPage(
                                           textOutput("text_14"), DT::dataTableOutput("metric_bp_table_14"),
                                           textOutput("text_15"), DT::dataTableOutput("metric_bp_table_15"),
                                           textOutput("text_16"), DT::dataTableOutput("metric_bp_table_16")
-                                          )
+                                          ), 
+                         conditionalPanel(condition = "output.dip_calc_tables", 
+                                          DT::dataTableOutput("metric_dip_calc_1"), 
+                                          DT::dataTableOutput("metric_dip_calc_2"))
                          )
                
                #mainPanel(DT::dataTableOutput("metric")))

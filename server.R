@@ -289,28 +289,41 @@ shinyServer(function(input,output,session) {
   })
   
   
-  ######METRICS######
+  
+  ################################################################################################################################  
+  ############################# METRIC SECTION ######################################################
+  
+  
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'bp_tables', 'cv', 'sv', 'dip_calc')){
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_tables", "cv", "sv")){
       return("none")
     }
-    else if(input$metric %in% c("dip_calc")){
-      return("time")
+    if(input$metric %in% c("dip_calc")){
+      return("dip_calc")
     }
   })
 
   output_type <- reactive({
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')){
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")){
       return("none")
     }
-    if(input$metric %in% c("bp_tables")){
+    if(input$metric == "bp_tables"){
       return("tables") 
     }
+    if(input$metric == "dip_calc"){
+      return("dip_calc")
+    }
+    
   })
   #specify first parameter and the default values
-  
+  output$select_parameter <- renderUI({
+    if(input$metric == "dip_calc"){
+      textInput("parameter", "Specify Parameter", value = ".10, .20")
+    }
+  })
+    
   #add description of first parameter
   
   output$help_text <- renderUI ({
@@ -319,41 +332,42 @@ shinyServer(function(input,output,session) {
     if(parameter_type == "none"){
       helpText("No parameters need to be specified.")
     }
-    else if(parameter_type == "time"){
-      helpText("Enter the sleep and wake times (24-hour)")
+    else if(parameter_type == "dip_calc"){
+      helpText("Enter the dip and extreme thresholds separated by comma.")
     }
   })
   
-  output$select_parameter <- renderUI({
-    parameter_type = parameter_type()
-    if(parameter_type == "time"){
-        textInput("Sleep Time", "Wake Time", value = "23, 6")
-    }
-  })
+  # output$select_parameter <- renderUI({
+  #   parameter_type = parameter_type()
+  #   if(parameter_type == "dip_calc"){
+  #       textInput("Dip Threshold", value = "0.10")
+  #       textInput("Extreme Threshold", value= "0.20")
+  #   }
+  # })
   
   #reactive and output functions based on the user's choice
     # outputting one table
-    observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", 'bp_stats', 'cv', 'sv', 'dip_calc')), {
-      metric_table <- reactive({
-        parameter_type = parameter_type()
-        output_type = output_type()
-        data = user_data()
-
-        #loading bp library and using metric function
-        if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
-          #
-          string = paste("bp::", input$metric, "(data)", sep = "")
-        }
-
-        eval(parse(text = string))
-      })
-
-      output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
-                                           options = list(dom = "Btip",
-                                                          buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                          scrollX = TRUE))
-
-    })
+    # observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stages", 'bp_stats', 'cv', 'sv', 'dip_calc')), {
+    #   metric_table <- reactive({
+    #     parameter_type = parameter_type()
+    #     output_type = output_type()
+    #     data = user_data()
+    # 
+    #     #loading bp library and using metric function
+    #     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
+    #       #
+    #       string = paste("bp::", input$metric, "(data)", sep = "")
+    #     }
+    # 
+    #     eval(parse(text = string))
+    #   })
+    # 
+    #   output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
+    #                                        options = list(dom = "Btip",
+    #                                                       buttons = c("copy", "csv", "excel", "pdf", "print"),
+    #                                                       scrollX = TRUE))
+    # 
+    # })
 
     # #outputting several tables (when 'bp_tables' is chosen as the metric)
     # observeEvent((req(input$metric == "bp_tables")), {
@@ -641,17 +655,70 @@ shinyServer(function(input,output,session) {
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                                  scrollX = TRUE))
   
+  ## dip_calc
+  metric_dip_calc_1 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if (is.null(input$parameter)) {
+      validate(
+        need(!is.null(input$parameter), "Please wait - Rendering")
+      )
+    } else if (grepl(',', input$parameter) & !grepl("\\(", input$parameter)) {
+      if (length(strsplit(input$parameter, split = ",")[[1]]) != 2) {
+        validate (
+          need(parameter_type == "dip_calc", "Please wait - Rendering")
+        )
+      } else {
+        validate(
+          need(parameter_type == "dip_calc", "Please wait - Rendering")
+        )
+      }
+    }
+    if(is.null(input$parameter) | (parameter_type == "dip_calc" & output_type == "dip_calc")){
+      dip_calc_output = bp::dip_calc(data, c(input$parameter))
+    }
+    return(data.frame(dip_calc_output[1]))
+  })
+  
+  metric_dip_calc_2 <- reactive({
+    parameter_type = parameter_type()
+    data = user_data()
+    output_type = output_type()
+    if(is.null(input$parameter) | (parameter_type == "dip_calc" & output_type == "dip_calc")){
+      dip_calc_output = bp::dip_calc(data, c(input$parameter))
+    }
+    return(data.frame(dip_calc_output[2]))
+  })
+  
+  output$metric_dip_calc_1 <- DT::renderDataTable(metric_dip_calc_1(), extensions = "Buttons",
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
+  output$metric_dip_calc_2 <- DT::renderDataTable(metric_dip_calc_2(), extensions = "Buttons",
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   
   output$one_table <- reactive({
-    input$metric %in% c('arv', 'bp_center', 'bp_mag', 'bp_range', 'bp_stats', 'cv', 'sv', 'dip_calc')
+    input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
   })
   outputOptions(output, 'one_table', suspendWhenHidden = FALSE)
   
-  output$several_tables <- reactive({
+  output$bp_tables_tables <- reactive({
     input$metric == "bp_tables"
   })
-  outputOptions(output, 'several_tables', suspendWhenHidden = FALSE)
+  outputOptions(output, 'bp_tables_tables', suspendWhenHidden = FALSE)
 
+  output$dip_calc_tables <- reactive({
+    input$metric == "dip_calc"
+  })
+  outputOptions(output, 'dip_calc_tables', suspendWhenHidden = FALSE)
+  
+  ################################################################################################################################
+  ################################################################################################################################
+  
+  
   ######PLOT######
   
   
