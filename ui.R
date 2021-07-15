@@ -16,8 +16,8 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectInput('fileselect', label = 'Select Dataset',
-                             choices = list('','bp_ghana' = 'ghana_data', 'bp_hypnos' = 'hypnos_data','bp_jhs' = 'jhsproc_data',
-                                            'bp_children' = 'bpchildren_data','bp_preg' = 'bppreg_data', 'User Datafile' = 'input_data' )),
+                             choices = list('', 'User Datafile' = 'input_data', 'bp_ghana' = 'ghana_data', 'bp_hypnos' = 'hypnos_data','bp_jhs' = 'jhsproc_data',
+                                            'bp_children' = 'bpchildren_data','bp_preg' = 'bppreg_data')),
                  uiOutput('file_input'),
                  uiOutput('sys_input'),
                  uiOutput('dias_input'),
