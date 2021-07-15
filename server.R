@@ -328,7 +328,7 @@ shinyServer(function(input,output,session) {
       return("dip_calc")
     }
   })
-
+  
   output_type <- reactive({
     if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")){
       return("none")
@@ -342,12 +342,18 @@ shinyServer(function(input,output,session) {
     
   })
   #specify first parameter and the default values
-  output$select_parameter <- renderUI({
+  output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
-      textInput("parameter", "Specify Parameter", value = ".10, .20")
+      numericInput("parameter", "Specify dip_thresh Parameter",value = 0.1, step = 0.05)
     }
   })
-    
+  
+  output$select_ext_parameter <- renderUI({
+    if(input$metric == "dip_calc"){
+      numericInput("parameter2", "Specify extreme_thresh Parameter",value = 0.2, step = 0.05)
+    }
+  })
+  
   #add description of first parameter
   
   output$help_text <- renderUI ({
@@ -370,58 +376,58 @@ shinyServer(function(input,output,session) {
   # })
   
   #reactive and output functions based on the user's choice
-    # outputting one table
-    # observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stages", 'bp_stats', 'cv', 'sv', 'dip_calc')), {
-    #   metric_table <- reactive({
-    #     parameter_type = parameter_type()
-    #     output_type = output_type()
-    #     data = user_data()
-    # 
-    #     #loading bp library and using metric function
-    #     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
-    #       #
-    #       string = paste("bp::", input$metric, "(data)", sep = "")
-    #     }
-    # 
-    #     eval(parse(text = string))
-    #   })
-    # 
-    #   output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
-    #                                        options = list(dom = "Btip",
-    #                                                       buttons = c("copy", "csv", "excel", "pdf", "print"),
-    #                                                       scrollX = TRUE))
-    # 
-    # })
-
-    # #outputting several tables (when 'bp_tables' is chosen as the metric)
-    # observeEvent((req(input$metric == "bp_tables")), {
-    #     metric_bp_tables <- reactive({
-    #     #parameter_type = parameter_type()
-    #     #output_type = output_type()
-    #       data = user_data()
-    #     #if(output_type == "tables"){
-    #       tables_output = bp::bp_tables(data)
-    #     #}
-    #     # for (i in sequence(length(tables_output))){
-    #     #   final_output <- as.data.frame(tables_output[i])
-    #     # }
-    #     # final_output
-    #       tables_output$SBP_Counts_by_Stage
-    #     })
-    # 
-    # 
-    #   # bp_tables_output = metric_bp_tables()
-    #   # for (i in sequence(16)){
-    #   output$metric_bp_tables <- DT::renderDataTable(metric_bp_tables(), extensions = "Buttons",
-    #                                           options = list(dom = "Btip",
-    #                                                          buttons = c("copy", "csv", "excel", "pdf", "print"),
-    #                                                          scrollX = TRUE))
-    #   # }
-    # })
-    # output$metric <- DT::renderDataTable(final_table, extensions = "Buttons",
-    #                                      options = list(dom = "Btip",
-    #                                                     buttons = c("copy", "csv", "excel", "pdf", "print"),
-    #                                                     scrollX = TRUE))
+  # outputting one table
+  # observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stages", 'bp_stats', 'cv', 'sv', 'dip_calc')), {
+  #   metric_table <- reactive({
+  #     parameter_type = parameter_type()
+  #     output_type = output_type()
+  #     data = user_data()
+  # 
+  #     #loading bp library and using metric function
+  #     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
+  #       #
+  #       string = paste("bp::", input$metric, "(data)", sep = "")
+  #     }
+  # 
+  #     eval(parse(text = string))
+  #   })
+  # 
+  #   output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
+  #                                        options = list(dom = "Btip",
+  #                                                       buttons = c("copy", "csv", "excel", "pdf", "print"),
+  #                                                       scrollX = TRUE))
+  # 
+  # })
+  
+  # #outputting several tables (when 'bp_tables' is chosen as the metric)
+  # observeEvent((req(input$metric == "bp_tables")), {
+  #     metric_bp_tables <- reactive({
+  #     #parameter_type = parameter_type()
+  #     #output_type = output_type()
+  #       data = user_data()
+  #     #if(output_type == "tables"){
+  #       tables_output = bp::bp_tables(data)
+  #     #}
+  #     # for (i in sequence(length(tables_output))){
+  #     #   final_output <- as.data.frame(tables_output[i])
+  #     # }
+  #     # final_output
+  #       tables_output$SBP_Counts_by_Stage
+  #     })
+  # 
+  # 
+  #   # bp_tables_output = metric_bp_tables()
+  #   # for (i in sequence(16)){
+  #   output$metric_bp_tables <- DT::renderDataTable(metric_bp_tables(), extensions = "Buttons",
+  #                                           options = list(dom = "Btip",
+  #                                                          buttons = c("copy", "csv", "excel", "pdf", "print"),
+  #                                                          scrollX = TRUE))
+  #   # }
+  # })
+  # output$metric <- DT::renderDataTable(final_table, extensions = "Buttons",
+  #                                      options = list(dom = "Btip",
+  #                                                     buttons = c("copy", "csv", "excel", "pdf", "print"),
+  #                                                     scrollX = TRUE))
   
   
   metric_table <- reactive({
@@ -434,9 +440,9 @@ shinyServer(function(input,output,session) {
     eval(parse(text = string))
   })
   output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
-                                       options = list(dom = "Btip",
-                                                      buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                      scrollX = TRUE))
+                                             options = list(dom = "Btip",
+                                                            buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                            scrollX = TRUE))
   metric_bp_table_1 <- reactive({
     parameter_type = parameter_type()
     data = user_data()
@@ -615,9 +621,9 @@ shinyServer(function(input,output,session) {
   
   
   output$metric_bp_table_1 <- DT::renderDataTable(metric_bp_table_1(), extensions = "Buttons",
-                                                 options = list(dom = "Btip",
-                                                                buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                scrollX = TRUE))
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
   output$metric_bp_table_2 <- DT::renderDataTable(metric_bp_table_2(), extensions = "Buttons",
                                                   options = list(dom = "Btip",
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
@@ -651,33 +657,33 @@ shinyServer(function(input,output,session) {
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                                  scrollX = TRUE))
   output$metric_bp_table_10 <- DT::renderDataTable(metric_bp_table_10(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   output$metric_bp_table_11 <- DT::renderDataTable(metric_bp_table_11(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   output$metric_bp_table_12 <- DT::renderDataTable(metric_bp_table_12(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   output$metric_bp_table_13 <- DT::renderDataTable(metric_bp_table_13(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   output$metric_bp_table_14 <- DT::renderDataTable(metric_bp_table_14(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   output$metric_bp_table_15 <- DT::renderDataTable(metric_bp_table_15(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   output$metric_bp_table_16 <- DT::renderDataTable(metric_bp_table_16(), extensions = "Buttons",
-                                                  options = list(dom = "Btip",
-                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                 scrollX = TRUE))
+                                                   options = list(dom = "Btip",
+                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                  scrollX = TRUE))
   
   ## dip_calc
   metric_dip_calc_1 <- reactive({
@@ -700,7 +706,7 @@ shinyServer(function(input,output,session) {
       }
     }
     if(is.null(input$parameter) | (parameter_type == "dip_calc" & output_type == "dip_calc")){
-      dip_calc_output = bp::dip_calc(data, c(input$parameter))
+      dip_calc_output = bp::dip_calc(data, dip_thresh = input$parameter, extreme_thresh = input$parameter2)
     }
     return(data.frame(dip_calc_output[1]))
   })
@@ -710,19 +716,19 @@ shinyServer(function(input,output,session) {
     data = user_data()
     output_type = output_type()
     if(is.null(input$parameter) | (parameter_type == "dip_calc" & output_type == "dip_calc")){
-      dip_calc_output = bp::dip_calc(data, c(input$parameter))
+      dip_calc_output = bp::dip_calc(data, dip_thresh = input$parameter, extreme_thresh = input$parameter2)
     }
     return(data.frame(dip_calc_output[2]))
   })
   
   output$metric_dip_calc_1 <- DT::renderDataTable(metric_dip_calc_1(), extensions = "Buttons",
-                                                   options = list(dom = "Btip",
-                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                  scrollX = TRUE))
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
   output$metric_dip_calc_2 <- DT::renderDataTable(metric_dip_calc_2(), extensions = "Buttons",
-                                                   options = list(dom = "Btip",
-                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
-                                                                  scrollX = TRUE))
+                                                  options = list(dom = "Btip",
+                                                                 buttons = c("copy", "csv", "excel", "pdf", "print"),
+                                                                 scrollX = TRUE))
   
   output$one_table <- reactive({
     input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
@@ -733,7 +739,7 @@ shinyServer(function(input,output,session) {
     input$metric == "bp_tables"
   })
   outputOptions(output, 'bp_tables_tables', suspendWhenHidden = FALSE)
-
+  
   output$dip_calc_tables <- reactive({
     input$metric == "dip_calc"
   })

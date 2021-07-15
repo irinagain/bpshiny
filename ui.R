@@ -58,7 +58,8 @@ ui <- fluidPage(
                                                                                'Nocturnal Blood Pressure Dipping Calculation' = 'dip_calc'
                                                                                
                )),
-               uiOutput("select_parameter"),
+               uiOutput("select_dip_parameter"),
+               uiOutput('select_ext_parameter'),
                uiOutput("help_text"),
                # uiOutput("select_second_parameter"),
                # uiOutput("second_parameter_helptext"),
