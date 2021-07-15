@@ -188,7 +188,7 @@ shinyServer(function(input,output,session) {
                                 bp_type = 'abpm',
                                 sbp = "syst",
                                 dbp = "DIAST",
-                                date_time = "date.time",
+                                date_time = "DATE.TIME",
                                 id = "id",
                                 wake = "wake",
                                 visit = "visit",
@@ -226,9 +226,9 @@ shinyServer(function(input,output,session) {
                                   sbp = 'sbp', dbp = 'dbp',
                                   id = 'id', visit = 'visit')
     if(input$dataview == 'proc_data'){
-      hypnos_proc
+      children_proc
     }else{
-      bp_hypnos
+      bp_children
     }
   })
   
