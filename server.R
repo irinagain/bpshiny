@@ -178,9 +178,7 @@ shinyServer(function(input,output,session) {
   })
   
   output$dataviewer <- renderUI(
-    if(input$fileselect == 'input_data'){
-      radioButtons('dataview', label = 'View Data', choices = c('Orginial Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
-    }
+    radioButtons('dataview', label = 'View Data', choices = c('Orginial Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
   )
   
    #Reactive Expression if users selects hypnos_data
@@ -199,7 +197,11 @@ shinyServer(function(input,output,session) {
                                 rpp = "rpp",
                                 pp = "pp",
                                 ToD_int = c(5, 13, 18, 23))
-    hypnos_proc
+    if(input$dataview == 'proc_data'){
+      hypnos_proc
+    }else{
+      bp_hypnos
+    }
   })
 
   #Reactive Expression if users selects jhs_data
@@ -210,7 +212,11 @@ shinyServer(function(input,output,session) {
                              dbp = "Dias.mmHg.",
                              date_time = "DateTime",
                              hr = "pulse.bpm.")
-    jhs_proc
+    if(input$dataview == 'proc_data'){
+      jhs_proc
+    }else{
+      bp_jhs
+    }
   })
   
   #Reactive Expression if user selects bp_children
@@ -219,7 +225,11 @@ shinyServer(function(input,output,session) {
     children_proc <- process_data(bp_children, 
                                   sbp = 'sbp', dbp = 'dbp',
                                   id = 'id', visit = 'visit')
-    children_proc
+    if(input$dataview == 'proc_data'){
+      hypnos_proc
+    }else{
+      bp_hypnos
+    }
   })
   
   #Reactive Expression if user selects bp_preg
@@ -227,7 +237,21 @@ shinyServer(function(input,output,session) {
     bp_preg <- bp::bp_preg
     bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
                                 id = 'ID')
-    bppreg_proc
+    if(input$dataview == 'proc_data'){
+      bppreg_proc
+    }else{
+      bp_preg
+    }
+  })
+  
+  ghana_data <- reactive({
+    bp_ghana <- bp::bp_ghana
+    bpghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+    if(input$dataview == 'proc_data'){
+      bpghana_proc
+    }else{
+      bp_ghana
+    }
   })
 
   
@@ -279,7 +303,7 @@ shinyServer(function(input,output,session) {
     #switch() function that will output table according to selected dataset 
   user_data <- reactive ({
     datachoice = input$fileselect
-    switch(datachoice,'ghana_data' = bp::bp_ghana, 'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'bpchildren_data' = children_data(),
+    switch(datachoice,'ghana_data' = ghana_data(), 'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'bpchildren_data' = children_data(),
            'bppreg_data' = preg_data(), 'input_data' = input_data())
   })
   
