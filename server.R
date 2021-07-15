@@ -107,7 +107,7 @@ shinyServer(function(input,output,session) {
   })
   
   
-  #Creates textInput() based on what column names were selected 
+  #Creates dropdown based on what column names were selected 
   output$dateinput <- renderUI({
     req(input$date1)
     selectInput('date', 'Date', names(dataset()))
@@ -176,7 +176,21 @@ shinyServer(function(input,output,session) {
       selectInput('dow', 'Day of the Week', names(dataset()))
     }
   })
+  #Toggle for data_screen argument 
+  output$data_screen_arg <- renderUI({
+    if(input$fileselect %in% c('input_data', 'ghana_data', 'hypnos_data', 'jhsproc_data', 'bpchildren_data', 'bppreg_data')){
+      selectInput('datascreen_arg', 'Screen for Extreme Values', c('TRUE' = 't', 'FALSE' = 'f'))
+    }
+  })
+  datascreen_tf_value <- reactive ({
+    if(input$datascreen_arg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
+    }
+  })
   
+  #Toggle between original and processed data
   output$dataviewer <- renderUI(
     radioButtons('dataview', label = 'View Data', choices = c('Orginial Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
   )
@@ -196,14 +210,15 @@ shinyServer(function(input,output,session) {
                                 map = "map",
                                 rpp = "rpp",
                                 pp = "pp",
-                                ToD_int = c(5, 13, 18, 23))
+                                ToD_int = c(5, 13, 18, 23),
+                                data_screen = datascreen_tf_value())
     if(input$dataview == 'proc_data'){
       hypnos_proc
     }else{
       bp_hypnos
     }
   })
-  
+
   #Reactive Expression if users selects jhs_data
   jhs_data <- reactive ({
     bp_jhs <- bp::bp_jhs
@@ -211,7 +226,7 @@ shinyServer(function(input,output,session) {
                              sbp = "Sys.mmHg.",
                              dbp = "Dias.mmHg.",
                              date_time = "DateTime",
-                             hr = "pulse.bpm.")
+                             hr = "pulse.bpm.", data_screen = datascreen_tf_value())
     if(input$dataview == 'proc_data'){
       jhs_proc
     }else{
@@ -224,7 +239,8 @@ shinyServer(function(input,output,session) {
     bp_children <- bp::bp_children
     children_proc <- process_data(bp_children, 
                                   sbp = 'sbp', dbp = 'dbp',
-                                  id = 'id', visit = 'visit')
+                                  id = 'id', visit = 'visit',
+                                  data_screen = datascreen_tf_value())
     if(input$dataview == 'proc_data'){
       children_proc
     }else{
@@ -236,7 +252,7 @@ shinyServer(function(input,output,session) {
   preg_data <- reactive({
     bp_preg <- bp::bp_preg
     bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
-                                id = 'ID')
+                                id = 'ID', data_screen = datascreen_tf_value())
     if(input$dataview == 'proc_data'){
       bppreg_proc
     }else{
@@ -246,7 +262,7 @@ shinyServer(function(input,output,session) {
   
   ghana_data <- reactive({
     bp_ghana <- bp::bp_ghana
-    bpghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+    bpghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID', data_screen = datascreen_tf_value())
     if(input$dataview == 'proc_data'){
       bpghana_proc
     }else{
@@ -292,7 +308,7 @@ shinyServer(function(input,output,session) {
     #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
     if(input$dataview == 'proc_data'){
       bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
+                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_tf_value())
       bpdata_final
     }else{
       bpdata
