@@ -192,7 +192,7 @@ shinyServer(function(input,output,session) {
   
   #Toggle between original and processed data
   output$dataviewer <- renderUI(
-    radioButtons('dataview', label = 'View Data', choices = c('Orginial Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
+    radioButtons('dataview', label = 'View Data', choices = c('Original Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
   )
   
   #Reactive Expression if users selects hypnos_data
