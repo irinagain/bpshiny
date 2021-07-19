@@ -183,6 +183,7 @@ shinyServer(function(input,output,session) {
     }
   })
   datascreen_tf_value <- reactive ({
+    req(input$datascreen_arg)
     if(input$datascreen_arg == 'f'){
       return(FALSE)
     }else{
