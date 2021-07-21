@@ -39,6 +39,7 @@ ui <- fluidPage(
                  uiOutput('rppinput'),
                  uiOutput('dow_checkbox'),
                  uiOutput('dowinput'),
+                 uiOutput('data_screen_check'),
                  uiOutput('data_screen_arg'),
                  uiOutput('dataviewer')
                ),
