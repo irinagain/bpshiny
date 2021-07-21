@@ -232,7 +232,7 @@ shinyServer(function(input,output,session) {
       bp_hypnos
     }
   })
-
+  
   #Reactive Expression if users selects jhs_data
   jhs_data <- reactive ({
     bp_jhs <- bp::bp_jhs
@@ -775,9 +775,6 @@ shinyServer(function(input,output,session) {
   })
   outputOptions(output, 'dip_calc_tables', suspendWhenHidden = FALSE)
   
-  ################################################################################################################################
-  ################################################################################################################################
-  
   ######PLOT######
   output$plotName <- renderText(input$fileselect)
   
@@ -797,7 +794,7 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     
     if((plottype == "bp_scatter") | (plottype == "bp_hist")){
-      selectInput(inputId = "subj_for_scatter_and_hist", label = "Subject", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
+      selectizeInput(inputId = "subj_for_scatter_and_hist", label = "Subject", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
     }
     else{NULL}
   })
@@ -807,7 +804,7 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     
     if(plottype == "bp_scatter"){
-      selectInput(inputId = "group_var_for_scatter", label = "Grouping Variable (1):", choices = c("", names(user_data()[,1:ncol(user_data())])),selected = NULL, multiple = T)
+      selectInput(inputId = "group_var_for_scatter", label = "Grouping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])),selected = NULL, multiple = T)
     }
     else{NULL}
   })
@@ -817,7 +814,7 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     
     if(plottype == "bp_scatter"){
-      selectInput(inputId = "wrap_var_for_scatter", label = "Wrapping Variable (1):", choices = c("", names(user_data()[,1:ncol(user_data())])), selected = NULL, multiple = T)
+      selectInput(inputId = "wrap_var_for_scatter", label = "Wrapping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])), selected = NULL, multiple = T)
     }
     else{NULL}
   })
