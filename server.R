@@ -590,8 +590,32 @@ shinyServer(function(input,output,session) {
     proc_preg <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
     proc_ghana <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
     
+    sys = input$sys
+    dias = input$dias
+    date = input$date
+    if(input$date1 == FALSE){date = NULL}
+    id = input$id
+    if(input$id1 == FALSE){id = NULL}
+    wake = input$wake
+    if(input$wake1 == FALSE){wake = NULL}
+    visit = input$visit
+    if(input$visit1 == FALSE){visit = NULL}
+    hr = input$hr
+    if(input$heart1 == FALSE){hr = NULL}
+    pp = input$pp
+    if(input$pp1 == FALSE){pp = NULL}
+    map = input$map
+    if(input$map1 == FALSE){map = NULL}
+    rpp = input$rpp
+    if(input$rpp1 == FALSE){rpp = NULL}
+    dow = input$dow
+    if(input$dow1 == FALSE){dow = NULL}
+    
+    proc_inputdata = process_data(data = input_data(), sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
+    
     switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
-           'bppreg_data' = proc_preg)
+           'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
   })
   
   output$contents <- renderTable({
@@ -1266,17 +1290,80 @@ shinyServer(function(input,output,session) {
     library(bp)
     
     if(plottype == "bp_hist"){
-      bp_hist(data = user_data(), subj = input$subj_for_plots)
+      
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
+        bp_hist(data = user_data(), subj = input$subj_for_plots)
+      }
+      
+      else if (input$fileselect == "jhsproc_data") {
+        bp_hist(data = {process_data(bp_jhs,
+                                     sbp = "Sys.mmHg.",
+                                     dbp = "Dias.mmHg.",
+                                     date_time = "DateTime",
+                                     hr = "pulse.bpm.")},
+                subj = input$subj_for_plots)
+      }
+      else if (input$fileselect == "hypnos_data"){
+        bp_hist(data = {process_data(bp_hypnos,
+                                     bp_type = 'abpm',
+                                     sbp = "syst",
+                                     dbp = "DIAST",
+                                     date_time = "DATE.TIME",
+                                     id = "id",
+                                     wake = "wake",
+                                     visit = "visit",
+                                     hr = "hr",
+                                     map = "map",
+                                     rpp = "rpp",
+                                     pp = "pp")},
+                subj = input$subj_for_plots)
+      }
     }
     else if(plottype == "bp_scatter"){
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
       bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
                  subj = input$subj_for_plots,
                  group_var = input$group_var_for_scatter_and_report,
                  wrap_var = input$wrap_var_for_scatter,
                  inc_crisis = input$inc_crisis_T_or_F, 
                  inc_low = input$inc_low_T_or_F)
+      }
+      else if (input$fileselect == "jhsproc_data") {
+        bp_scatter(data = {process_data(bp_jhs,
+                                        sbp = "Sys.mmHg.",
+                                        dbp = "Dias.mmHg.",
+                                        date_time = "DateTime",
+                                        hr = "pulse.bpm.")}, 
+                   plot_type = input$plot_type_for_scatter,
+                   subj = input$subj_for_plots,
+                   group_var = input$group_var_for_scatter_and_report,
+                   wrap_var = input$wrap_var_for_scatter,
+                   inc_crisis = input$inc_crisis_T_or_F, 
+                   inc_low = input$inc_low_T_or_F)
+      }
+      else if (input$fileselect == "hypnos_data"){
+        bp_scatter(data = {process_data(bp_hypnos,
+                                        bp_type = 'abpm',
+                                        sbp = "syst",
+                                        dbp = "DIAST",
+                                        date_time = "DATE.TIME",
+                                        id = "id",
+                                        wake = "wake",
+                                        visit = "visit",
+                                        hr = "hr",
+                                        map = "map",
+                                        rpp = "rpp",
+                                        pp = "pp")},
+                   plot_type = input$plot_type_for_scatter,
+                   subj = input$subj_for_plots,
+                   group_var = input$group_var_for_scatter_and_report,
+                   wrap_var = input$wrap_var_for_scatter,
+                   inc_crisis = input$inc_crisis_T_or_F, 
+                   inc_low = input$inc_low_T_or_F)
+      }
     }
     else if(plottype == "bp_report"){
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
       bp_report(data = user_data(),
                 subj = input$subj_for_plots,
                 inc_low = input$inc_low_T_or_F,
@@ -1290,10 +1377,81 @@ shinyServer(function(input,output,session) {
                 filetype = "pdf",
                 units = input$units_for_report,
                 scale = 1)
+      }
+      else if (input$fileselect == "jhsproc_data") {
+        bp_report(data = {process_data(bp_jhs,
+                                       sbp = "Sys.mmHg.",
+                                       dbp = "Dias.mmHg.",
+                                       date_time = "DateTime",
+                                       hr = "pulse.bpm.")},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      else if (input$fileselect == "hypnos_data"){
+        bp_report(data = {process_data(bp_hypnos,
+                                       bp_type = 'abpm',
+                                       sbp = "syst",
+                                       dbp = "DIAST",
+                                       date_time = "DATE.TIME",
+                                       id = "id",
+                                       wake = "wake",
+                                       visit = "visit",
+                                       hr = "hr",
+                                       map = "map",
+                                       rpp = "rpp",
+                                       pp = "pp")},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
     }
     else if(plottype == "dow_tod_plots"){
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
       dow_tod_plots_out <- dow_tod_plots(data = user_data(),
-                                          subj = input$subj_for_plots)
+                                         subj = input$subj_for_plots)
+      }
+      else if (input$fileselect == "jhsproc_data") {
+        dow_tod_plots_out <- dow_tod_plots(data = {process_data(bp_jhs,
+                                                                sbp = "Sys.mmHg.",
+                                                                dbp = "Dias.mmHg.",
+                                                                date_time = "DateTime",
+                                                                hr = "pulse.bpm.")},
+                                           subj = input$subj_for_plots)
+      }
+      else if (input$fileselect == "hypnos_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {process_data(bp_hypnos,
+                                                                bp_type = 'abpm',
+                                                                sbp = "syst",
+                                                                dbp = "DIAST",
+                                                                date_time = "DATE.TIME",
+                                                                id = "id",
+                                                                wake = "wake",
+                                                                visit = "visit",
+                                                                hr = "hr",
+                                                                map = "map",
+                                                                rpp = "rpp",
+                                                                pp = "pp")},
+                                           subj = input$subj_for_plots)
+      }
       grid::grid.draw(
         gridExtra::grid.arrange(dow_tod_plots_out[[1]], dow_tod_plots_out[[2]], ncol = 2)
       )
