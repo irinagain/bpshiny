@@ -612,7 +612,10 @@ shinyServer(function(input,output,session) {
     if(input$dow1 == FALSE){dow = NULL}
     
     proc_inputdata = process_data(data = input_data(), sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
+                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
+                                ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
+                                agg_thresh = aggthresh_value(), collapse_df = collapse_value())
     
     switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
            'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
