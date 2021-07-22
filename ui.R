@@ -49,6 +49,14 @@ ui <- fluidPage(
                  uiOutput('inc_crisis_arg'),
                  uiOutput('tod_int_check'),
                  uiOutput('tod_int_arg'),
+                 uiOutput('eod_check'),
+                 uiOutput('eod_arg'),
+                 uiOutput('agg_check'),
+                 uiOutput('agg_arg'),
+                 uiOutput('agg_thresh_check'),
+                 uiOutput('agg_thresh_arg'),
+                 uiOutput('collapse_df_check'),
+                 uiOutput('collapse_df_arg'),
                  uiOutput('dataviewer')
                ),
                mainPanel(tableOutput("contents"))

@@ -293,7 +293,7 @@ shinyServer(function(input,output,session) {
   
   #Input for tod_int argument
   output$tod_int_check <- renderUI({
-    if(input$fileselect %in% c('input_data','hypnos_data')){
+    if(input$fileselect %in% c('input_data')){
       checkboxInput('todint_check', 'Include Time of Day Argument')
     }
   })
@@ -317,9 +317,119 @@ shinyServer(function(input,output,session) {
       req(length(inp) >= 4)
       return(inp)
     }
-    
-    
   })
+  
+  #Input for eod argument
+  output$eod_check <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('eodcheck', 'Include EOD Argument')
+    }
+  })
+  
+  output$eod_arg <- renderUI({
+    req(input$eodcheck)
+    if(input$eodcheck == FALSE){
+      return(NULL)
+    }else{
+      textInput('eodarg', 'EOD Argument')
+    }
+  })
+  
+  eod_value <- reactive({
+    if(is.null(input$eodarg) | isFALSE(input$eodcheck)){
+      return(NULL)
+    }
+    req(input$eodarg)
+    if(!is.null(input$eodarg)){
+      inp1 <- as.numeric(input$eodarg)
+      req(nchar(input$eodarg) == 4)
+      return(inp1)
+    }
+  })
+  
+  #Input for agg argument 
+  output$agg_check <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('aggcheck', 'Include AGG Argument')
+    }
+  })
+  
+  output$agg_arg <- renderUI({
+    req(input$aggcheck)
+    if(input$aggcheck == FALSE){
+      return(NULL)
+    }else{
+      selectInput('aggarg', 'AGG Argument', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
+  agg_value <- reactive ({
+    if(is.null(input$aggarg) | isFALSE(input$aggcheck)){
+      return(FALSE)
+    }
+    req(input$aggarg)
+    if(input$aggarg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
+    }
+  })
+  
+  #Input for agg_thresh argument
+  output$agg_thresh_check <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('aggthresh_check', 'Include AGG Thresh Argument')
+    }
+  })
+  
+  output$agg_thresh_arg <- renderUI({
+    req(input$aggthresh_check)
+    if(input$aggthresh_check == FALSE){
+      return(NULL)
+    }else{
+      textInput('aggthresh_arg', 'AGG Thresh Argument', '3')
+    }
+  })
+  
+  aggthresh_value <- reactive ({
+    if(is.null(input$aggthresh_arg) | isFALSE(input$aggthresh_check | isTRUE(agg_value()))){
+      return(NULL)
+    }
+    req(input$aggthresh_arg)
+    if(!is.null(input$aggthresh_arg)){
+      inp2 <- as.numeric(input$aggthresh_arg)
+      return(inp2)
+    }
+  })
+  
+  #Input for collapse_df argument
+  output$collapse_df_check <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('collapsedf_check', 'Include Collapse df Argument')
+    }
+  })
+  
+  output$collapse_df_arg <- renderUI({
+    req(input$collapsedf_check)
+    if(input$collapsedf_check == FALSE){
+      return(NULL)
+    }else{
+      selectInput('collapsedf_arg', 'Collapse df Argument', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
+  collapse_value <- reactive ({
+    if(is.null(input$collapsedf_arg) | isFALSE(input$collapsedf_check)){
+      return(FALSE)
+    }
+    req(input$collapsedf_arg)
+    if(input$collapsedf_arg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
+    }
+  })
+  
   
   #Toggle between original and processed data
   output$dataviewer <- renderUI(
@@ -438,7 +548,8 @@ shinyServer(function(input,output,session) {
       bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                  ToD_int = todint_value())
+                                  ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
+                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
       bpdata_final
     }else{
       bpdata
