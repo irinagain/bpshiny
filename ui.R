@@ -41,6 +41,14 @@ ui <- fluidPage(
                  uiOutput('dowinput'),
                  uiOutput('data_screen_check'),
                  uiOutput('data_screen_arg'),
+                 uiOutput('bp_type_check'),
+                 uiOutput('bp_type_arg'),
+                 uiOutput('inc_low_check'),
+                 uiOutput('inc_low_arg'),
+                 uiOutput('inc_crisis_check'),
+                 uiOutput('inc_crisis_arg'),
+                 uiOutput('tod_int_check'),
+                 uiOutput('tod_int_arg'),
                  uiOutput('dataviewer')
                ),
                mainPanel(tableOutput("contents"))
