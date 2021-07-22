@@ -176,7 +176,7 @@ shinyServer(function(input,output,session) {
       selectInput('dow', 'Day of the Week', names(dataset()))
     }
   })
-
+  
   #Select for bp_type argument
   output$bp_type_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
@@ -206,7 +206,7 @@ shinyServer(function(input,output,session) {
       return('ap')
     }
   })
-
+  
   #Toggle for data_screen argument 
   output$data_screen_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
@@ -303,7 +303,7 @@ shinyServer(function(input,output,session) {
     if(input$todint_check == FALSE){
       return(NULL)
     }else{
-     textInput('todint_arg', 'Time of Day Argument') 
+      textInput('todint_arg', 'Time of Day Argument') 
     }
   })
   
@@ -564,6 +564,35 @@ shinyServer(function(input,output,session) {
            'bppreg_data' = preg_data(), 'input_data' = input_data())
   })
   
+  original_data <- reactive({
+    datachoice = input$fileselect
+    proc_hypnos <- process_data(bp_hypnos,
+                                bp_type = 'abpm',
+                                sbp = "syst",
+                                dbp = "DIAST",
+                                date_time = "DATE.TIME",
+                                id = "id",
+                                wake = "wake",
+                                visit = "visit",
+                                hr = "hr",
+                                map = "map",
+                                rpp = "rpp",
+                                pp = "pp")
+    proc_jhs <- process_data(bp_jhs,
+                             sbp = "Sys.mmHg.",
+                             dbp = "Dias.mmHg.",
+                             date_time = "DateTime",
+                             hr = "pulse.bpm.")
+    proc_children <- process_data(bp_children, 
+                                  sbp = 'sbp', dbp = 'dbp',
+                                  id = 'id', visit = 'visit')
+    
+    proc_preg <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+    proc_ghana <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+    
+    switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
+           'bppreg_data' = proc_preg)
+  })
   
   output$contents <- renderTable({
     user_data()
@@ -692,7 +721,11 @@ shinyServer(function(input,output,session) {
   
   metric_table <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    #If/else statement that decides whether to use sample data that is processed in data tab
+    #Or if original data is still selected, it will use the pre-proccessed sample data
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     ## validate(need) argument, eliminates error popping up when changing parameter type
     validate (
@@ -711,7 +744,9 @@ shinyServer(function(input,output,session) {
                                                             scrollX = TRUE))
   metric_bp_table_1 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -726,7 +761,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_2 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -741,7 +778,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_3 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -756,7 +795,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_4 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -771,7 +812,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_5 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -786,7 +829,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_6 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -801,7 +846,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_7 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -816,7 +863,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_8 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -831,7 +880,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_9 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -846,7 +897,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_10 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -861,7 +914,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_11 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -876,7 +931,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_12 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -891,7 +948,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_13 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -910,7 +969,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_14 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -928,7 +989,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_15 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -946,7 +1009,9 @@ shinyServer(function(input,output,session) {
   
   metric_bp_table_16 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
@@ -1031,7 +1096,9 @@ shinyServer(function(input,output,session) {
   ## dip_calc
   metric_dip_calc_1 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "dip_calc", "parameter type incorrect"),
@@ -1060,7 +1127,9 @@ shinyServer(function(input,output,session) {
   
   metric_dip_calc_2 <- reactive({
     parameter_type = parameter_type()
-    data = user_data()
+    if(input$dataview == 'proc_data'){
+      data = user_data()
+    }else{data = original_data()}
     output_type = output_type()
     validate (
       need(parameter_type == "dip_calc", "parameter type incorrect"),
@@ -1096,6 +1165,7 @@ shinyServer(function(input,output,session) {
   })
   outputOptions(output, 'dip_calc_tables', suspendWhenHidden = FALSE)
   
+  
   ######PLOT######
   output$plotName <- renderText(input$fileselect)
   
@@ -1106,26 +1176,33 @@ shinyServer(function(input,output,session) {
     else if(input$plottype == "bp_hist"){
       return("bp_hist")
     }
+    else if(input$plottype == "bp_report"){
+      return("bp_report")
+    }
+    else if(input$plottype == "dow_tod_plots"){
+      return("dow_tod_plots")
+    }
   })
   
+  output$plot_type_text <- renderText(plottype())
   
-  ### Get subj argument for bp_scatter and bp_hist
+  ### Get subj argument used in all the plots
   
-  output$subj_for_scatter_and_hist <- renderUI({
+  output$subj_for_plots<- renderUI({
     plottype = plottype()
     
-    if((plottype == "bp_scatter") | (plottype == "bp_hist")){
-      selectizeInput(inputId = "subj_for_scatter_and_hist", label = "Subject", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
+    if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots")){
+      selectizeInput(inputId = "subj_for_plots", label = "Subject", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
     }
     else{NULL}
   })
   
-  ### Get group_var argument for bp_scatter
-  output$group_var_for_scatter <- renderUI({
+  ### Get group_var argument for bp_scatter & bp_report
+  output$group_var_for_scatter_and_report <- renderUI({
     plottype = plottype()
     
-    if(plottype == "bp_scatter"){
-      selectInput(inputId = "group_var_for_scatter", label = "Grouping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])),selected = NULL, multiple = T)
+    if((plottype == "bp_scatter") | (plottype == "bp_report") ){
+      selectInput(inputId = "group_var_for_scatter_and_report", label = "Grouping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])),selected = NULL, multiple = T)
     }
     else{NULL}
   })
@@ -1153,8 +1230,8 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     plot_type_for_scatter = input$plot_type_for_scatter
     
-    if (plottype == "bp_scatter" & plot_type_for_scatter == "stages2020"){
-      checkboxInput(inputId = "inc_crisis_T_or_F",label = "Include Hypersensitive Crisis?", value = T)
+    if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")) {
+      checkboxInput(inputId = "inc_crisis_T_or_F",label = "Include Hypersensitive Crisis", value = T)
     }
   })
   
@@ -1162,36 +1239,64 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     plot_type_for_scatter = input$plot_type_for_scatter
     
-    if (plottype == "bp_scatter" & plot_type_for_scatter == "stages2020"){
-      checkboxInput(inputId = "inc_low_T_or_F",label = "Include Low Hypotension?", value = T)
+    if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")){
+      checkboxInput(inputId = "inc_low_T_or_F",label = "Include Low Hypotension", value = T)
     }
   })
   
+  output$save_report_for_report <- renderUI({
+    plottype = plottype()
+    if (plottype == "bp_report"){
+      checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
+    }
+    else{NULL}
+  })
+  output$units_for_report <- renderUI({
+    plottype = plottype()
+    if (plottype == "bp_report"){
+      selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
+    }
+  })
   
   ### Render Plot
   
-  plotFunc <- reactive({
+  plotFunc <- eventReactive(input$plot_update,{
     
     plottype = plottype() # bring reactive input variable into this renderPlot call
     library(bp)
     
     if(plottype == "bp_hist"){
-      
-      
-      if(input$fileselect == "ghana_data"){
-        bp_hist(data = bp_ghana, subj = input$subj_for_scatter_and_hist)
-      }
-      else{
-        bp_hist(data = user_data(), subj = input$subj_for_scatter_and_hist)
-      }
+      bp_hist(data = user_data(), subj = input$subj_for_plots)
     }
     else if(plottype == "bp_scatter"){
       bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
-                 subj = input$subj_for_scatter_and_hist,
-                 group_var = input$group_var_for_scatter,
+                 subj = input$subj_for_plots,
+                 group_var = input$group_var_for_scatter_and_report,
                  wrap_var = input$wrap_var_for_scatter,
                  inc_crisis = input$inc_crisis_T_or_F, 
                  inc_low = input$inc_low_T_or_F)
+    }
+    else if(plottype == "bp_report"){
+      bp_report(data = user_data(),
+                subj = input$subj_for_plots,
+                inc_low = input$inc_low_T_or_F,
+                inc_crisis = input$inc_crisis_T_or_F,
+                group_var = input$group_var_for_scatter_and_report,
+                save_report = input$save_report_for_report,
+                path = NULL,
+                filename = "bp_report",
+                width = 12,
+                height = 8.53,
+                filetype = "pdf",
+                units = input$units_for_report,
+                scale = 1)
+    }
+    else if(plottype == "dow_tod_plots"){
+      dow_tod_plots_out <- dow_tod_plots(data = user_data(),
+                                          subj = input$subj_for_plots)
+      grid::grid.draw(
+        gridExtra::grid.arrange(dow_tod_plots_out[[1]], dow_tod_plots_out[[2]], ncol = 2)
+      )
     }
   })
   

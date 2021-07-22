@@ -123,19 +123,24 @@ ui <- fluidPage(
                sidebarPanel = sidebarPanel(
                  radioButtons("plottype",  "Plot Type",
                               choices = c(`Scatter Plot` = 'bp_scatter',
-                                          `Histogram` = 'bp_hist'
+                                          `Histogram` = 'bp_hist', `Report` = 'bp_report',
+                                          `DOW_TOD_PLOTS_RENAME` = "dow_tod_plots"
                               )
                  ),
-                 uiOutput("subj_for_scatter_and_hist"),
-                 uiOutput("group_var_for_scatter"),
+                 actionButton(inputId = "plot_update", label = "Update"),
+                 uiOutput("subj_for_plots"),
+                 uiOutput("group_var_for_scatter_and_report"),
                  uiOutput("wrap_var_for_scatter"),
                  uiOutput("plot_type_for_scatter"),
                  uiOutput("include_crisis_stages2020"),
-                 uiOutput("include_low_stages2020")),
+                 uiOutput("include_low_stages2020"),
+                 uiOutput("units_for_report"),
+                 uiOutput("save_report_for_report")),
                mainPanel = 
                  mainPanel(plotOutput("plot"),
                            hr(),
-                           textOutput(outputId = "plotName"))
+                           textOutput(outputId = "plotName"),
+                           textOutput(outputId = "plot_type_text"))
                
              )
     )
