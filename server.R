@@ -577,7 +577,7 @@ shinyServer(function(input,output,session) {
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_tables", "cv", "sv")){
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_tables", "cv", "sv", "mbps", "tp_ratio", "si", "w_sd", "me_avg", "me_diff")){
       return("none")
     }
     if(input$metric %in% c("dip_calc")){
@@ -586,7 +586,7 @@ shinyServer(function(input,output,session) {
   })
   
   output_type <- reactive({
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")){
+    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv", "mbps", "tp_ratio", "si", "w_sd", "me_avg", "me_diff")){
       return("none")
     }
     if(input$metric == "bp_tables"){
@@ -637,7 +637,7 @@ shinyServer(function(input,output,session) {
   
   #reactive and output functions based on the user's choice
   # outputting one table
-  # observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stages", 'bp_stats', 'cv', 'sv', 'dip_calc')), {
+  # observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stages", 'bp_stats', 'cv', 'sv', 'dip_calc', "mbps", "tp_ratio", "si", "w_sd", "me_avg", "me_diff")), {
   #   metric_table <- reactive({
   #     parameter_type = parameter_type()
   #     output_type = output_type()
@@ -1082,7 +1082,7 @@ shinyServer(function(input,output,session) {
                                                                  scrollX = TRUE))
   
   output$one_table <- reactive({
-    input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
+    input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv", "mbps", "tp_ratio", "si", "w_sd", "me_avg", "me_diff")
   })
   outputOptions(output, 'one_table', suspendWhenHidden = FALSE)
   

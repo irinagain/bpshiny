@@ -74,7 +74,13 @@ ui <- fluidPage(
                                                                                'Blood Pressure Tables' = 'bp_tables', 
                                                                                'Coefficient of Variation (CV)' = 'cv',
                                                                                'Successive Variation (SV)' = 'sv', 
-                                                                               'Nocturnal Blood Pressure Dipping Calculation' = 'dip_calc'
+                                                                               'Nocturnal Blood Pressure Dipping Calculation' = 'dip_calc', 
+                                                                               "Morning Blood Pressure Surge" = "mbps", 
+                                                                               "Trough: Peak Ratio" = "tp_ratio", 
+                                                                               "Smoothness Index" = "si", 
+                                                                               "Weighted Standard Deviation" = "w_sd", 
+                                                                               "Morningness-Eveningness Average" = "me-avg", 
+                                                                               "Morningness-Eveningness Difference" = "me_diff"
                                                                                
                )),
                uiOutput("select_dip_parameter"),
