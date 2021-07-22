@@ -590,8 +590,32 @@ shinyServer(function(input,output,session) {
     proc_preg <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
     proc_ghana <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
     
+    sys = input$sys
+    dias = input$dias
+    date = input$date
+    if(input$date1 == FALSE){date = NULL}
+    id = input$id
+    if(input$id1 == FALSE){id = NULL}
+    wake = input$wake
+    if(input$wake1 == FALSE){wake = NULL}
+    visit = input$visit
+    if(input$visit1 == FALSE){visit = NULL}
+    hr = input$hr
+    if(input$heart1 == FALSE){hr = NULL}
+    pp = input$pp
+    if(input$pp1 == FALSE){pp = NULL}
+    map = input$map
+    if(input$map1 == FALSE){map = NULL}
+    rpp = input$rpp
+    if(input$rpp1 == FALSE){rpp = NULL}
+    dow = input$dow
+    if(input$dow1 == FALSE){dow = NULL}
+    
+    proc_inputdata = process_data(data = input_data(), sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow)
+    
     switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
-           'bppreg_data' = proc_preg)
+           'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
   })
   
   output$contents <- renderTable({
