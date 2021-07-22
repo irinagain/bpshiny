@@ -670,12 +670,16 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    ## need wake to calculate sbp_by_wake_status(metric_bp_table_13), dbp_by_wake_status(14), sbp_by_wake_perc(15), and dbp_by_wake_perc(16), details seen in bp::bp_tables function
+    validate(
+      need("WAKE" %in% names(data), "N/A - WAKE column not available")
+    )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
     tables_output$SBP_by_WAKE_status
   })
-  output$text_13 <- renderText({"\n Table 13. SBP_by_WAKE_status"})
+  output$text_13 <- renderText({"\n Table 13. SBP_by_WAKE_status \n"})
   
   metric_bp_table_14 <- reactive({
     parameter_type = parameter_type()
@@ -685,12 +689,15 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    validate(
+      need("WAKE" %in% names(data), "N/A - WAKE column not available")
+    )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
     tables_output$DBP_by_WAKE_status
   })
-  output$text_14 <- renderText({"\n Table 14. DBP_by_WAKE_status"})
+  output$text_14 <- renderText(paste("Table 14. DBP_by_WAKE_status", "", sep = "\n"))
   
   metric_bp_table_15 <- reactive({
     parameter_type = parameter_type()
@@ -700,12 +707,15 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    validate(
+      need("WAKE" %in% names(data), "N/A - WAKE column not available")
+    )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
     tables_output$SBP_by_WAKE_perc
   })
-  output$text_15 <- renderText({"\n Table 15. SBP_by_WAKE_perc"})
+  output$text_15 <- renderText({"\n Table 15. SBP_by_WAKE_perc \n"})
   
   metric_bp_table_16 <- reactive({
     parameter_type = parameter_type()
@@ -716,11 +726,8 @@ shinyServer(function(input,output,session) {
       need(output_type == "tables", "output type incorrect")
     )
     validate(
-      if(is.null(user_data$wake)){
-        need(!is.null(user_data$wake), "N/A - WAKE column not available")
-      }
+      need("WAKE" %in% names(data), "N/A - WAKE column not available")
     )
-
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
