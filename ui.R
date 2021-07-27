@@ -91,6 +91,7 @@ ui <- fluidPage(
                # uiOutput("second_parameter_helptext"),
                # uiOutput("select_third_parameter"),
                # uiOutput("third_parameter_helptext"),
+               actionButton(inputId = "metric_update", label = "Update")
                ),
                mainPanel(conditionalPanel(condition = "output.one_table",
                                           DT::dataTableOutput("metric_table")),

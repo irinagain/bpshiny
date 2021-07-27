@@ -743,7 +743,7 @@ shinyServer(function(input,output,session) {
   #                                                     scrollX = TRUE))
   
   
-  metric_table <- reactive({
+  metric_table <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     #If/else statement that decides whether to use sample data that is processed in data tab
     #Or if original data is still selected, it will use the pre-proccessed sample data
@@ -766,7 +766,7 @@ shinyServer(function(input,output,session) {
                                              options = list(dom = "Btip",
                                                             buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                             scrollX = TRUE))
-  metric_bp_table_1 <- reactive({
+  metric_bp_table_1 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -783,7 +783,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_1 <- renderText({"Table 1. SBP Counts by Stage"})
   
-  metric_bp_table_2 <- reactive({
+  metric_bp_table_2 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -800,7 +800,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_2 <- renderText({"\n Table 2. DBP Counts by Stage"})
   
-  metric_bp_table_3 <- reactive({
+  metric_bp_table_3 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -817,7 +817,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_3 <- renderText({"\n Table 3. CLASS Counts"})
   
-  metric_bp_table_4 <- reactive({
+  metric_bp_table_4 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -834,7 +834,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_4 <- renderText({"\n Table 4. All BP Stage Combinations"})
   
-  metric_bp_table_5 <- reactive({
+  metric_bp_table_5 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -851,7 +851,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_5 <- renderText({"\n Table 5. BP_contingency_count"})
   
-  metric_bp_table_6 <- reactive({
+  metric_bp_table_6 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -868,7 +868,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_6 <- renderText({"\n Table 6. BP_contingency_percent"})
   
-  metric_bp_table_7 <- reactive({
+  metric_bp_table_7 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -885,7 +885,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_7 <- renderText({"\n Table 7. SBP_by_Day_of_Week"})
   
-  metric_bp_table_8 <- reactive({
+  metric_bp_table_8 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -902,7 +902,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_8 <- renderText({"\n Table 8. DBP_by_Day_of_Week"})
   
-  metric_bp_table_9 <- reactive({
+  metric_bp_table_9 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -919,7 +919,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_9 <- renderText({"\n Table 9. CLASS_Day_of_Week"})
   
-  metric_bp_table_10 <- reactive({
+  metric_bp_table_10 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -936,7 +936,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_10 <- renderText({"\n Table 10. SBP_by_Time_of_Day"})
   
-  metric_bp_table_11 <- reactive({
+  metric_bp_table_11 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -953,7 +953,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_11 <- renderText({"\n Table 11. DBP_by_Time_of_Day"})
   
-  metric_bp_table_12 <- reactive({
+  metric_bp_table_12 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -970,7 +970,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_12 <- renderText({"\n Table 12. CLASS_Time_of_Day"})
   
-  metric_bp_table_13 <- reactive({
+  metric_bp_table_13 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -991,7 +991,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_13 <- renderText({"\n Table 13. SBP_by_WAKE_status \n"})
   
-  metric_bp_table_14 <- reactive({
+  metric_bp_table_14 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1011,7 +1011,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_14 <- renderText(paste("Table 14. DBP_by_WAKE_status", "", sep = "\n"))
   
-  metric_bp_table_15 <- reactive({
+  metric_bp_table_15 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1031,7 +1031,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_15 <- renderText({"\n Table 15. SBP_by_WAKE_perc \n"})
   
-  metric_bp_table_16 <- reactive({
+  metric_bp_table_16 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1118,7 +1118,7 @@ shinyServer(function(input,output,session) {
                                                                   scrollX = TRUE))
   
   ## dip_calc
-  metric_dip_calc_1 <- reactive({
+  metric_dip_calc_1 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1149,7 +1149,7 @@ shinyServer(function(input,output,session) {
     return(data.frame(dip_calc_output[1]))
   })
   
-  metric_dip_calc_2 <- reactive({
+  metric_dip_calc_2 <- eventReactive(input$metric_update, {
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
