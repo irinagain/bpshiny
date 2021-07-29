@@ -612,10 +612,10 @@ shinyServer(function(input,output,session) {
     if(input$dow1 == FALSE){dow = NULL}
     
     proc_inputdata = process_data(data = input_data(), sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
-                                bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
-                                agg_thresh = aggthresh_value(), collapse_df = collapse_value())
+                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                  bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
+                                  ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
+                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
     
     switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
            'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
@@ -1192,10 +1192,14 @@ shinyServer(function(input,output,session) {
   })
   outputOptions(output, 'dip_calc_tables', suspendWhenHidden = FALSE)
   
-  
   ######PLOT######
-  output$plotName <- renderText(input$fileselect)
   
+  #Get name of dataset
+  plotName <- eventReactive(input$plot_update, {input$fileselect})
+  
+  output$plotName <- plotName
+  
+  #Get the type of plot the user wants to render
   plottype <- reactive({  # wrap plottype input in a reactive for rendering UI and Plot
     if(input$plottype == "bp_scatter"){
       return("bp_scatter")
@@ -1209,16 +1213,37 @@ shinyServer(function(input,output,session) {
     else if(input$plottype == "dow_tod_plots"){
       return("dow_tod_plots")
     }
+    else if(input$plottype == "bp_ts_plots"){
+      return("bp_ts_plots")
+    }
   })
   
-  output$plot_type_text <- renderText(plottype())
-  
+  #get the name of the type of plot the user wants to render
+  plot_type_text <- eventReactive(input$plot_update, {
+    if(input$plottype == "bp_scatter"){
+      return("bp_scatter")
+    }
+    else if(input$plottype == "bp_hist"){
+      return("bp_hist")
+    }
+    else if(input$plottype == "bp_report"){
+      return("bp_report")
+    }
+    else if(input$plottype == "dow_tod_plots"){
+      return("dow_tod_plots")
+    }
+    else if(input$plottype == "bp_ts_plots"){
+      return("bp_ts_plots")
+    }
+  })
+  output$plot_type_text <- renderText(plot_type_text())
   ### Get subj argument used in all the plots
   
+  #Get the subject arguments that is used in all plot types 
   output$subj_for_plots<- renderUI({
     plottype = plottype()
     
-    if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots")){
+    if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
       selectizeInput(inputId = "subj_for_plots", label = "Subject", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
     }
     else{NULL}
@@ -1234,16 +1259,17 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
-  ### Get wrap_var argument for bp_scattter
+  ### Get wrap_var argument for bp_scattter & bp_ts_plots
   output$wrap_var_for_scatter <- renderUI({
     plottype = plottype()
     
-    if(plottype == "bp_scatter"){
+    if((plottype == "bp_scatter")){
       selectInput(inputId = "wrap_var_for_scatter", label = "Wrapping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])), selected = NULL, multiple = T)
     }
     else{NULL}
   })
   
+  #Get the user to choose between AHA or Stages 2020 plot type used exclusively in the bp_scatter function
   output$plot_type_for_scatter <- renderUI({
     plottype = plottype()
     if (plottype == "bp_scatter"){
@@ -1253,6 +1279,7 @@ shinyServer(function(input,output,session) {
   })
   
   
+  #If the user selects stages2020, they have the option to render the crisis category
   output$include_crisis_stages2020 <- renderUI({
     plottype = plottype()
     plot_type_for_scatter = input$plot_type_for_scatter
@@ -1262,6 +1289,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #if the user selects stages2020, they have the option to render the low category
   output$include_low_stages2020 <- renderUI({
     plottype = plottype()
     plot_type_for_scatter = input$plot_type_for_scatter
@@ -1271,45 +1299,196 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  output$save_report_for_report <- renderUI({
+  #Get argument "Save Report" used in the bp_report() function
+  #output$save_report_for_report <- renderUI({
+    #plottype = plottype()
+    #if (plottype == "bp_report"){
+      #checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
+    #}
+    #else{NULL}
+  #})
+  
+  #Get the argument "units" used in the bp_report() function
+  #output$units_for_report <- renderUI({
+   # plottype = plottype()
+    #if (plottype == "bp_report"){
+     # selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
+    #}
+  #})
+  
+  ### Arguments for bp_ts_plots
+  output$wrap_var_for_ts <- renderUI({
     plottype = plottype()
-    if (plottype == "bp_report"){
-      checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
+    
+    if(plottype == "bp_ts_plots"){
+      selectInput(inputId = "wrap_var_for_ts", label = "Wrapping Variable (1):", choices = c("", names(user_data())), selected = NULL, multiple = T)
     }
     else{NULL}
   })
-  output$units_for_report <- renderUI({
+  
+  output$wrap_rowcol_for_ts <- renderUI({
     plottype = plottype()
-    if (plottype == "bp_report"){
-      selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
+    
+    if(plottype == "bp_ts_plots"){
+      
+        column(4, numericInput(inputId = "wrap_row_for_ts", 
+                               label = "# Rows",value = 1, min = 1, max = 9, step = 1, width = '50%'))
+        column(4, numericInput(inputId = "wrap_col_for_ts", 
+                               label = "# Columns", value = 1, min = 1, max = 9, ste1, width = '50%'))
+      
     }
+  })
+  output$index_for_ts <- renderUI({
+    plottype = plottype()
+    
+    if(plottype == "bp_ts_plots"){
+      selectInput(inputId = "index_for_ts", label = "Index:", choices = c("", names(user_data())), selected = NULL, multiple = T)
+    }
+    else{NULL}
+  })
+  
+  output$first_hour_for_ts <- renderUI({
+    plottype = plottype()
+    
+    if(plottype == "bp_ts_plots"){
+      numericInput(inputId = "first_hour_for_ts", label = "First Hour (0-23):", value = 0, min = 0, max = 23)
+    }
+    else{NULL}
+  })
+  
+  output$rotate_xlab_for_ts <- renderUI({
+    plottype = plottype()
+    
+    if (plottype == "bp_ts_plots"){
+      checkboxInput(inputId = "rotate_xlab_for_ts", label = "Rotate x-axis labels", value = F)
+    }
+    else{NULL}
   })
   
   ### Render Plot
   
+  #Make a event reactive object that will update whenever the user interacts with the action button "Update" in the plot section.
+  #plotFunc is now an object that can be fed into a renderPlot element in the output list
   plotFunc <- eventReactive(input$plot_update,{
     
     plottype = plottype() # bring reactive input variable into this renderPlot call
     library(bp)
     
+    #React to plottype call
+    
+    #If the user wants to render bp_hist
     if(plottype == "bp_hist"){
-      bp_hist(data = user_data(), subj = input$subj_for_plots)
+      
+      #if the user wants to do bp_hist on data that isn't unprocessed jhs/hypnos/ghana/children/preg
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data") && !(input$fileselect == "ghana_data") && !(input$fileselect == "bpchildren_data") && !(input$fileselect == "bppreg_data")) {
+        bp_hist(data = user_data(), subj = input$subj_for_plots)
+      }
+      #if the user wants to do bp_hist on unprocessed jhs data
+      else if (input$fileselect == "jhsproc_data") {
+        bp_hist(data = {process_data(bp_jhs,
+                                     sbp = "Sys.mmHg.",
+                                     dbp = "Dias.mmHg.",
+                                     date_time = "DateTime",
+                                     hr = "pulse.bpm.")},
+                subj = input$subj_for_plots)
+      }
+      
+      #if the user wants to do bp_hist on unprocessed hypnos data
+      else if (input$fileselect == "hypnos_data"){
+        bp_hist(data = {process_data(bp_hypnos,
+                                     bp_type = 'abpm',
+                                     sbp = "syst",
+                                     dbp = "DIAST",
+                                     date_time = "DATE.TIME",
+                                     id = "id",
+                                     wake = "wake",
+                                     visit = "visit",
+                                     hr = "hr",
+                                     map = "map",
+                                     rpp = "rpp",
+                                     pp = "pp")},
+                subj = input$subj_for_plots)
+      }
+      
+      #if the user wants to do bp_hist on unprocessed ghana data
+      else if (input$fileselect == "ghana_data"){
+       bp_hist(data = {process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')}, subj = input$subj_for_plots) 
+      }
+      
+      else if (input$fileselect == "bpchildren_data"){
+        bp_hist(data = {
+          process_data(bp_children, 
+                       sbp = 'sbp', dbp = 'dbp',
+                       id = 'id', visit = 'visit')
+        }, subj = input$subj_for_plots)
+      }
+      
+      else if (input$fileselect == "bppreg_data"){
+        bp_hist(data = {
+          process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+        }, subj = input$subj_for_plots)
+      }
     }
+    
+    #If the user wants to render bp_scatter
     else if(plottype == "bp_scatter"){
+      
+      #if the user wants to bp_scatter() data that isn't unprocessed jhs or unprocessed hypnos
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
       bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
                  subj = input$subj_for_plots,
                  group_var = input$group_var_for_scatter_and_report,
                  wrap_var = input$wrap_var_for_scatter,
                  inc_crisis = input$inc_crisis_T_or_F, 
                  inc_low = input$inc_low_T_or_F)
+      }
+      #if the user wants to use bp_scatter on unprocessed jhs data
+      else if (input$fileselect == "jhsproc_data") {
+        bp_scatter(data = {process_data(bp_jhs,
+                                        sbp = "Sys.mmHg.",
+                                        dbp = "Dias.mmHg.",
+                                        date_time = "DateTime",
+                                        hr = "pulse.bpm.")}, 
+                   plot_type = input$plot_type_for_scatter,
+                   subj = input$subj_for_plots,
+                   group_var = input$group_var_for_scatter_and_report,
+                   wrap_var = input$wrap_var_for_scatter,
+                   inc_crisis = input$inc_crisis_T_or_F, 
+                   inc_low = input$inc_low_T_or_F)
+      }
+      #if the user wants to use bp_scatter on the unprocessed hypnos data
+      else if (input$fileselect == "hypnos_data"){
+        bp_scatter(data = {process_data(bp_hypnos,
+                                        bp_type = 'abpm',
+                                        sbp = "syst",
+                                        dbp = "DIAST",
+                                        date_time = "DATE.TIME",
+                                        id = "id",
+                                        wake = "wake",
+                                        visit = "visit",
+                                        hr = "hr",
+                                        map = "map",
+                                        rpp = "rpp",
+                                        pp = "pp")},
+                   plot_type = input$plot_type_for_scatter,
+                   subj = input$subj_for_plots,
+                   group_var = input$group_var_for_scatter_and_report,
+                   wrap_var = input$wrap_var_for_scatter,
+                   inc_crisis = input$inc_crisis_T_or_F, 
+                   inc_low = input$inc_low_T_or_F)
+      }
     }
+    
+    #If the user wants to render bp_report
     else if(plottype == "bp_report"){
+      #If the user wants to user wants to use bp_report for data that isn't unprocessed jhs or unprocessed hypnos
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
       bp_report(data = user_data(),
                 subj = input$subj_for_plots,
                 inc_low = input$inc_low_T_or_F,
                 inc_crisis = input$inc_crisis_T_or_F,
                 group_var = input$group_var_for_scatter_and_report,
-                save_report = input$save_report_for_report,
+                #save_report = input$save_report_for_report,
                 path = NULL,
                 filename = "bp_report",
                 width = 12,
@@ -1317,17 +1496,115 @@ shinyServer(function(input,output,session) {
                 filetype = "pdf",
                 units = input$units_for_report,
                 scale = 1)
+      }
+      #if the user wants to use bp_report on unprocessed jhs data
+      else if (input$fileselect == "jhsproc_data") {
+        bp_report(data = {process_data(bp_jhs,
+                                       sbp = "Sys.mmHg.",
+                                       dbp = "Dias.mmHg.",
+                                       date_time = "DateTime",
+                                       hr = "pulse.bpm.")},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      #if the user wants to use bp_report on unprocessed hypnos data
+      else if (input$fileselect == "hypnos_data"){
+        bp_report(data = {process_data(bp_hypnos,
+                                       bp_type = 'abpm',
+                                       sbp = "syst",
+                                       dbp = "DIAST",
+                                       date_time = "DATE.TIME",
+                                       id = "id",
+                                       wake = "wake",
+                                       visit = "visit",
+                                       hr = "hr",
+                                       map = "map",
+                                       rpp = "rpp",
+                                       pp = "pp")},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
     }
+    
+    #if the user wants to render the dow_tod_plots() 
     else if(plottype == "dow_tod_plots"){
+      #if the user wants to dow_tod_plots a dataset that isn't unprocessedd hypnos or unprocessed jhs
+      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
       dow_tod_plots_out <- dow_tod_plots(data = user_data(),
-                                          subj = input$subj_for_plots)
+                                         subj = input$subj_for_plots)
+      }
+      #if the user wants to dow_tod_plots the jhs data
+      else if (input$fileselect == "jhsproc_data") {
+        dow_tod_plots_out <- dow_tod_plots(data = {process_data(bp_jhs,
+                                                                sbp = "Sys.mmHg.",
+                                                                dbp = "Dias.mmHg.",
+                                                                date_time = "DateTime",
+                                                                hr = "pulse.bpm.")},
+                                           subj = input$subj_for_plots)
+      }
+      #if the user wants to dow_tod_plots the hypnos dataset
+      else if (input$fileselect == "hypnos_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {process_data(bp_hypnos,
+                                                                bp_type = 'abpm',
+                                                                sbp = "syst",
+                                                                dbp = "DIAST",
+                                                                date_time = "DATE.TIME",
+                                                                id = "id",
+                                                                wake = "wake",
+                                                                visit = "visit",
+                                                                hr = "hr",
+                                                                map = "map",
+                                                                rpp = "rpp",
+                                                                pp = "pp")},
+                                           subj = input$subj_for_plots)
+      }
+      
+      #use grid & gridExtra package to arrange the list of plots created by the dow_tod_plots() function
       grid::grid.draw(
         gridExtra::grid.arrange(dow_tod_plots_out[[1]], dow_tod_plots_out[[2]], ncol = 2)
       )
     }
+    
+    #If the user wants to render the bp_ts_plots
+    else if(plottype == "bp_ts_plots"){
+      bp_ts_plots(data = user_data(),
+                  subj = input$subj_for_plots,
+                  wrap_var = input$wrap_var_for_ts, 
+                  index = input$index_for_ts, 
+                  first_hour = input$first_hour_for_ts,
+                  rotate_xlab = input$rotate_xlab_for_ts
+  )
+    }
+    
   })
   
-  output$plot <- renderPlot({
-    plotFunc()
-  })
+  #download handler
+  output$downloadPlot <- downloadHandler(
+    filename = function() {paste(input$fileselect, '.png', sep = '')},
+    content = function(file) {
+      ggplot2::ggsave(file, plotFunc())
+    }
+  )
+  #output the plot
+  output$plot <- renderPlot({plotFunc()})
 })
