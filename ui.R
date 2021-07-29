@@ -132,7 +132,7 @@ ui <- fluidPage(
                  radioButtons("plottype",  "Plot Type",
                               choices = c(`Scatter Plot` = 'bp_scatter',
                                           `Histogram` = 'bp_hist', `Report` = 'bp_report',
-                                          `DOW_TOD_PLOTS_RENAME` = "dow_tod_plots",
+                                          `Day of Week/Time of Day` = "dow_tod_plots",
                                           `Time Series` = "bp_ts_plots"
                               )
                  ),
