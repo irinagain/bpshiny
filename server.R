@@ -1550,7 +1550,6 @@ shinyServer(function(input,output,session) {
                   width = 12,
                   height = 8.53,
                   filetype = "pdf",
-                  units = input$units_for_report,
                   scale = 1)
       }
     }
@@ -1601,8 +1600,10 @@ shinyServer(function(input,output,session) {
                   wrap_var = input$wrap_var_for_ts, 
                   index = input$index_for_ts, 
                   first_hour = input$first_hour_for_ts,
-                  rotate_xlab = input$rotate_xlab_for_ts
-  )
+                  rotate_xlab = input$rotate_xlab_for_ts,
+                  wrap_row = input$wrap_row_for_ts, 
+                  wrap_col = input$wrap_col_for_ts
+              )
     }
     
   })
@@ -1611,7 +1612,7 @@ shinyServer(function(input,output,session) {
   output$downloadPlot <- downloadHandler(
     filename = function() {paste(input$fileselect, '.png', sep = '')},
     content = function(file) {
-      ggplot2::ggsave(file, plotFunc())
+      ggplot2::ggsave(file, print(plotFunc()))
     }
   )
   #output the plot
