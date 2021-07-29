@@ -131,9 +131,10 @@ ui <- fluidPage(
                  #user selects the type of plot they want to render
                  radioButtons("plottype",  "Plot Type",
                               choices = c(`Scatter Plot` = 'bp_scatter',
-                                          `Histogram` = 'bp_hist', `Report` = 'bp_report',
+                                          `Histogram` = 'bp_hist',
+                                          `Time Series` = "bp_ts_plots",
                                           `Day of Week/Time of Day` = "dow_tod_plots",
-                                          `Time Series` = "bp_ts_plots"
+                                          `Report` = 'bp_report'
                               )
                  ),
                  #actionbutton that will notify shiny the user wants to update the plot information
