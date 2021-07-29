@@ -180,7 +180,7 @@ shinyServer(function(input,output,session) {
   #Select for bp_type argument
   output$bp_type_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
-      checkboxInput('bptype_check', 'Blood Presure Type Argument')
+      checkboxInput('bptype_check', 'Blood Presure Data Type')
     }
   })
   
@@ -189,7 +189,7 @@ shinyServer(function(input,output,session) {
     if(input$bptype_check == FALSE){
       return(NULL)
     }else{
-      selectInput('bptype_arg', 'Blood Pressure Type', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
+      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
     }
   })
   
@@ -210,84 +210,45 @@ shinyServer(function(input,output,session) {
   #Toggle for data_screen argument 
   output$data_screen_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
-      checkboxInput('datascreen_check', 'Data Screen Argument')
+      checkboxInput('datascreen_check', 'Data Screen', value = TRUE)
     }
   })
-  
-  output$data_screen_arg <- renderUI({
-    req(input$datascreen_check)
-    if(input$datascreen_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('datascreen_arg', 'Screen For Extreme Values', c('True' = 't', 'False' = 'f'))
-    }
-  })
-  
+
   datascreen_value <- reactive ({
-    if(is.null(input$datascreen_arg) | isFALSE(input$datascreen_check)){
+    if(isTRUE(input$datascreen_check)){
       return(TRUE)
-    }
-    req(input$datascreen_arg)
-    if(input$datascreen_arg == 'f'){
-      return(FALSE)
     }else{
-      return(TRUE)
+      return(FALSE)
     }
   })
   
   #Toggle for inc_low argument
   output$inc_low_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
-      checkboxInput('inclow_check', 'Include Low Argument')
+      checkboxInput('inclow_check', 'Include Low Argument', value = TRUE)
     }
   })
-  
-  output$inc_low_arg <- renderUI({
-    req(input$inclow_check)
-    if(input$inclow_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('inclow_arg', 'Include Low Category', c('True' = 't', 'False' = 'f'))
-    }
-  })
-  
+
   inclow_value <- reactive({
-    if(is.null(input$inclow_arg) | isFALSE(input$inclow_check)){
+    if(isTRUE(input$inclow_check)){
       return(TRUE)
-    }
-    req(input$inclow_arg)
-    if(input$inclow_arg == 'f'){
-      return(FALSE)
     }else{
-      return(TRUE)
+      return(FALSE)
     }
   })
   
   #Toggle for the inc_crisis argument
   output$inc_crisis_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
-      checkboxInput('inccrisis_check', 'Include Crisis Argument')
+      checkboxInput('inccrisis_check', 'Include Crisis Argument', value = TRUE)
     }
   })
-  
-  output$inc_crisis_arg <- renderUI({
-    req(input$inccrisis_check)
-    if(input$inccrisis_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('inccrisis_arg', 'Include Crisis Category', c('True' = 't', 'False' = 'f'))
-    }
-  })
-  
+
   inccrisis_value <- reactive({
-    if(is.null(input$inccrisis_arg) | isFALSE(input$inccrisis_check)){
+    if(isTRUE(input$inccrisis_check)){
       return(TRUE)
-    }
-    req(input$inccrisis_arg)
-    if(input$inccrisis_arg == 'f'){
-      return(FALSE)
     }else{
-      return(TRUE)
+      return(FALSE)
     }
   })
   
@@ -350,25 +311,12 @@ shinyServer(function(input,output,session) {
   #Input for agg argument 
   output$agg_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
-      checkboxInput('aggcheck', 'Include AGG Argument')
+      checkboxInput('aggcheck', 'Include AGG Argument', value = FALSE)
     }
   })
-  
-  output$agg_arg <- renderUI({
-    req(input$aggcheck)
-    if(input$aggcheck == FALSE){
-      return(NULL)
-    }else{
-      selectInput('aggarg', 'AGG Argument', c('True' = 't', 'False' = 'f'))
-    }
-  })
-  
+
   agg_value <- reactive ({
-    if(is.null(input$aggarg) | isFALSE(input$aggcheck)){
-      return(FALSE)
-    }
-    req(input$aggarg)
-    if(input$aggarg == 'f'){
+    if(isFALSE(input$aggcheck)){
       return(FALSE)
     }else{
       return(TRUE)
@@ -392,7 +340,7 @@ shinyServer(function(input,output,session) {
   })
   
   aggthresh_value <- reactive ({
-    if(is.null(input$aggthresh_arg) | isFALSE(input$aggthresh_check | isTRUE(agg_value()))){
+    if(is.null(input$aggthresh_arg) | isFALSE(input$aggthresh_check | isFALSE(agg_value()))){
       return(NULL)
     }
     req(input$aggthresh_arg)
@@ -405,25 +353,28 @@ shinyServer(function(input,output,session) {
   #Input for collapse_df argument
   output$collapse_df_check <- renderUI({
     if(input$fileselect %in% c('input_data')){
-      checkboxInput('collapsedf_check', 'Include Collapse df Argument')
+      checkboxInput('collapsedf_check', 'Include Collapse df Argument', value = FALSE)
     }
   })
-  
-  output$collapse_df_arg <- renderUI({
-    req(input$collapsedf_check)
-    if(input$collapsedf_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('collapsedf_arg', 'Collapse df Argument', c('True' = 't', 'False' = 'f'))
-    }
-  })
+
   
   collapse_value <- reactive ({
-    if(is.null(input$collapsedf_arg) | isFALSE(input$collapsedf_check)){
+    if(isFALSE(input$collapsedf_check)){
       return(FALSE)
+    }else{
+      return(TRUE)
     }
-    req(input$collapsedf_arg)
-    if(input$collapsedf_arg == 'f'){
+  })
+  
+  #Input for chron_order argument
+  output$chronorder_check <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('chron_order_check', 'Chronological Order Argument', value = FALSE)
+    }
+  })
+  
+  chronorder_value <- reactive({
+    if(isFALSE(input$chron_order_check)){
       return(FALSE)
     }else{
       return(TRUE)
@@ -549,7 +500,7 @@ shinyServer(function(input,output,session) {
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                   ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
-                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
+                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value(), chron_order = chronorder_value())
       bpdata_final
     }else{
       bpdata
@@ -615,10 +566,11 @@ shinyServer(function(input,output,session) {
                                 hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                 bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                 ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
-                                agg_thresh = aggthresh_value(), collapse_df = collapse_value())
+                                agg_thresh = aggthresh_value(), collapse_df = collapse_value(), chron_order = chronorder_value())
     
     switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
            'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
+
   })
   
   output$contents <- renderTable({
