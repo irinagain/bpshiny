@@ -1326,15 +1326,24 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  
   output$wrap_rowcol_for_ts <- renderUI({
     plottype = plottype()
+    wrap_var_for_ts = input$wrap_var_for_ts
     
-    if(plottype == "bp_ts_plots"){
-      
-        column(4, numericInput(inputId = "wrap_row_for_ts", 
-                               label = "# Rows",value = 1, min = 1, max = 9, step = 1, width = '50%'))
-        column(4, numericInput(inputId = "wrap_col_for_ts", 
-                               label = "# Columns", value = 1, min = 1, max = 9, ste1, width = '50%'))
+    if ((plottype == "bp_ts_plots") && !is.null(wrap_var_for_ts)){
+      wellPanel(
+        fluidRow(
+                  column(width = 4, 
+                         numericInput(inputId = "wrap_col_for_ts", 
+                                        label = "# Columns", 
+                                        value = 1, min = 1, max = 9, step = 1)
+                         ),
+                  column(width = 4,
+                         numericInput(inputId = "wrap_row_for_ts", 
+                                        label = "# Rows",value = 1, min = 1, max = 9, step = 1)
+                         )
+      ))
       
     }
   })
@@ -1367,7 +1376,7 @@ shinyServer(function(input,output,session) {
   
   ### Render Plot
   
-  #Make a event reactive object that will update whenever the user interacts with the action button "Update" in the plot section.
+  #Make a event reactive object that will update whenever the user interacts with the action button "Render" in the plot section.
   #plotFunc is now an object that can be fed into a renderPlot element in the output list
   plotFunc <- eventReactive(input$plot_update,{
     
