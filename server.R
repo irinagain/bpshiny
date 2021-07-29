@@ -203,22 +203,21 @@ shinyServer(function(input,output,session) {
     if(input$bptype_check == FALSE){
       return(NULL)
     }else{
-      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'),
-                  value = '')
+      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
     }
   })
   
   bptype_value <- reactive({
     if(is.null(input$bptype_arg) | isFALSE(input$bptype_check)){
-      return('hbpm')
+      return('HBPM')
     }
     req(input$bptype_arg)
     if(input$bptype_arg == 'hbpm'){
-      return('hbpm')
+      return('HBPM')
     }else if (input$bptype_arg == 'abpm'){
-      return('abpm')
+      return('ABPM')
     }else{
-      return('ap')
+      return('AP')
     }
   })
   
@@ -311,7 +310,7 @@ shinyServer(function(input,output,session) {
   
   output$eod_arg <- renderUI({
     req(input$eodcheck)
-    if(input$eodcheck == FALSE){
+    if(input$eodcheck == FALSE | isFALSE(input$optional_arg)){
       return(NULL)
     }else{
       textInput('eodarg', "Input four digits that correspond to 24-hour time to adjust the end of day so that any readings
@@ -320,7 +319,7 @@ shinyServer(function(input,output,session) {
   })
   
   eod_value <- reactive({
-    if(is.null(input$eodarg) | isFALSE(input$optional_arg)){
+    if(is.null(input$eodarg) | isFALSE(input$optional_arg) | isFALSE(input$eodcheck)){
       return(NULL)
     }
     req(input$eodarg)
@@ -533,12 +532,14 @@ shinyServer(function(input,output,session) {
                                   ToD_int = todint_value(), eod = eod_value(), 
                                   #agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
                                   chron_order = chronorder_value())
-      
-      bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
-      bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
-      
-      bpdata_final
+      if(isFALSE(input$date1)){
+        bpdata_final
+      }else{
+        bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
+        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+        bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
+        bpdata_final
+      }
     }else{
       bpdata
     }
