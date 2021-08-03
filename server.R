@@ -177,133 +177,115 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  output$optional_arguments <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('optional_arg', 'Display Optional Arguments')
+    }
+  })
+  
+  #Label for Optional Arguments
+  output$optionallabel <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      h5('Optional Arguments')
+    }
+  })
+  
+  
   #Select for bp_type argument
   output$bp_type_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('bptype_check', 'Blood Presure Type Argument')
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('bptype_check', 'Blood Presure Data Type')
     }
   })
   
   output$bp_type_arg <- renderUI({
     req(input$bptype_check)
-    if(input$bptype_check == FALSE){
+    if(input$bptype_check == FALSE | isFALSE(input$optional_arg)){
       return(NULL)
     }else{
-      selectInput('bptype_arg', 'Blood Pressure Type', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
+      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
     }
   })
   
   bptype_value <- reactive({
-    if(is.null(input$bptype_arg) | isFALSE(input$bptype_check)){
-      return('hbpm')
+    if(isFALSE(input$optional_arg) | isFALSE(input$bptype_check)){
+      return('HBPM')
     }
     req(input$bptype_arg)
     if(input$bptype_arg == 'hbpm'){
-      return('hbpm')
+      return('HBPM')
     }else if (input$bptype_arg == 'abpm'){
-      return('abpm')
+      return('ABPM')
     }else{
-      return('ap')
+      return('AP')
     }
   })
   
   #Toggle for data_screen argument 
   output$data_screen_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('datascreen_check', 'Data Screen Argument')
-    }
-  })
-  
-  output$data_screen_arg <- renderUI({
-    req(input$datascreen_check)
-    if(input$datascreen_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('datascreen_arg', 'Screen For Extreme Values', c('True' = 't', 'False' = 'f'))
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('datascreen_check', 'Screen for extreme values in data for both SBP and DBP. Default is True', value = TRUE)
     }
   })
   
   datascreen_value <- reactive ({
-    if(is.null(input$datascreen_arg) | isFALSE(input$datascreen_check)){
+    if(isFALSE(input$optional_arg)){
       return(TRUE)
-    }
-    req(input$datascreen_arg)
-    if(input$datascreen_arg == 'f'){
-      return(FALSE)
     }else{
-      return(TRUE)
+      if(isTRUE(input$datascreen_check)){
+        return(TRUE)
+      }else{return(FALSE)}
     }
   })
   
   #Toggle for inc_low argument
   output$inc_low_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('inclow_check', 'Include Low Argument')
-    }
-  })
-  
-  output$inc_low_arg <- renderUI({
-    req(input$inclow_check)
-    if(input$inclow_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('inclow_arg', 'Include Low Category', c('True' = 't', 'False' = 'f'))
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('inclow_check', 'Include low category for BP classification column. Default is True', value = TRUE)
     }
   })
   
   inclow_value <- reactive({
-    if(is.null(input$inclow_arg) | isFALSE(input$inclow_check)){
+    if(isFALSE(input$optional_arg)){
       return(TRUE)
-    }
-    req(input$inclow_arg)
-    if(input$inclow_arg == 'f'){
-      return(FALSE)
     }else{
-      return(TRUE)
+      if(isTRUE(input$inclow_check)){
+        return(TRUE)
+      }else{return(FALSE)}
     }
   })
   
   #Toggle for the inc_crisis argument
   output$inc_crisis_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('inccrisis_check', 'Include Crisis Argument')
-    }
-  })
-  
-  output$inc_crisis_arg <- renderUI({
-    req(input$inccrisis_check)
-    if(input$inccrisis_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('inccrisis_arg', 'Include Crisis Category', c('True' = 't', 'False' = 'f'))
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('inccrisis_check', 'Include crisis category for BP classification column. Default is True', value = TRUE)
     }
   })
   
   inccrisis_value <- reactive({
-    if(is.null(input$inccrisis_arg) | isFALSE(input$inccrisis_check)){
+    if(isFALSE(input$optional_arg)){
       return(TRUE)
-    }
-    req(input$inccrisis_arg)
-    if(input$inccrisis_arg == 'f'){
-      return(FALSE)
     }else{
-      return(TRUE)
+      if(isTRUE(input$inccrisis_check)){
+        return(TRUE)
+      }else{return(FALSE)}
     }
   })
   
   #Input for tod_int argument
   output$tod_int_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('todint_check', 'Include Time of Day Argument')
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('todint_check', 'Override the default interval for the Time-of-Day periods')
     }
   })
   
   output$tod_int_arg <- renderUI({
     req(input$todint_check)
-    if(input$todint_check == FALSE){
+    if(input$todint_check == FALSE | isFALSE(input$optional_arg)){
       return(NULL)
     }else{
-      textInput('todint_arg', 'Time of Day Argument') 
+      textInput('todint_arg', 'Input a vector of four numbers corresponding to the desired times. By default, the Morning, Afternoon, Evening, and Night 
+                periods are set at 6,12,18,0 respectively, where 0 corresponds to the 24th hour of the day', value = '6,12,18,0') 
     }
   })
   
@@ -321,26 +303,27 @@ shinyServer(function(input,output,session) {
   
   #Input for eod argument
   output$eod_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('eodcheck', 'Include EOD Argument')
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('eodcheck', 'Adjust the delineation of the end of day')
     }
   })
   
   output$eod_arg <- renderUI({
     req(input$eodcheck)
-    if(input$eodcheck == FALSE){
+    if(input$eodcheck == FALSE | isFALSE(input$optional_arg)){
       return(NULL)
     }else{
-      textInput('eodarg', 'EOD Argument')
+      textInput('eodarg', "Input four digits that correspond to 24-hour time to adjust the end of day so that any readings
+                in the early morning are not grouped with the next day's readings", value = NULL)
     }
   })
   
   eod_value <- reactive({
-    if(is.null(input$eodarg) | isFALSE(input$eodcheck)){
+    if(is.null(input$eodarg) | isFALSE(input$optional_arg) | isFALSE(input$eodcheck)){
       return(NULL)
     }
     req(input$eodarg)
-    if(!is.null(input$eodarg)){
+    if(!is.null(input$eodarg) | isFALSE(input$optional_arg)){
       inp1 <- as.numeric(input$eodarg)
       req(nchar(input$eodarg) == 4)
       return(inp1)
@@ -349,53 +332,34 @@ shinyServer(function(input,output,session) {
   
   #Input for agg argument 
   output$agg_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('aggcheck', 'Include AGG Argument')
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('aggcheck', 'Aggregate the data based on the amount of time between observations. Default is False', value = FALSE)
     }
   })
   
-  output$agg_arg <- renderUI({
-    req(input$aggcheck)
-    if(input$aggcheck == FALSE){
-      return(NULL)
-    }else{
-      selectInput('aggarg', 'AGG Argument', c('True' = 't', 'False' = 'f'))
-    }
-  })
-  
-  agg_value <- reactive ({
-    if(is.null(input$aggarg) | isFALSE(input$aggcheck)){
-      return(FALSE)
-    }
-    req(input$aggarg)
-    if(input$aggarg == 'f'){
+  agg_value <- reactive({
+    if(isFALSE(input$optional_arg)){
       return(FALSE)
     }else{
-      return(TRUE)
-    }
-  })
-  
-  #Input for agg_thresh argument
-  output$agg_thresh_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('aggthresh_check', 'Include AGG Thresh Argument')
+      if(isTRUE(input$aggcheck)){
+        return(TRUE)
+      }else{return(FALSE)}
     }
   })
   
   output$agg_thresh_arg <- renderUI({
-    req(input$aggthresh_check)
-    if(input$aggthresh_check == FALSE){
+    req(input$aggcheck)
+    if(isFALSE(input$aggcheck) | isFALSE(input$optional_arg)){
       return(NULL)
     }else{
-      textInput('aggthresh_arg', 'AGG Thresh Argument', '3')
+      textInput('aggthresh_arg', 'Specify the threshold of how many minutes can pass between readings and still be considered part of the same sitting', '3')
     }
   })
   
   aggthresh_value <- reactive ({
-    if(is.null(input$aggthresh_arg) | isFALSE(input$aggthresh_check | isTRUE(agg_value()))){
+    if(isFALSE(input$aggcheck) | isFALSE(input$optional_arg)){
       return(NULL)
     }
-    req(input$aggthresh_arg)
     if(!is.null(input$aggthresh_arg)){
       inp2 <- as.numeric(input$aggthresh_arg)
       return(inp2)
@@ -404,29 +368,36 @@ shinyServer(function(input,output,session) {
   
   #Input for collapse_df argument
   output$collapse_df_check <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('collapsedf_check', 'Include Collapse df Argument')
-    }
-  })
-  
-  output$collapse_df_arg <- renderUI({
-    req(input$collapsedf_check)
-    if(input$collapsedf_check == FALSE){
-      return(NULL)
-    }else{
-      selectInput('collapsedf_arg', 'Collapse df Argument', c('True' = 't', 'False' = 'f'))
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$aggcheck)){
+      checkboxInput('collapsedf_check', 'Argument that collapses data to eliminate repeating rows after aggregation. Default is False.', value = FALSE)
     }
   })
   
   collapse_value <- reactive ({
-    if(is.null(input$collapsedf_arg) | isFALSE(input$collapsedf_check)){
-      return(FALSE)
-    }
-    req(input$collapsedf_arg)
-    if(input$collapsedf_arg == 'f'){
+    if(isFALSE(input$optional_arg) | isFALSE(input$aggcheck)){
       return(FALSE)
     }else{
-      return(TRUE)
+      if(isTRUE(input$collapsedf_check)){
+        return(TRUE)
+      }else{return(FALSE)}
+    }
+  })
+  
+  #Input for chron_order argument
+  output$chronorder_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
+      checkboxInput('chron_order_check', 'Specify whether to to order the data in chronological order or reverse chronological order. Default is False which
+                     corresponds to reverse chronological order', value = FALSE)
+    }
+  })
+  
+  chronorder_value <- reactive({
+    if(isFALSE(input$optional_arg)){
+      return(FALSE)
+    }else{
+      if(isTRUE(input$chron_order_check)){
+        return(TRUE)
+      }else{return(FALSE)}
     }
   })
   
@@ -558,8 +529,9 @@ shinyServer(function(input,output,session) {
       bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                  ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
-                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
+                                  ToD_int = todint_value(), eod = eod_value(),
+                                  #agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                  chron_order = chronorder_value())
       if(isFALSE(input$date1)){
         bpdata_final
       }else{
