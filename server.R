@@ -1192,6 +1192,7 @@ shinyServer(function(input,output,session) {
   })
   outputOptions(output, 'dip_calc_tables', suspendWhenHidden = FALSE)
   
+  
   ######PLOT######
   
   #Get name of dataset
@@ -1236,9 +1237,8 @@ shinyServer(function(input,output,session) {
       return("bp_ts_plots")
     }
   })
-  
-  
   output$plot_type_text <- renderText(plot_type_text())
+  ### Get subj argument used in all the plots
   
   #Get the subject arguments that is used in all plot types 
   output$subj_for_plots<- renderUI({
@@ -1493,20 +1493,6 @@ shinyServer(function(input,output,session) {
     else if(plottype == "bp_report"){
       #If the user wants to user wants to use bp_report for data that isn't unprocessed jhs or unprocessed hypnos
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-<<<<<<< HEAD
-      bp_report(data = user_data(),
-                subj = input$subj_for_plots,
-                inc_low = input$inc_low_T_or_F,
-                inc_crisis = input$inc_crisis_T_or_F,
-                group_var = input$group_var_for_scatter_and_report,
-                #save_report = input$save_report_for_report,
-                path = NULL,
-                filename = "bp_report",
-                width = 12,
-                height = 8.53,
-                filetype = "pdf",
-                scale = 1)
-=======
         bp_report(data = user_data(),
                   subj = input$subj_for_plots,
                   inc_low = input$inc_low_T_or_F,
@@ -1520,7 +1506,6 @@ shinyServer(function(input,output,session) {
                   filetype = "pdf",
                   units = input$units_for_report,
                   scale = 1)
->>>>>>> 05575ae9ae21e6b620edbbd26191e78cf19cd520
       }
       #if the user wants to use bp_report on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1539,6 +1524,7 @@ shinyServer(function(input,output,session) {
                   width = 12,
                   height = 8.53,
                   filetype = "pdf",
+                  units = input$units_for_report,
                   scale = 1)
       }
       #if the user wants to use bp_report on unprocessed hypnos data
