@@ -451,6 +451,9 @@ shinyServer(function(input,output,session) {
                                 map = "map",
                                 rpp = "rpp",
                                 pp = "pp")
+    hypnos_proc$DATE_TIME <- as.POSIXct(hypnos_proc$DATE_TIME)
+    hypnos_proc$DATE_TIME <- format(hypnos_proc$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+    hypnos_proc$DATE <- format(hypnos_proc$DATE, "%m/%d/%Y")
     if(input$dataview == 'proc_data'){
       hypnos_proc
     }else{
@@ -461,11 +464,18 @@ shinyServer(function(input,output,session) {
   #Reactive Expression if users selects jhs_data
   jhs_data <- reactive ({
     bp_jhs <- bp::bp_jhs
+    date11 = as.character(bp_jhs$DateTime)
+    bp_jhs <- bp_jhs%>%
+      select(-DateTime)%>%
+      mutate(DateTime = date11, .before = Month)
     jhs_proc <- process_data(bp_jhs,
                              sbp = "Sys.mmHg.",
                              dbp = "Dias.mmHg.",
                              date_time = "DateTime",
                              hr = "pulse.bpm.")
+    jhs_proc$DATE_TIME <- as.POSIXct(jhs_proc$DATE_TIME)
+    jhs_proc$DATE_TIME <- format(jhs_proc$DATE_TIME, "%m-%d-%Y %H:%M:%S")
+    jhs_proc$DATE <- format(jhs_proc$DATE, "%m/%d/%Y")
     if(input$dataview == 'proc_data'){
       jhs_proc
     }else{
@@ -550,7 +560,14 @@ shinyServer(function(input,output,session) {
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                   ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
                                   agg_thresh = aggthresh_value(), collapse_df = collapse_value())
-      bpdata_final
+      if(isFALSE(input$date1)){
+        bpdata_final
+      }else{
+        bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
+        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+        bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
+        bpdata_final
+      }
     }else{
       bpdata
     }
