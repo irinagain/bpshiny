@@ -1236,8 +1236,9 @@ shinyServer(function(input,output,session) {
       return("bp_ts_plots")
     }
   })
+  
+  
   output$plot_type_text <- renderText(plot_type_text())
-  ### Get subj argument used in all the plots
   
   #Get the subject arguments that is used in all plot types 
   output$subj_for_plots<- renderUI({
@@ -1503,7 +1504,6 @@ shinyServer(function(input,output,session) {
                 width = 12,
                 height = 8.53,
                 filetype = "pdf",
-                units = input$units_for_report,
                 scale = 1)
       }
       #if the user wants to use bp_report on unprocessed jhs data
@@ -1523,7 +1523,6 @@ shinyServer(function(input,output,session) {
                   width = 12,
                   height = 8.53,
                   filetype = "pdf",
-                  units = input$units_for_report,
                   scale = 1)
       }
       #if the user wants to use bp_report on unprocessed hypnos data
