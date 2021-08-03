@@ -1302,19 +1302,19 @@ shinyServer(function(input,output,session) {
   
   #Get argument "Save Report" used in the bp_report() function
   #output$save_report_for_report <- renderUI({
-    #plottype = plottype()
-    #if (plottype == "bp_report"){
-      #checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
-    #}
-    #else{NULL}
+  #plottype = plottype()
+  #if (plottype == "bp_report"){
+  #checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
+  #}
+  #else{NULL}
   #})
   
   #Get the argument "units" used in the bp_report() function
   #output$units_for_report <- renderUI({
-   # plottype = plottype()
-    #if (plottype == "bp_report"){
-     # selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
-    #}
+  # plottype = plottype()
+  #if (plottype == "bp_report"){
+  # selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
+  #}
   #})
   
   ### Arguments for bp_ts_plots
@@ -1335,16 +1335,16 @@ shinyServer(function(input,output,session) {
     if ((plottype == "bp_ts_plots") && !is.null(wrap_var_for_ts)){
       wellPanel(
         fluidRow(
-                  column(width = 4, 
-                         numericInput(inputId = "wrap_col_for_ts", 
-                                        label = "# Columns", 
-                                        value = 1, min = 1, max = 9, step = 1)
-                         ),
-                  column(width = 4,
-                         numericInput(inputId = "wrap_row_for_ts", 
-                                        label = "# Rows",value = 1, min = 1, max = 9, step = 1)
-                         )
-      ))
+          column(width = 4, 
+                 numericInput(inputId = "wrap_col_for_ts", 
+                              label = "# Columns", 
+                              value = 1, min = 1, max = 9, step = 1)
+          ),
+          column(width = 4,
+                 numericInput(inputId = "wrap_row_for_ts", 
+                              label = "# Rows",value = 1, min = 1, max = 9, step = 1)
+          )
+        ))
       
     }
   })
@@ -1422,7 +1422,7 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to do bp_hist on unprocessed ghana data
       else if (input$fileselect == "ghana_data"){
-       bp_hist(data = {process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')}, subj = input$subj_for_plots) 
+        bp_hist(data = {process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')}, subj = input$subj_for_plots) 
       }
       
       else if (input$fileselect == "bpchildren_data"){
@@ -1445,12 +1445,12 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to bp_scatter() data that isn't unprocessed jhs or unprocessed hypnos
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-      bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
-                 subj = input$subj_for_plots,
-                 group_var = input$group_var_for_scatter_and_report,
-                 wrap_var = input$wrap_var_for_scatter,
-                 inc_crisis = input$inc_crisis_T_or_F, 
-                 inc_low = input$inc_low_T_or_F)
+        bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
+                   subj = input$subj_for_plots,
+                   group_var = input$group_var_for_scatter_and_report,
+                   wrap_var = input$wrap_var_for_scatter,
+                   inc_crisis = input$inc_crisis_T_or_F, 
+                   inc_low = input$inc_low_T_or_F)
       }
       #if the user wants to use bp_scatter on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1493,6 +1493,7 @@ shinyServer(function(input,output,session) {
     else if(plottype == "bp_report"){
       #If the user wants to user wants to use bp_report for data that isn't unprocessed jhs or unprocessed hypnos
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
+<<<<<<< HEAD
       bp_report(data = user_data(),
                 subj = input$subj_for_plots,
                 inc_low = input$inc_low_T_or_F,
@@ -1505,6 +1506,21 @@ shinyServer(function(input,output,session) {
                 height = 8.53,
                 filetype = "pdf",
                 scale = 1)
+=======
+        bp_report(data = user_data(),
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+>>>>>>> 05575ae9ae21e6b620edbbd26191e78cf19cd520
       }
       #if the user wants to use bp_report on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1557,8 +1573,8 @@ shinyServer(function(input,output,session) {
     else if(plottype == "dow_tod_plots"){
       #if the user wants to dow_tod_plots a dataset that isn't unprocessedd hypnos or unprocessed jhs
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-      dow_tod_plots_out <- dow_tod_plots(data = user_data(),
-                                         subj = input$subj_for_plots)
+        dow_tod_plots_out <- dow_tod_plots(data = user_data(),
+                                           subj = input$subj_for_plots)
       }
       #if the user wants to dow_tod_plots the jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1602,7 +1618,7 @@ shinyServer(function(input,output,session) {
                   rotate_xlab = input$rotate_xlab_for_ts,
                   wrap_row = input$wrap_row_for_ts, 
                   wrap_col = input$wrap_col_for_ts
-              )
+      )
     }
     
   })
