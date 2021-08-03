@@ -22,7 +22,7 @@ shinyServer(function(input,output,session) {
     }
   })  
   
-  #Reactive function to read datafile and assin to variable dataset
+  #Reactive function to read datafile
   dataset <- reactive({
     inFile <- input$datafile
     if(is.null(inFile)){
@@ -30,7 +30,7 @@ shinyServer(function(input,output,session) {
     }
     read.csv(inFile$datapath, header = T)
   })
-  #Updates selectInput() value for Systolic and Diastolic Variable Names
+  #Updates selectInput() value 
   observe({
     updateSelectInput(session,'sys', choices = names(dataset()))
     updateSelectInput(session, 'dias', choices = names(dataset()))
@@ -51,7 +51,7 @@ shinyServer(function(input,output,session) {
   })
   
   
-  #Creates checkboxs based on if User Datafile is selected
+  #Creates checkbox based on if User Datafile is selected
   output$date_checkbox <- renderUI({
     if(input$fileselect == 'input_data'){
       checkboxInput('date1', 'Date/Time')
@@ -177,24 +177,10 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  output$optional_arguments <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('optional_arg', 'Display Optional Arguments')
-    }
-  })
-  
-  #Label for Optional Arguments
-  output$optionallabel <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      h5('Optional Arguments')
-    }
-  })
-  
-  
   #Select for bp_type argument
   output$bp_type_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('bptype_check', 'Blood Presure Data Type')
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('bptype_check', 'Blood Presure Type Argument')
     }
   })
   
@@ -203,79 +189,112 @@ shinyServer(function(input,output,session) {
     if(input$bptype_check == FALSE){
       return(NULL)
     }else{
-      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
+      selectInput('bptype_arg', 'Blood Pressure Type', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
     }
   })
   
   bptype_value <- reactive({
     if(is.null(input$bptype_arg) | isFALSE(input$bptype_check)){
-      return('HBPM')
+      return('hbpm')
     }
     req(input$bptype_arg)
     if(input$bptype_arg == 'hbpm'){
-      return('HBPM')
+      return('hbpm')
     }else if (input$bptype_arg == 'abpm'){
-      return('ABPM')
+      return('abpm')
     }else{
-      return('AP')
+      return('ap')
     }
   })
   
   #Toggle for data_screen argument 
   output$data_screen_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('datascreen_check', 'Screen for extreme values in data for both SBP and DBP. Default is True', value = TRUE)
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('datascreen_check', 'Data Screen Argument')
     }
   })
-
-  datascreen_value <- reactive ({
-    if(isFALSE(input$optional_arg)){
-      return(TRUE)
+  
+  output$data_screen_arg <- renderUI({
+    req(input$datascreen_check)
+    if(input$datascreen_check == FALSE){
+      return(NULL)
     }else{
-      if(isTRUE(input$datascreen_check)){
-        return(TRUE)
-      }else{return(FALSE)}
+      selectInput('datascreen_arg', 'Screen For Extreme Values', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
+  datascreen_value <- reactive ({
+    if(is.null(input$datascreen_arg) | isFALSE(input$datascreen_check)){
+      return(TRUE)
+    }
+    req(input$datascreen_arg)
+    if(input$datascreen_arg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
     }
   })
   
   #Toggle for inc_low argument
   output$inc_low_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('inclow_check', 'Include low category for BP classification column. Default is True', value = TRUE)
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('inclow_check', 'Include Low Argument')
     }
   })
-
-  inclow_value <- reactive({
-    if(isFALSE(input$optional_arg)){
-      return(TRUE)
+  
+  output$inc_low_arg <- renderUI({
+    req(input$inclow_check)
+    if(input$inclow_check == FALSE){
+      return(NULL)
     }else{
-      if(isTRUE(input$inclow_check)){
-        return(TRUE)
-      }else{return(FALSE)}
+      selectInput('inclow_arg', 'Include Low Category', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
+  inclow_value <- reactive({
+    if(is.null(input$inclow_arg) | isFALSE(input$inclow_check)){
+      return(TRUE)
+    }
+    req(input$inclow_arg)
+    if(input$inclow_arg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
     }
   })
   
   #Toggle for the inc_crisis argument
   output$inc_crisis_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('inccrisis_check', 'Include crisis category for BP classification column. Default is True', value = TRUE)
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('inccrisis_check', 'Include Crisis Argument')
     }
   })
-
-  inccrisis_value <- reactive({
-    if(isFALSE(input$optional_arg)){
-      return(TRUE)
+  
+  output$inc_crisis_arg <- renderUI({
+    req(input$inccrisis_check)
+    if(input$inccrisis_check == FALSE){
+      return(NULL)
     }else{
-      if(isTRUE(input$inccrisis_check)){
-        return(TRUE)
-      }else{return(FALSE)}
+      selectInput('inccrisis_arg', 'Include Crisis Category', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
+  inccrisis_value <- reactive({
+    if(is.null(input$inccrisis_arg) | isFALSE(input$inccrisis_check)){
+      return(TRUE)
+    }
+    req(input$inccrisis_arg)
+    if(input$inccrisis_arg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
     }
   })
   
   #Input for tod_int argument
   output$tod_int_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('todint_check', 'Override the default interval for the Time-of-Day periods')
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('todint_check', 'Include Time of Day Argument')
     }
   })
   
@@ -284,8 +303,7 @@ shinyServer(function(input,output,session) {
     if(input$todint_check == FALSE){
       return(NULL)
     }else{
-      textInput('todint_arg', 'Input a vector of four numbers corresponding to the desired times. By default, the Morning, Afternoon, Evening, and Night 
-                periods are set at 6,12,18,0 respectively, where 0 corresponds to the 24th hour of the day', value = '6,12,18,0') 
+      textInput('todint_arg', 'Time of Day Argument') 
     }
   })
   
@@ -303,27 +321,26 @@ shinyServer(function(input,output,session) {
   
   #Input for eod argument
   output$eod_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('eodcheck', 'Adjust the delineation of the end of day')
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('eodcheck', 'Include EOD Argument')
     }
   })
   
   output$eod_arg <- renderUI({
     req(input$eodcheck)
-    if(input$eodcheck == FALSE | isFALSE(input$optional_arg)){
+    if(input$eodcheck == FALSE){
       return(NULL)
     }else{
-      textInput('eodarg', "Input four digits that correspond to 24-hour time to adjust the end of day so that any readings
-                in the early morning are not grouped with the next day's readings", value = NULL)
+      textInput('eodarg', 'EOD Argument')
     }
   })
   
   eod_value <- reactive({
-    if(is.null(input$eodarg) | isFALSE(input$optional_arg) | isFALSE(input$eodcheck)){
+    if(is.null(input$eodarg) | isFALSE(input$eodcheck)){
       return(NULL)
     }
     req(input$eodarg)
-    if(!is.null(input$eodarg) | isFALSE(input$optional_arg)){
+    if(!is.null(input$eodarg)){
       inp1 <- as.numeric(input$eodarg)
       req(nchar(input$eodarg) == 4)
       return(inp1)
@@ -332,34 +349,53 @@ shinyServer(function(input,output,session) {
   
   #Input for agg argument 
   output$agg_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('aggcheck', 'Aggregate the data based on the amount of time between observations. Default is False', value = FALSE)
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('aggcheck', 'Include AGG Argument')
     }
   })
   
-  agg_value <- reactive({
-    if(isFALSE(input$optional_arg)){
-      return(FALSE)
-    }else{
-      if(isTRUE(input$aggcheck)){
-        return(TRUE)
-      }else{return(FALSE)}
-    }
-  })
-
-  output$agg_thresh_arg <- renderUI({
+  output$agg_arg <- renderUI({
     req(input$aggcheck)
-    if(isFALSE(input$aggcheck) | isFALSE(input$optional_arg)){
+    if(input$aggcheck == FALSE){
       return(NULL)
     }else{
-      textInput('aggthresh_arg', 'Specify the threshold of how many minutes can pass between readings and still be considered part of the same sitting', '3')
+      selectInput('aggarg', 'AGG Argument', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
+  agg_value <- reactive ({
+    if(is.null(input$aggarg) | isFALSE(input$aggcheck)){
+      return(FALSE)
+    }
+    req(input$aggarg)
+    if(input$aggarg == 'f'){
+      return(FALSE)
+    }else{
+      return(TRUE)
+    }
+  })
+  
+  #Input for agg_thresh argument
+  output$agg_thresh_check <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('aggthresh_check', 'Include AGG Thresh Argument')
+    }
+  })
+  
+  output$agg_thresh_arg <- renderUI({
+    req(input$aggthresh_check)
+    if(input$aggthresh_check == FALSE){
+      return(NULL)
+    }else{
+      textInput('aggthresh_arg', 'AGG Thresh Argument', '3')
     }
   })
   
   aggthresh_value <- reactive ({
-    if(isFALSE(input$aggcheck) | isFALSE(input$optional_arg)){
+    if(is.null(input$aggthresh_arg) | isFALSE(input$aggthresh_check | isTRUE(agg_value()))){
       return(NULL)
     }
+    req(input$aggthresh_arg)
     if(!is.null(input$aggthresh_arg)){
       inp2 <- as.numeric(input$aggthresh_arg)
       return(inp2)
@@ -368,36 +404,29 @@ shinyServer(function(input,output,session) {
   
   #Input for collapse_df argument
   output$collapse_df_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$aggcheck)){
-      checkboxInput('collapsedf_check', 'Argument that collapses data to eliminate repeating rows after aggregation. Default is False.', value = FALSE)
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('collapsedf_check', 'Include Collapse df Argument')
     }
   })
-
+  
+  output$collapse_df_arg <- renderUI({
+    req(input$collapsedf_check)
+    if(input$collapsedf_check == FALSE){
+      return(NULL)
+    }else{
+      selectInput('collapsedf_arg', 'Collapse df Argument', c('True' = 't', 'False' = 'f'))
+    }
+  })
+  
   collapse_value <- reactive ({
-    if(isFALSE(input$optional_arg) | isFALSE(input$aggcheck)){
+    if(is.null(input$collapsedf_arg) | isFALSE(input$collapsedf_check)){
+      return(FALSE)
+    }
+    req(input$collapsedf_arg)
+    if(input$collapsedf_arg == 'f'){
       return(FALSE)
     }else{
-      if(isTRUE(input$collapsedf_check)){
-        return(TRUE)
-      }else{return(FALSE)}
-    }
-  })
-  
-  #Input for chron_order argument
-  output$chronorder_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('chron_order_check', 'Specify whether to to order the data in chronological order or reverse chronological order. Default is False which
-                     corresponds to reverse chronological order', value = FALSE)
-    }
-  })
-  
-  chronorder_value <- reactive({
-    if(isFALSE(input$optional_arg)){
-      return(FALSE)
-    }else{
-      if(isTRUE(input$chron_order_check)){
-        return(TRUE)
-      }else{return(FALSE)}
+      return(TRUE)
     }
   })
   
@@ -407,7 +436,7 @@ shinyServer(function(input,output,session) {
     radioButtons('dataview', label = 'View Data', choices = c('Original Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
   )
   
-  #Reactive Expression if users selects hypnos_data and outputs displays processed vs original data based on input$dataviewer
+  #Reactive Expression if users selects hypnos_data
   hypnos_data <- reactive({
     bp_hypnos <- bp::bp_hypnos
     hypnos_proc <- process_data(bp_hypnos,
@@ -422,9 +451,6 @@ shinyServer(function(input,output,session) {
                                 map = "map",
                                 rpp = "rpp",
                                 pp = "pp")
-    hypnos_proc$DATE_TIME <- as.POSIXct(hypnos_proc$DATE_TIME)
-    hypnos_proc$DATE_TIME <- format(hypnos_proc$DATE_TIME, "%m/%d/%Y %H:%M:%S")
-    hypnos_proc$DATE <- format(hypnos_proc$DATE, "%m/%d/%Y")
     if(input$dataview == 'proc_data'){
       hypnos_proc
     }else{
@@ -432,29 +458,22 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Reactive Expression if users selects jhs_data and outputs displays processed vs original data based on input$dataviewer
+  #Reactive Expression if users selects jhs_data
   jhs_data <- reactive ({
     bp_jhs <- bp::bp_jhs
-    date11 = as.character(bp_jhs$DateTime)
-    bp_jhs1 <- bp_jhs%>%
-      select(-DateTime)%>%
-      mutate(DateTime = date11, .before = Month)
-    jhs_proc <- process_data(bp_jhs1,
+    jhs_proc <- process_data(bp_jhs,
                              sbp = "Sys.mmHg.",
                              dbp = "Dias.mmHg.",
                              date_time = "DateTime",
                              hr = "pulse.bpm.")
-    jhs_proc$DATE_TIME <- as.POSIXct(jhs_proc$DATE_TIME)
-    jhs_proc$DATE_TIME <- format(jhs_proc$DATE_TIME, "%m-%d-%Y %H:%M:%S")
-    jhs_proc$DATE <- format(jhs_proc$DATE, "%m/%d/%Y")
     if(input$dataview == 'proc_data'){
       jhs_proc
     }else{
-      bp_jhs1
+      bp_jhs
     }
   })
   
-  #Reactive Expression if user selects bp_children and outputs displays processed vs original data based on input$dataviewer
+  #Reactive Expression if user selects bp_children
   children_data <- reactive({
     bp_children <- bp::bp_children
     children_proc <- process_data(bp_children, 
@@ -467,7 +486,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Reactive Expression if user selects bp_preg and outputs displays processed vs original data based on input$dataviewer
+  #Reactive Expression if user selects bp_preg
   preg_data <- reactive({
     bp_preg <- bp::bp_preg
     bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
@@ -490,7 +509,7 @@ shinyServer(function(input,output,session) {
   })
   
   
-  #Reactive Expression to read data and assing all variable names to process_data() function and outputs displays processed vs original data based on input$dataviewer
+  #Reactive Expression if user inputs their own data
   input_data <- reactive({
     file <- input$datafile
     
@@ -529,17 +548,9 @@ shinyServer(function(input,output,session) {
       bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                  ToD_int = todint_value(), eod = eod_value(), 
-                                  #agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
-                                  chron_order = chronorder_value())
-      if(isFALSE(input$date1)){
-        bpdata_final
-      }else{
-        bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
-        bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
-        bpdata_final
-      }
+                                  ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
+                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
+      bpdata_final
     }else{
       bpdata
     }
@@ -553,21 +564,9 @@ shinyServer(function(input,output,session) {
            'bppreg_data' = preg_data(), 'input_data' = input_data())
   })
   
-  #Expression containg processed jhs data
-  jhs_data1 <- reactive({
-    bp_jhs <- bp::bp_jhs
-    jhs_proc <- process_data(bp_jhs,
-                             sbp = "Sys.mmHg.",
-                             dbp = "Dias.mmHg.",
-                             date_time = "DateTime",
-                             hr = "pulse.bpm.")
-    jhs_proc
-  })
-  
-  #Expression containing processed hypnos data
-  hypnos_data1 <- reactive({
-    bp_hypnos <- bp::bp_hypnos
-    hypnos_proc <- process_data(bp_hypnos,
+  original_data <- reactive({
+    datachoice = input$fileselect
+    proc_hypnos <- process_data(bp_hypnos,
                                 bp_type = 'abpm',
                                 sbp = "syst",
                                 dbp = "DIAST",
@@ -579,48 +578,18 @@ shinyServer(function(input,output,session) {
                                 map = "map",
                                 rpp = "rpp",
                                 pp = "pp")
-    hypnos_proc
-
-  })
-  
-  #Expression containing processed ghana data
-  ghana_data1 <- reactive({
-    bp_ghana <- bp::bp_ghana
-    bpghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
-    bpghana_proc
-  })
-  
-  #Expression containing processed preg data
-  preg_data1 <- reactive({
-    bp_preg <- bp::bp_preg
-    bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
-                                id = 'ID')
-    bppreg_proc
-  })
-  
-  #Expression containing processed children data
-  children_data1 <- reactive({
-    bp_children <- bp::bp_children
-    children_proc <- process_data(bp_children, 
+    proc_jhs <- process_data(bp_jhs,
+                             sbp = "Sys.mmHg.",
+                             dbp = "Dias.mmHg.",
+                             date_time = "DateTime",
+                             hr = "pulse.bpm.")
+    proc_children <- process_data(bp_children, 
                                   sbp = 'sbp', dbp = 'dbp',
                                   id = 'id', visit = 'visit')
-    children_proc
-
-  })
-  
-  #Expression containing processed input data
-  input_data1 <- reactive({
-    file <- input$datafile
     
-    #Ensuring uploaded file is .csv format
-    ext <- tools::file_ext(file$datapath)
-    req(file)
-    validate(need(ext == "csv", "Please upload a csv file"))
+    proc_preg <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+    proc_ghana <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
     
-    #Assigning data to variable 'bpdata'
-    bpdata = read.csv(file$datapath, header=T)
-    
-    #Transforming Variable names to usable form 
     sys = input$sys
     dias = input$dias
     date = input$date
@@ -642,24 +611,14 @@ shinyServer(function(input,output,session) {
     dow = input$dow
     if(input$dow1 == FALSE){dow = NULL}
     
-    #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
-
-    bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
-                                bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                ToD_int = todint_value(), eod = eod_value(), 
-                                #agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
-                                chron_order = chronorder_value())
-    bpdata_final
-
+    proc_inputdata = process_data(data = input_data(), sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                  bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
+                                  ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
+                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
     
-  })
-  
-  #Switch function that will contain data that does not need to be processed further. Can be used regardless input$dataview
-  original_data <- reactive({
-    datachoice = input$fileselect
-    switch(datachoice,'ghana_data' = ghana_data1(), 'hypnos_data' = hypnos_data1(), 'jhsproc_data' = jhs_data1(), 'bpchildren_data' = children_data1(),
-           'bppreg_data' = preg_data1(), 'input_data' = input_data1())
+    switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
+           'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
   })
   
   output$contents <- renderTable({
@@ -787,7 +746,7 @@ shinyServer(function(input,output,session) {
   #                                                     scrollX = TRUE))
   
   
-  metric_table <- reactive({
+  metric_table <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     #If/else statement that decides whether to use sample data that is processed in data tab
     #Or if original data is still selected, it will use the pre-proccessed sample data
@@ -810,7 +769,7 @@ shinyServer(function(input,output,session) {
                                              options = list(dom = "Btip",
                                                             buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                             scrollX = TRUE))
-  metric_bp_table_1 <- reactive({
+  metric_bp_table_1 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -827,7 +786,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_1 <- renderText({"Table 1. SBP Counts by Stage"})
   
-  metric_bp_table_2 <- reactive({
+  metric_bp_table_2 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -844,7 +803,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_2 <- renderText({"\n Table 2. DBP Counts by Stage"})
   
-  metric_bp_table_3 <- reactive({
+  metric_bp_table_3 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -861,7 +820,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_3 <- renderText({"\n Table 3. CLASS Counts"})
   
-  metric_bp_table_4 <- reactive({
+  metric_bp_table_4 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -878,7 +837,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_4 <- renderText({"\n Table 4. All BP Stage Combinations"})
   
-  metric_bp_table_5 <- reactive({
+  metric_bp_table_5 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -895,7 +854,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_5 <- renderText({"\n Table 5. BP_contingency_count"})
   
-  metric_bp_table_6 <- reactive({
+  metric_bp_table_6 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -912,7 +871,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_6 <- renderText({"\n Table 6. BP_contingency_percent"})
   
-  metric_bp_table_7 <- reactive({
+  metric_bp_table_7 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -929,7 +888,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_7 <- renderText({"\n Table 7. SBP_by_Day_of_Week"})
   
-  metric_bp_table_8 <- reactive({
+  metric_bp_table_8 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -946,7 +905,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_8 <- renderText({"\n Table 8. DBP_by_Day_of_Week"})
   
-  metric_bp_table_9 <- reactive({
+  metric_bp_table_9 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -963,7 +922,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_9 <- renderText({"\n Table 9. CLASS_Day_of_Week"})
   
-  metric_bp_table_10 <- reactive({
+  metric_bp_table_10 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -980,7 +939,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_10 <- renderText({"\n Table 10. SBP_by_Time_of_Day"})
   
-  metric_bp_table_11 <- reactive({
+  metric_bp_table_11 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -997,7 +956,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_11 <- renderText({"\n Table 11. DBP_by_Time_of_Day"})
   
-  metric_bp_table_12 <- reactive({
+  metric_bp_table_12 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1014,7 +973,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_12 <- renderText({"\n Table 12. CLASS_Time_of_Day"})
   
-  metric_bp_table_13 <- reactive({
+  metric_bp_table_13 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1035,7 +994,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_13 <- renderText({"\n Table 13. SBP_by_WAKE_status \n"})
   
-  metric_bp_table_14 <- reactive({
+  metric_bp_table_14 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1055,7 +1014,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_14 <- renderText(paste("Table 14. DBP_by_WAKE_status", "", sep = "\n"))
   
-  metric_bp_table_15 <- reactive({
+  metric_bp_table_15 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1075,7 +1034,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_15 <- renderText({"\n Table 15. SBP_by_WAKE_perc \n"})
   
-  metric_bp_table_16 <- reactive({
+  metric_bp_table_16 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1162,7 +1121,7 @@ shinyServer(function(input,output,session) {
                                                                   scrollX = TRUE))
   
   ## dip_calc
-  metric_dip_calc_1 <- reactive({
+  metric_dip_calc_1 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1193,7 +1152,7 @@ shinyServer(function(input,output,session) {
     return(data.frame(dip_calc_output[1]))
   })
   
-  metric_dip_calc_2 <- reactive({
+  metric_dip_calc_2 <- eventReactive(req(input$metric_update),{
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1218,17 +1177,17 @@ shinyServer(function(input,output,session) {
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                                  scrollX = TRUE))
   
-  output$one_table <- reactive({
+  output$one_table <- eventReactive(req(input$metric_update),{
     input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
   })
   outputOptions(output, 'one_table', suspendWhenHidden = FALSE)
   
-  output$bp_tables_tables <- reactive({
+  output$bp_tables_tables <- eventReactive(req(input$metric_update),{
     input$metric == "bp_tables"
   })
   outputOptions(output, 'bp_tables_tables', suspendWhenHidden = FALSE)
   
-  output$dip_calc_tables <- reactive({
+  output$dip_calc_tables <- eventReactive(req(input$metric_update),{
     input$metric == "dip_calc"
   })
   outputOptions(output, 'dip_calc_tables', suspendWhenHidden = FALSE)
@@ -1342,19 +1301,19 @@ shinyServer(function(input,output,session) {
   
   #Get argument "Save Report" used in the bp_report() function
   #output$save_report_for_report <- renderUI({
-    #plottype = plottype()
-    #if (plottype == "bp_report"){
-      #checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
-    #}
-    #else{NULL}
+  #plottype = plottype()
+  #if (plottype == "bp_report"){
+  #checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
+  #}
+  #else{NULL}
   #})
   
   #Get the argument "units" used in the bp_report() function
   #output$units_for_report <- renderUI({
-   # plottype = plottype()
-    #if (plottype == "bp_report"){
-     # selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
-    #}
+  # plottype = plottype()
+  #if (plottype == "bp_report"){
+  # selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
+  #}
   #})
   
   ### Arguments for bp_ts_plots
@@ -1367,15 +1326,24 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  
   output$wrap_rowcol_for_ts <- renderUI({
     plottype = plottype()
+    wrap_var_for_ts = input$wrap_var_for_ts
     
-    if(plottype == "bp_ts_plots"){
-      
-        column(4, numericInput(inputId = "wrap_row_for_ts", 
-                               label = "# Rows",value = 1, min = 1, max = 9, step = 1, width = '50%'))
-        column(4, numericInput(inputId = "wrap_col_for_ts", 
-                               label = "# Columns", value = 1, min = 1, max = 9, ste1, width = '50%'))
+    if ((plottype == "bp_ts_plots") && !is.null(wrap_var_for_ts)){
+      wellPanel(
+        fluidRow(
+          column(width = 4, 
+                 numericInput(inputId = "wrap_col_for_ts", 
+                              label = "# Columns", 
+                              value = 1, min = 1, max = 9, step = 1)
+          ),
+          column(width = 4,
+                 numericInput(inputId = "wrap_row_for_ts", 
+                              label = "# Rows",value = 1, min = 1, max = 9, step = 1)
+          )
+        ))
       
     }
   })
@@ -1408,7 +1376,7 @@ shinyServer(function(input,output,session) {
   
   ### Render Plot
   
-  #Make a event reactive object that will update whenever the user interacts with the action button "Update" in the plot section.
+  #Make a event reactive object that will update whenever the user interacts with the action button "Render" in the plot section.
   #plotFunc is now an object that can be fed into a renderPlot element in the output list
   plotFunc <- eventReactive(input$plot_update,{
     
@@ -1453,7 +1421,7 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to do bp_hist on unprocessed ghana data
       else if (input$fileselect == "ghana_data"){
-       bp_hist(data = {process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')}, subj = input$subj_for_plots) 
+        bp_hist(data = {process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')}, subj = input$subj_for_plots) 
       }
       
       else if (input$fileselect == "bpchildren_data"){
@@ -1476,12 +1444,12 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to bp_scatter() data that isn't unprocessed jhs or unprocessed hypnos
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-      bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
-                 subj = input$subj_for_plots,
-                 group_var = input$group_var_for_scatter_and_report,
-                 wrap_var = input$wrap_var_for_scatter,
-                 inc_crisis = input$inc_crisis_T_or_F, 
-                 inc_low = input$inc_low_T_or_F)
+        bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
+                   subj = input$subj_for_plots,
+                   group_var = input$group_var_for_scatter_and_report,
+                   wrap_var = input$wrap_var_for_scatter,
+                   inc_crisis = input$inc_crisis_T_or_F, 
+                   inc_low = input$inc_low_T_or_F)
       }
       #if the user wants to use bp_scatter on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1524,19 +1492,19 @@ shinyServer(function(input,output,session) {
     else if(plottype == "bp_report"){
       #If the user wants to user wants to use bp_report for data that isn't unprocessed jhs or unprocessed hypnos
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-      bp_report(data = user_data(),
-                subj = input$subj_for_plots,
-                inc_low = input$inc_low_T_or_F,
-                inc_crisis = input$inc_crisis_T_or_F,
-                group_var = input$group_var_for_scatter_and_report,
-                #save_report = input$save_report_for_report,
-                path = NULL,
-                filename = "bp_report",
-                width = 12,
-                height = 8.53,
-                filetype = "pdf",
-                units = input$units_for_report,
-                scale = 1)
+        bp_report(data = user_data(),
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
       }
       #if the user wants to use bp_report on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1582,7 +1550,6 @@ shinyServer(function(input,output,session) {
                   width = 12,
                   height = 8.53,
                   filetype = "pdf",
-                  units = input$units_for_report,
                   scale = 1)
       }
     }
@@ -1591,8 +1558,8 @@ shinyServer(function(input,output,session) {
     else if(plottype == "dow_tod_plots"){
       #if the user wants to dow_tod_plots a dataset that isn't unprocessedd hypnos or unprocessed jhs
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-      dow_tod_plots_out <- dow_tod_plots(data = user_data(),
-                                         subj = input$subj_for_plots)
+        dow_tod_plots_out <- dow_tod_plots(data = user_data(),
+                                           subj = input$subj_for_plots)
       }
       #if the user wants to dow_tod_plots the jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -1633,8 +1600,10 @@ shinyServer(function(input,output,session) {
                   wrap_var = input$wrap_var_for_ts, 
                   index = input$index_for_ts, 
                   first_hour = input$first_hour_for_ts,
-                  rotate_xlab = input$rotate_xlab_for_ts
-  )
+                  rotate_xlab = input$rotate_xlab_for_ts,
+                  wrap_row = input$wrap_row_for_ts, 
+                  wrap_col = input$wrap_col_for_ts
+      )
     }
     
   })
@@ -1643,7 +1612,7 @@ shinyServer(function(input,output,session) {
   output$downloadPlot <- downloadHandler(
     filename = function() {paste(input$fileselect, '.png', sep = '')},
     content = function(file) {
-      ggplot2::ggsave(file, plotFunc())
+      ggplot2::ggsave(file, print(plotFunc()))
     }
   )
   #output the plot

@@ -39,21 +39,24 @@ ui <- fluidPage(
                  uiOutput('rppinput'),
                  uiOutput('dow_checkbox'),
                  uiOutput('dowinput'),
-                 uiOutput('optionallabel'),
-                 uiOutput('optional_arguments'),
                  uiOutput('data_screen_check'),
+                 uiOutput('data_screen_arg'),
                  uiOutput('bp_type_check'),
                  uiOutput('bp_type_arg'),
                  uiOutput('inc_low_check'),
+                 uiOutput('inc_low_arg'),
                  uiOutput('inc_crisis_check'),
+                 uiOutput('inc_crisis_arg'),
                  uiOutput('tod_int_check'),
                  uiOutput('tod_int_arg'),
                  uiOutput('eod_check'),
                  uiOutput('eod_arg'),
                  uiOutput('agg_check'),
+                 uiOutput('agg_arg'),
+                 uiOutput('agg_thresh_check'),
                  uiOutput('agg_thresh_arg'),
                  uiOutput('collapse_df_check'),
-                 uiOutput('chronorder_check'),
+                 uiOutput('collapse_df_arg'),
                  uiOutput('dataviewer')
                ),
                mainPanel(tableOutput("contents"))
@@ -128,9 +131,10 @@ ui <- fluidPage(
                  #user selects the type of plot they want to render
                  radioButtons("plottype",  "Plot Type",
                               choices = c(`Scatter Plot` = 'bp_scatter',
-                                          `Histogram` = 'bp_hist', `Report` = 'bp_report',
-                                          `DOW_TOD_PLOTS_RENAME` = "dow_tod_plots",
-                                          `Time Series` = "bp_ts_plots"
+                                          `Histogram` = 'bp_hist',
+                                          `Time Series` = "bp_ts_plots",
+                                          `Day of Week/Time of Day` = "dow_tod_plots",
+                                          `Report` = 'bp_report'
                               )
                  ),
                  #actionbutton that will notify shiny the user wants to update the plot information
@@ -141,14 +145,14 @@ ui <- fluidPage(
                  uiOutput("wrap_var_for_scatter"),
                  uiOutput("index_for_ts"),
                  uiOutput("wrap_var_for_ts"),
+                 uiOutput("wrap_rowcol_for_ts"),
                  uiOutput("first_hour_for_ts"),
                  uiOutput("plot_type_for_scatter"),
-                # uiOutput("wrap_rowcol_for_ts"),
                  uiOutput("rotate_xlab_for_ts"),
                  uiOutput("include_crisis_stages2020"),
                  uiOutput("include_low_stages2020")),
-                 #uiOutput("units_for_report")),
-                 #uiOutput("save_report_for_report")),
+               #uiOutput("units_for_report")),
+               #uiOutput("save_report_for_report")),
                #configure main panel 
                mainPanel = 
                  #draw the plot
