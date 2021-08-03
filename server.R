@@ -553,9 +553,21 @@ shinyServer(function(input,output,session) {
            'bppreg_data' = preg_data(), 'input_data' = input_data())
   })
   
-  original_data <- reactive({
-    datachoice = input$fileselect
-    proc_hypnos <- process_data(bp_hypnos,
+  #Expression containg processed jhs data
+  jhs_data1 <- reactive({
+    bp_jhs <- bp::bp_jhs
+    jhs_proc <- process_data(bp_jhs,
+                             sbp = "Sys.mmHg.",
+                             dbp = "Dias.mmHg.",
+                             date_time = "DateTime",
+                             hr = "pulse.bpm.")
+    jhs_proc
+  })
+  
+  #Expression containing processed hypnos data
+  hypnos_data1 <- reactive({
+    bp_hypnos <- bp::bp_hypnos
+    hypnos_proc <- process_data(bp_hypnos,
                                 bp_type = 'abpm',
                                 sbp = "syst",
                                 dbp = "DIAST",
@@ -567,18 +579,48 @@ shinyServer(function(input,output,session) {
                                 map = "map",
                                 rpp = "rpp",
                                 pp = "pp")
-    proc_jhs <- process_data(bp_jhs,
-                             sbp = "Sys.mmHg.",
-                             dbp = "Dias.mmHg.",
-                             date_time = "DateTime",
-                             hr = "pulse.bpm.")
-    proc_children <- process_data(bp_children, 
+    hypnos_proc
+    
+  })
+  
+  #Expression containing processed ghana data
+  ghana_data1 <- reactive({
+    bp_ghana <- bp::bp_ghana
+    bpghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+    bpghana_proc
+  })
+  
+  #Expression containing processed preg data
+  preg_data1 <- reactive({
+    bp_preg <- bp::bp_preg
+    bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
+                                id = 'ID')
+    bppreg_proc
+  })
+  
+  #Expression containing processed children data
+  children_data1 <- reactive({
+    bp_children <- bp::bp_children
+    children_proc <- process_data(bp_children, 
                                   sbp = 'sbp', dbp = 'dbp',
                                   id = 'id', visit = 'visit')
+    children_proc
     
-    proc_preg <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
-    proc_ghana <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
+  })
+  
+  #Expression containing processed input data
+  input_data1 <- reactive({
+    file <- input$datafile
     
+    #Ensuring uploaded file is .csv format
+    ext <- tools::file_ext(file$datapath)
+    req(file)
+    validate(need(ext == "csv", "Please upload a csv file"))
+    
+    #Assigning data to variable 'bpdata'
+    bpdata = read.csv(file$datapath, header=T)
+    
+    #Transforming Variable names to usable form 
     sys = input$sys
     dias = input$dias
     date = input$date
@@ -600,15 +642,33 @@ shinyServer(function(input,output,session) {
     dow = input$dow
     if(input$dow1 == FALSE){dow = NULL}
     
-    proc_inputdata = process_data(data = input_data(), sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                  hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
-                                  bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                  ToD_int = todint_value(), eod = eod_value(), agg = agg_value(),
-                                  agg_thresh = aggthresh_value(), collapse_df = collapse_value())
+
+    #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
     
-    switch(datachoice,'ghana_data' = proc_ghana, 'hypnos_data' = proc_hypnos, 'jhsproc_data' = proc_jhs, 'bpchildren_data' = proc_children,
-           'bppreg_data' = proc_preg, 'input_data' = proc_inputdata)
+    bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
+                                ToD_int = todint_value(), eod = eod_value(), 
+                                #agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                chron_order = chronorder_value())
+    if(isFALSE(input$date1)){
+      bpdata_final
+    }else{
+      bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
+      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+      bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
+      bpdata_final
+    }
+
   })
+  
+  #Switch function that will contain data that does not need to be processed further. Can be used regardless input$dataview
+  original_data <- reactive({
+    datachoice = input$fileselect
+    switch(datachoice,'ghana_data' = ghana_data1(), 'hypnos_data' = hypnos_data1(), 'jhsproc_data' = jhs_data1(), 'bpchildren_data' = children_data1(),
+           'bppreg_data' = preg_data1(), 'input_data' = input_data1())
+  })
+  
   
   output$contents <- renderTable({
     user_data()
