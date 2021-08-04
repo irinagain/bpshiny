@@ -74,12 +74,8 @@ ui <- fluidPage(
                                                                                "Coefficient of Variation (CV)" = "cv",
                                                                                "Measures of Center" = "bp_center", 
                                                                                "Morning Blood Pressure Surge" = "mbps", 
-                                                                               "Morningness-Eveningness Average" = "me_avg", 
-                                                                               "Morningness-Eveningness Difference" = "me_diff", 
                                                                                "Nocturnal Blood Pressure Dipping Calculation" = "dip_calc", 
-                                                                               "Smoothness Index" = "si",                                                                                
                                                                                "Successive Variation (SV)" = "sv", 
-                                                                               "Trough: Peak Ratio" = "tp_ratio", 
                                                                                "Weighted Standard Deviation" = "w_sd"
                                                                                
                                                                                
