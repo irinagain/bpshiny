@@ -1287,11 +1287,11 @@ shinyServer(function(input,output,session) {
     }
   })
   output$plot_type_text <- renderText(plot_type_text())
-  ### Get subj argument used in all the plots
   
   #Get the subject arguments that is used in all plot types 
   output$subj_for_plots<- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
       selectizeInput(inputId = "subj_for_plots", label = "Subject", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
@@ -1302,6 +1302,7 @@ shinyServer(function(input,output,session) {
   ### Get group_var argument for bp_scatter & bp_report
   output$group_var_for_scatter_and_report <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if((plottype == "bp_scatter") | (plottype == "bp_report") ){
       selectInput(inputId = "group_var_for_scatter_and_report", label = "Grouping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])),selected = NULL, multiple = T)
@@ -1312,6 +1313,7 @@ shinyServer(function(input,output,session) {
   ### Get wrap_var argument for bp_scattter & bp_ts_plots
   output$wrap_var_for_scatter <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if((plottype == "bp_scatter")){
       selectInput(inputId = "wrap_var_for_scatter", label = "Wrapping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])), selected = NULL, multiple = T)
@@ -1322,6 +1324,8 @@ shinyServer(function(input,output,session) {
   #Get the user to choose between AHA or Stages 2020 plot type used exclusively in the bp_scatter function
   output$plot_type_for_scatter <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
+    
     if (plottype == "bp_scatter"){
       radioButtons(inputId = "plot_type_for_scatter", label = "Plot Type", choices = c("stages2020", "AHA"), selected = "stages2020")
     }
@@ -1332,22 +1336,36 @@ shinyServer(function(input,output,session) {
   #If the user selects stages2020, they have the option to render the crisis category
   output$include_crisis_stages2020 <- renderUI({
     plottype = plottype()
+    if (!(is.null(input$plot_type_for_scatter))){
+  
+  
+    
     plot_type_for_scatter = input$plot_type_for_scatter
     
     if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")) {
       checkboxInput(inputId = "inc_crisis_T_or_F",label = "Include Hypersensitive Crisis", value = T)
     }
+    else{NULL}
+    }
+    else{NULL}
   })
   
   #if the user selects stages2020, they have the option to render the low category
   output$include_low_stages2020 <- renderUI({
+    
     plottype = plottype()
+    if (!(is.null(input$plot_type_for_scatter))){
+    
+    
     plot_type_for_scatter = input$plot_type_for_scatter
     
     if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")){
       checkboxInput(inputId = "inc_low_T_or_F",label = "Include Low Hypotension", value = T)
     }
-  })
+    else{NULL}
+    }
+    else{NULL}
+    })
   
   #Get argument "Save Report" used in the bp_report() function
   #output$save_report_for_report <- renderUI({
@@ -1369,6 +1387,7 @@ shinyServer(function(input,output,session) {
   ### Arguments for bp_ts_plots
   output$wrap_var_for_ts <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if(plottype == "bp_ts_plots"){
       selectInput(inputId = "wrap_var_for_ts", label = "Wrapping Variable (1):", choices = c("", names(user_data())), selected = NULL, multiple = T)
@@ -1379,6 +1398,8 @@ shinyServer(function(input,output,session) {
   
   output$wrap_rowcol_for_ts <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
+    
     wrap_var_for_ts = input$wrap_var_for_ts
     
     if ((plottype == "bp_ts_plots") && !is.null(wrap_var_for_ts)){
@@ -1396,9 +1417,11 @@ shinyServer(function(input,output,session) {
         ))
       
     }
+    else{NULL}
   })
   output$index_for_ts <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if(plottype == "bp_ts_plots"){
       selectInput(inputId = "index_for_ts", label = "Index:", choices = c("", names(user_data())), selected = NULL, multiple = T)
@@ -1408,6 +1431,7 @@ shinyServer(function(input,output,session) {
   
   output$first_hour_for_ts <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if(plottype == "bp_ts_plots"){
       numericInput(inputId = "first_hour_for_ts", label = "First Hour (0-23):", value = 0, min = 0, max = 23)
@@ -1417,12 +1441,24 @@ shinyServer(function(input,output,session) {
   
   output$rotate_xlab_for_ts <- renderUI({
     plottype = plottype()
+    req(input$fileselect)
     
     if (plottype == "bp_ts_plots"){
       checkboxInput(inputId = "rotate_xlab_for_ts", label = "Rotate x-axis labels", value = F)
     }
     else{NULL}
   })
+  
+  #there are multiple plots to view with bp_hist, this lets user choose which plot to view
+  output$bp_hist_view <- renderUI(
+    if (plottype() == "bp_hist"){
+      selectInput(inputId = "bp_hist_view", label = NULL, choices = c(`# of Readings per BP Classification` = "1", 
+                                                                      `Frequency of SBP Readings` = "2", 
+                                                                      `Frequency of DBP Readings` = "3"),
+                  selected = 1, size = 1, selectize = F)
+    }
+    else{NULL}
+  )
   
   ### Render Plot
   
@@ -1440,52 +1476,35 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to do bp_hist on data that isn't unprocessed jhs/hypnos/ghana/children/preg
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data") && !(input$fileselect == "ghana_data") && !(input$fileselect == "bpchildren_data") && !(input$fileselect == "bppreg_data")) {
-        bp_hist(data = user_data(), subj = input$subj_for_plots)
+        bp_hist(data = user_data(), subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
       #if the user wants to do bp_hist on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
-        bp_hist(data = {process_data(bp_jhs,
-                                     sbp = "Sys.mmHg.",
-                                     dbp = "Dias.mmHg.",
-                                     date_time = "DateTime",
-                                     hr = "pulse.bpm.")},
-                subj = input$subj_for_plots)
+        bp_hist(data = {jhs_data1()},
+                subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
       
       #if the user wants to do bp_hist on unprocessed hypnos data
       else if (input$fileselect == "hypnos_data"){
-        bp_hist(data = {process_data(bp_hypnos,
-                                     bp_type = 'abpm',
-                                     sbp = "syst",
-                                     dbp = "DIAST",
-                                     date_time = "DATE.TIME",
-                                     id = "id",
-                                     wake = "wake",
-                                     visit = "visit",
-                                     hr = "hr",
-                                     map = "map",
-                                     rpp = "rpp",
-                                     pp = "pp")},
-                subj = input$subj_for_plots)
+        bp_hist(data = {hypnos_data1()},
+                subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
       
       #if the user wants to do bp_hist on unprocessed ghana data
       else if (input$fileselect == "ghana_data"){
-        bp_hist(data = {process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')}, subj = input$subj_for_plots) 
+        bp_hist(data = {ghana_data1()}, subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)] 
       }
       
       else if (input$fileselect == "bpchildren_data"){
         bp_hist(data = {
-          process_data(bp_children, 
-                       sbp = 'sbp', dbp = 'dbp',
-                       id = 'id', visit = 'visit')
-        }, subj = input$subj_for_plots)
+         children_data1()
+        }, subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
       
       else if (input$fileselect == "bppreg_data"){
         bp_hist(data = {
-          process_data(bp_preg, sbp = 'SBP', dbp = 'DBP', id = 'ID')
-        }, subj = input$subj_for_plots)
+          preg_data1()
+        }, subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
     }
     
@@ -1494,7 +1513,8 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to bp_scatter() data that isn't unprocessed jhs or unprocessed hypnos
       if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        bp_scatter(data = user_data(), plot_type = input$plot_type_for_scatter,
+        bp_scatter(data = user_data(),
+                   plot_type = input$plot_type_for_scatter,
                    subj = input$subj_for_plots,
                    group_var = input$group_var_for_scatter_and_report,
                    wrap_var = input$wrap_var_for_scatter,
@@ -1503,11 +1523,7 @@ shinyServer(function(input,output,session) {
       }
       #if the user wants to use bp_scatter on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
-        bp_scatter(data = {process_data(bp_jhs,
-                                        sbp = "Sys.mmHg.",
-                                        dbp = "Dias.mmHg.",
-                                        date_time = "DateTime",
-                                        hr = "pulse.bpm.")}, 
+        bp_scatter(data = {jhs_data1()}, 
                    plot_type = input$plot_type_for_scatter,
                    subj = input$subj_for_plots,
                    group_var = input$group_var_for_scatter_and_report,
@@ -1517,18 +1533,7 @@ shinyServer(function(input,output,session) {
       }
       #if the user wants to use bp_scatter on the unprocessed hypnos data
       else if (input$fileselect == "hypnos_data"){
-        bp_scatter(data = {process_data(bp_hypnos,
-                                        bp_type = 'abpm',
-                                        sbp = "syst",
-                                        dbp = "DIAST",
-                                        date_time = "DATE.TIME",
-                                        id = "id",
-                                        wake = "wake",
-                                        visit = "visit",
-                                        hr = "hr",
-                                        map = "map",
-                                        rpp = "rpp",
-                                        pp = "pp")},
+        bp_scatter(data = {hypnos_data1()},
                    plot_type = input$plot_type_for_scatter,
                    subj = input$subj_for_plots,
                    group_var = input$group_var_for_scatter_and_report,
@@ -1558,11 +1563,7 @@ shinyServer(function(input,output,session) {
       }
       #if the user wants to use bp_report on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
-        bp_report(data = {process_data(bp_jhs,
-                                       sbp = "Sys.mmHg.",
-                                       dbp = "Dias.mmHg.",
-                                       date_time = "DateTime",
-                                       hr = "pulse.bpm.")},
+        bp_report(data = {jhs_data1()},
                   subj = input$subj_for_plots,
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
@@ -1578,18 +1579,7 @@ shinyServer(function(input,output,session) {
       }
       #if the user wants to use bp_report on unprocessed hypnos data
       else if (input$fileselect == "hypnos_data"){
-        bp_report(data = {process_data(bp_hypnos,
-                                       bp_type = 'abpm',
-                                       sbp = "syst",
-                                       dbp = "DIAST",
-                                       date_time = "DATE.TIME",
-                                       id = "id",
-                                       wake = "wake",
-                                       visit = "visit",
-                                       hr = "hr",
-                                       map = "map",
-                                       rpp = "rpp",
-                                       pp = "pp")},
+        bp_report(data = {hypnos_data1()},
                   subj = input$subj_for_plots,
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
@@ -1613,27 +1603,12 @@ shinyServer(function(input,output,session) {
       }
       #if the user wants to dow_tod_plots the jhs data
       else if (input$fileselect == "jhsproc_data") {
-        dow_tod_plots_out <- dow_tod_plots(data = {process_data(bp_jhs,
-                                                                sbp = "Sys.mmHg.",
-                                                                dbp = "Dias.mmHg.",
-                                                                date_time = "DateTime",
-                                                                hr = "pulse.bpm.")},
+        dow_tod_plots_out <- dow_tod_plots(data = {jhs_data1()},
                                            subj = input$subj_for_plots)
       }
       #if the user wants to dow_tod_plots the hypnos dataset
       else if (input$fileselect == "hypnos_data"){
-        dow_tod_plots_out <- dow_tod_plots(data = {process_data(bp_hypnos,
-                                                                bp_type = 'abpm',
-                                                                sbp = "syst",
-                                                                dbp = "DIAST",
-                                                                date_time = "DATE.TIME",
-                                                                id = "id",
-                                                                wake = "wake",
-                                                                visit = "visit",
-                                                                hr = "hr",
-                                                                map = "map",
-                                                                rpp = "rpp",
-                                                                pp = "pp")},
+        dow_tod_plots_out <- dow_tod_plots(data = {hypnos_data1()},
                                            subj = input$subj_for_plots)
       }
       
@@ -1652,11 +1627,22 @@ shinyServer(function(input,output,session) {
                   first_hour = input$first_hour_for_ts,
                   rotate_xlab = input$rotate_xlab_for_ts,
                   wrap_row = input$wrap_row_for_ts, 
-                  wrap_col = input$wrap_col_for_ts
-      )
+                  wrap_col = input$wrap_col_for_ts)
+      
     }
     
+    
   })
+  
+  output$plot_length <- renderText(length(plotFunc()))
+  
+  
+  
+
+  
+ 
+  #output the plot
+  output$plot <- renderPlot({plotFunc()})
   
   #download handler
   output$downloadPlot <- downloadHandler(
@@ -1665,6 +1651,4 @@ shinyServer(function(input,output,session) {
       ggplot2::ggsave(file, print(plotFunc()))
     }
   )
-  #output the plot
-  output$plot <- renderPlot({plotFunc()})
 })
