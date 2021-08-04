@@ -39,24 +39,21 @@ ui <- fluidPage(
                  uiOutput('rppinput'),
                  uiOutput('dow_checkbox'),
                  uiOutput('dowinput'),
+                 uiOutput('optionallabel'),
+                 uiOutput('optional_arguments'),
                  uiOutput('data_screen_check'),
-                 uiOutput('data_screen_arg'),
                  uiOutput('bp_type_check'),
                  uiOutput('bp_type_arg'),
                  uiOutput('inc_low_check'),
-                 uiOutput('inc_low_arg'),
                  uiOutput('inc_crisis_check'),
-                 uiOutput('inc_crisis_arg'),
                  uiOutput('tod_int_check'),
                  uiOutput('tod_int_arg'),
                  uiOutput('eod_check'),
                  uiOutput('eod_arg'),
                  uiOutput('agg_check'),
-                 uiOutput('agg_arg'),
-                 uiOutput('agg_thresh_check'),
                  uiOutput('agg_thresh_arg'),
                  uiOutput('collapse_df_check'),
-                 uiOutput('collapse_df_arg'),
+                 uiOutput('chronorder_check'),
                  uiOutput('dataviewer')
                ),
                mainPanel(tableOutput("contents"))
@@ -147,8 +144,8 @@ ui <- fluidPage(
                  uiOutput("rotate_xlab_for_ts"),
                  uiOutput("include_crisis_stages2020"),
                  uiOutput("include_low_stages2020")),
-                 #uiOutput("units_for_report")),
-                 #uiOutput("save_report_for_report")),
+               #uiOutput("units_for_report")),
+               #uiOutput("save_report_for_report")),
                #configure main panel 
                mainPanel = 
                  #draw the plot
