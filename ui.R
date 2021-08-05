@@ -63,7 +63,8 @@ ui <- fluidPage(
              )),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
-               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c("Aggregated BP Summary Statistics" = "bp_stats", 
+               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c("Nocturnal Blood Pressure Dipping Calculation" = "dip_calc", 
+                                                                               "Aggregated BP Summary Statistics" = "bp_stats", 
                                                                                "Average Real Variability (ARV)" = "arv",
                                                                                "Blood Pressure Magnitude (Peak and Trough)" = "bp_mag",
                                                                                "Blood Pressure Range" = "bp_range", 
@@ -71,7 +72,7 @@ ui <- fluidPage(
                                                                                "Coefficient of Variation (CV)" = "cv",
                                                                                "Measures of Center" = "bp_center", 
                                                                                "Morning Blood Pressure Surge" = "mbps", 
-                                                                               "Nocturnal Blood Pressure Dipping Calculation" = "dip_calc", 
+                                                                               
                                                                                "Successive Variation (SV)" = "sv", 
                                                                                "Weighted Standard Deviation" = "w_sd"
                                                                                
@@ -79,12 +80,7 @@ ui <- fluidPage(
                )),
                uiOutput("select_dip_parameter"),
                uiOutput("select_ext_parameter"),
-               uiOutput("help_text"),
-               # uiOutput("select_second_parameter"),
-               # uiOutput("second_parameter_helptext"),
-               # uiOutput("select_third_parameter"),
-               # uiOutput("third_parameter_helptext"),
-               actionButton(inputId = "metric_update", label = "Update")
+               uiOutput("help_text")
                ),
                mainPanel(conditionalPanel(condition = "output.one_table",
                                           DT::dataTableOutput("metric_table")),

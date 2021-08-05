@@ -705,7 +705,7 @@ shinyServer(function(input,output,session) {
   #specify first parameter and the default values
   output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
-      numericInput("parameter", "Specify dipping threshold",value = 0.1, step = 0.05)
+      numericInput("parameter1", "Specify extreme dipping threshold",value = 0.1, step = 0.05)
     }
   })
   
@@ -714,7 +714,7 @@ shinyServer(function(input,output,session) {
       numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05)
     }
   })
-  #add warning message if dip_thres >= ext_thres
+
   
   #add description of first parameter
   
@@ -725,75 +725,13 @@ shinyServer(function(input,output,session) {
       helpText("No parameters need to be specified.")
     }
     else if(parameter_type == "dip_calc"){
-      helpText("Enter the dip and extreme thresholds separated by comma. ")
-      if (input$parameter >= input$parameter2){
-        helpText("Enter a dipping threshold less than extreme dipping threshold. ")
-      }
+      helpText("Enter the dip and extreme thresholds separated by comma. ") 
+      # if (input$parameter1 >= input$parameter2){
+      #   helpText("Enter a dipping threshold less than extreme dipping threshold. ")   #add warning message if dip_thres >= ext_thres
+      # }
     }
   })
-  
-  # output$select_parameter <- renderUI({
-  #   parameter_type = parameter_type()
-  #   if(parameter_type == "dip_calc"){
-  #       textInput("Dip Threshold", value = "0.10")
-  #       textInput("Extreme Threshold", value= "0.20")
-  #   }
-  # })
-  
-  #reactive and output functions based on the user's choice
-  # outputting one table
-  # observeEvent(req(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stages", 'bp_stats', 'cv', 'sv', 'dip_calc')), {
-  #   metric_table <- reactive({
-  #     parameter_type = parameter_type()
-  #     output_type = output_type()
-  #     data = user_data()
-  # 
-  #     #loading bp library and using metric function
-  #     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
-  #       #
-  #       string = paste("bp::", input$metric, "(data)", sep = "")
-  #     }
-  # 
-  #     eval(parse(text = string))
-  #   })
-  # 
-  #   output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
-  #                                        options = list(dom = "Btip",
-  #                                                       buttons = c("copy", "csv", "excel", "pdf", "print"),
-  #                                                       scrollX = TRUE))
-  # 
-  # })
-  
-  # #outputting several tables (when 'bp_tables' is chosen as the metric)
-  # observeEvent((req(input$metric == "bp_tables")), {
-  #     metric_bp_tables <- reactive({
-  #     #parameter_type = parameter_type()
-  #     #output_type = output_type()
-  #       data = user_data()
-  #     #if(output_type == "tables"){
-  #       tables_output = bp::bp_tables(data)
-  #     #}
-  #     # for (i in sequence(length(tables_output))){
-  #     #   final_output <- as.data.frame(tables_output[i])
-  #     # }
-  #     # final_output
-  #       tables_output$SBP_Counts_by_Stage
-  #     })
-  # 
-  # 
-  #   # bp_tables_output = metric_bp_tables()
-  #   # for (i in sequence(16)){
-  #   output$metric_bp_tables <- DT::renderDataTable(metric_bp_tables(), extensions = "Buttons",
-  #                                           options = list(dom = "Btip",
-  #                                                          buttons = c("copy", "csv", "excel", "pdf", "print"),
-  #                                                          scrollX = TRUE))
-  #   # }
-  # })
-  # output$metric <- DT::renderDataTable(final_table, extensions = "Buttons",
-  #                                      options = list(dom = "Btip",
-  #                                                     buttons = c("copy", "csv", "excel", "pdf", "print"),
-  #                                                     scrollX = TRUE))
-  
+
   
   metric_table <- reactive({
     parameter_type = parameter_type()
@@ -809,7 +747,7 @@ shinyServer(function(input,output,session) {
       need(output_type == "none", "output type incorrect")
     )
     
-    if(is.null(input$parameter) | (parameter_type == "none" & output_type == "none")){
+    if(parameter_type == "none" & output_type == "none"){
       string = paste("bp::", input$metric, "(data)", sep = "")
     }
     eval(parse(text = string))
@@ -1170,7 +1108,8 @@ shinyServer(function(input,output,session) {
                                                                   scrollX = TRUE))
   
   ## dip_calc
-  metric_dip_calc_1 <- eventReactive(input$metric_update, {
+  metric_dip_calc_1 <- reactive({
+    req(input$parameter1, input$parameter2)
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1180,38 +1119,19 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "dip_calc", "parameter type incorrect"),
       need(output_type == "dip_calc", "output type incorrect")
     )
-    validate(
-      need(is.null(input$parameter), "Please wait - Rendering"),
-      need(is.null(input$parameter2), "Please wait - Rendering")
+    validate (
+      need(parameter_type == "dip_calc", "parameter type incorrect"),
+      need(output_type == "dip_calc", "output type incorrect")
     )
-    # if (is.null(input$parameter)) {
-    #   validate(
-    #     need(!is.null(input$parameter), "Please wait - Rendering")
-    #   )
-    # } 
-    # if (is.null(input$parameter2)) {
-    #   validate(
-    #     need(!is.null(input$parameter2), "Please wait - Rendering")
-    #   )
-    # } 
-    # else if (grepl(',', input$parameter) & !grepl("\\(", input$parameter)) {
-    #   if (length(strsplit(input$parameter, split = ",")[[1]]) != 2) {
-    #     validate (
-    #       need(parameter_type == "dip_calc", "Please wait - Rendering")
-    #     )
-    #   } else {
-    #     validate(
-    #       need(parameter_type == "dip_calc", "Please wait - Rendering")
-    #     )
-    #   }
-    # }
-    if(is.null(input$parameter) | (parameter_type == "dip_calc" & output_type == "dip_calc")){
-      dip_calc_output = bp::dip_calc(data, dip_thresh = input$parameter, extreme_thresh = input$parameter2)
+    if(parameter_type == "dip_calc" & output_type == "dip_calc"){
+      dip_calc_output = bp::dip_calc(data, sleep_start_end = NULL, dip_thresh = input$parameter1, extreme_thresh = input$parameter2, 
+                                     inc_date = FALSE, subj = NULL)#data, dip_thresh = input$parameter, extreme_thresh = input$parameter2)
     }
     return(data.frame(dip_calc_output[1]))
   })
   
-  metric_dip_calc_2 <- eventReactive(input$metric_update, {
+  metric_dip_calc_2 <- reactive({
+    req(input$parameter1, input$parameter2)
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1221,18 +1141,9 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "dip_calc", "parameter type incorrect"),
       need(output_type == "dip_calc", "output type incorrect")
     )
-    # if (is.null(input$parameter)) {
-    #   validate(
-    #     need(!is.null(input$parameter), "Please wait - Rendering")
-    #   )
-    # } 
-    # if (is.null(input$parameter2)) {
-    #   validate(
-    #     need(!is.null(input$parameter2), "Please wait - Rendering")
-    #   )
-    # } 
-    if(is.null(input$parameter) | (parameter_type == "dip_calc" & output_type == "dip_calc")){
-      dip_calc_output = bp::dip_calc(data, dip_thresh = input$parameter, extreme_thresh = input$parameter2)
+    if(parameter_type == "dip_calc" & output_type == "dip_calc"){
+      dip_calc_output = bp::dip_calc(data, sleep_start_end = NULL, dip_thresh = input$parameter1, extreme_thresh = input$parameter2, 
+                                     inc_date = FALSE, subj = NULL)
     }
     return(data.frame(dip_calc_output[2]))
   })
@@ -1245,7 +1156,7 @@ shinyServer(function(input,output,session) {
                                                   options = list(dom = "Btip",
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                                  scrollX = TRUE))
-  
+
   output$one_table <- reactive({
     input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
   })
