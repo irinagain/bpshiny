@@ -284,7 +284,7 @@ shinyServer(function(input,output,session) {
     if(input$todint_check == FALSE | isFALSE(input$optional_arg)){
       return(NULL)
     }else{
-      textInput('todint_arg', 'Input a vector of four numbers corresponding to the desired times. By default, the Morning, Afternoon, Evening, and Night 
+      textInput('todint_arg', 'Input a vector of four numbers between 0 and 23 corresponding to the desired times. By default, the Morning, Afternoon, Evening, and Night 
                 periods are set at 6,12,18,0 respectively, where 0 corresponds to the 24th hour of the day', value = '6,12,18,0') 
     }
   })
@@ -296,7 +296,10 @@ shinyServer(function(input,output,session) {
     req(input$todint_arg)
     if(!is.null(input$todint_arg)){
       inp <- as.numeric(unlist(strsplit(input$todint_arg,",")))
-      req(length(inp) >= 4)
+      validate(
+        need(length(inp) == 4, 'Time of Day interval must be atleast 4 digits and lie within the 0-24 hour interval'),
+        need(length(inp[inp >= 24]) == 0 && length(inp[inp < 0]) == 0 , 'Time of Day intervals must lie within the 0-24 hour interval')
+      )
       return(inp)
     }
   })
@@ -314,7 +317,7 @@ shinyServer(function(input,output,session) {
       return(NULL)
     }else{
       textInput('eodarg', "Input four digits that correspond to 24-hour time to adjust the end of day so that any readings
-                in the early morning are not grouped with the next day's readings", value = NULL)
+                in the early morning are not grouped with the next day's readings where 0000 denotes midnight", value = NULL)
     }
   })
   
@@ -325,8 +328,12 @@ shinyServer(function(input,output,session) {
     req(input$eodarg)
     if(!is.null(input$eodarg) | isFALSE(input$optional_arg)){
       inp1 <- as.numeric(input$eodarg)
-      req(nchar(input$eodarg) == 4)
-      return(inp1)
+      min <- inp1 %% 100
+      validate(
+        need(nchar(input$eodarg) == 4, "EOD Argument must be atleast four digits that and lie within 0-24 hour interval"),
+        need(min >= 0 && min <= 59, 'EOD minute argument cannot be less than 0 or exceed 59' )
+      )
+      return(input$eodarg)
     }
   })
   
@@ -423,8 +430,8 @@ shinyServer(function(input,output,session) {
                                 rpp = "rpp",
                                 pp = "pp")
     hypnos_proc$DATE_TIME <- as.POSIXct(hypnos_proc$DATE_TIME)
-    hypnos_proc$DATE_TIME <- format(hypnos_proc$DATE_TIME, "%m/%d/%Y %H:%M:%S")
-    hypnos_proc$DATE <- format(hypnos_proc$DATE, "%m/%d/%Y")
+    hypnos_proc$DATE_TIME <- format(hypnos_proc$DATE_TIME, "%m-%d-%Y %H:%M:%S")
+    hypnos_proc$DATE <- format(hypnos_proc$DATE, "%m-%d-%Y")
     if(input$dataview == 'proc_data'){
       hypnos_proc
     }else{
@@ -536,7 +543,7 @@ shinyServer(function(input,output,session) {
         bpdata_final
       }else{
         bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m-%d-%Y %H:%M:%S")
         bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
         bpdata_final
       }
