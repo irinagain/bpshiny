@@ -1492,7 +1492,7 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to do bp_hist on unprocessed ghana data
       else if (input$fileselect == "ghana_data"){
-        bp_hist(data = {ghana_data1()}, subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)] 
+        bp_hist(data = {ghana_data1()}, subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
       
       else if (input$fileselect == "bpchildren_data"){

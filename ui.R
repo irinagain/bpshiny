@@ -163,8 +163,8 @@ ui <- fluidPage(
                            downloadButton(outputId = "downloadPlot", label = "Download"),
                            #give data used and type of plot
                            textOutput(outputId = "plotName"),
-                           textOutput(outputId = "plot_type_text"),
-                           textOutput(outputId = "plot_length"))
+                           textOutput(outputId = "plot_type_text"))
+                           #textOutput(outputId = "plot_length"))
                
              )
     )
