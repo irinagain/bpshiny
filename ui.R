@@ -145,7 +145,10 @@ ui <- fluidPage(
                #configure main panel 
                mainPanel = 
                  #draw the plot
-                 mainPanel(plotOutput("plot"),
+                 mainPanel(
+                          uiOutput("bp_hist_view"),
+                          hr(),
+                          plotOutput("plot"),
                            #line break
                            hr(),
                            #Download button
@@ -153,6 +156,7 @@ ui <- fluidPage(
                            #give data used and type of plot
                            textOutput(outputId = "plotName"),
                            textOutput(outputId = "plot_type_text"))
+                           #textOutput(outputId = "plot_length"))
                
              )
     )
