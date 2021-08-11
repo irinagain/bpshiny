@@ -1352,7 +1352,7 @@ shinyServer(function(input,output,session) {
         need(input$id != '', label = "To specify subject(s) in plotting, 'ID' on Data tab")
       )
       validate(
-        need(input$dataview == "proc_data", label = "Select 'Processed Data' on Data Tab, a processed data set is needed for subject identification")
+        need(input$dataview == "proc_data", label = "Select 'Processed Data' on Data Tab, a processed data set ")
       )
       selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data1()$ID)))), selected = NULL, multiple = T)
     }
