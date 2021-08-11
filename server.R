@@ -50,6 +50,26 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  output$bptype_input <- renderUI({
+    if(input$fileselect == 'input_data'){
+      selectInput('bptype_arg', 'Blood Pressure Type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
+    }
+  })
+
+  bptype_value <- reactive({
+    if(input$fileselect != 'input_data'){
+      return('HBPM')
+    }
+    req(input$bptype_arg)
+    if(input$bptype_arg == 'hbpm'){
+      return('HBPM')
+    }else if (input$bptype_arg == 'abpm'){
+      return('ABPM')
+    }else{
+      return('AP')
+    }
+  })
+  
   
   #Creates checkbox based on if User Datafile is selected
   output$date_checkbox <- renderUI({
@@ -189,37 +209,8 @@ shinyServer(function(input,output,session) {
       h5('Optional Arguments')
     }
   })
-  
-  
-  #Select for bp_type argument
-  output$bp_type_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('bptype_check', 'Blood Presure Data Type')
-    }
-  })
-  
-  output$bp_type_arg <- renderUI({
-    req(input$bptype_check)
-    if(input$bptype_check == FALSE | isFALSE(input$optional_arg)){
-      return(NULL)
-    }else{
-      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
-    }
-  })
-  
-  bptype_value <- reactive({
-    if(isFALSE(input$optional_arg) | isFALSE(input$bptype_check)){
-      return('HBPM')
-    }
-    req(input$bptype_arg)
-    if(input$bptype_arg == 'hbpm'){
-      return('HBPM')
-    }else if (input$bptype_arg == 'abpm'){
-      return('ABPM')
-    }else{
-      return('AP')
-    }
-  })
+
+
   
   #Toggle for data_screen argument 
   output$data_screen_check <- renderUI({
