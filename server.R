@@ -732,7 +732,7 @@ shinyServer(function(input,output,session) {
       helpText("No parameters need to be specified.")
     }
     else if(parameter_type == "dip_calc"){
-      helpText("Enter the dip and extreme thresholds separated by comma. ") 
+      helpText("Enter the dip and extreme thresholds. ") 
       # if (input$parameter1 >= input$parameter2){
       #   helpText("Enter a dipping threshold less than extreme dipping threshold. ")   #add warning message if dip_thres >= ext_thres
       # }
@@ -875,6 +875,10 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    ## need DAY_OF_WEEK column to calculate SBP_by_DAY_OF_WEEK(metric_bp_table_7), DBP_by_DAY_OF_WEEK(8), and CLASS_by_DAY_OF_WEEK(9), details seen in bp::bp_tables function
+    validate(
+      need("DAY_OF_WEEK" %in% names(data), "N/A - DAY_OF_WEEK column not available")
+    )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
@@ -891,6 +895,9 @@ shinyServer(function(input,output,session) {
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
+    )
+    validate(
+      need("DAY_OF_WEEK" %in% names(data), "N/A - DAY_OF_WEEK column not available")
     )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
@@ -909,6 +916,9 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    validate(
+      need("DAY_OF_WEEK" %in% names(data), "N/A - DAY_OF_WEEK column not available")
+    )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
@@ -925,6 +935,10 @@ shinyServer(function(input,output,session) {
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
+    )
+    ## need TIME_OF_DAY column to calculate SBP_by_Time_of_Day(metric_bp_table_10), DBP_by_Time_of_Day(11), and CLASS_by_Time_of_Day(12), details seen in bp::bp_tables function
+    validate(
+      need("TIME_OF_DAY" %in% names(data), "N/A - TIME_OF_DAY column not available")
     )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
@@ -943,6 +957,9 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    validate(
+      need("TIME_OF_DAY" %in% names(data), "N/A - TIME_OF_DAY column not available")
+    )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
@@ -959,6 +976,9 @@ shinyServer(function(input,output,session) {
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
+    )
+    validate(
+      need("TIME_OF_DAY" %in% names(data), "N/A - TIME_OF_DAY column not available")
     )
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
@@ -977,7 +997,7 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
-    ## need wake to calculate sbp_by_wake_status(metric_bp_table_13), dbp_by_wake_status(14), sbp_by_wake_perc(15), and dbp_by_wake_perc(16), details seen in bp::bp_tables function
+    ## need wake column to calculate sbp_by_wake_status(metric_bp_table_13), dbp_by_wake_status(14), sbp_by_wake_perc(15), and dbp_by_wake_perc(16), details seen in bp::bp_tables function
     validate(
       need("WAKE" %in% names(data), "N/A - WAKE column not available")
     )

@@ -63,8 +63,7 @@ ui <- fluidPage(
              )),
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
-               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c("Nocturnal Blood Pressure Dipping Calculation" = "dip_calc", 
-                                                                               "Aggregated BP Summary Statistics" = "bp_stats", 
+               sidebarPanel(selectInput('metric', 'Choose Metric', choices = c("Aggregated BP Summary Statistics" = "bp_stats", 
                                                                                "Average Real Variability (ARV)" = "arv",
                                                                                "Blood Pressure Magnitude (Peak and Trough)" = "bp_mag",
                                                                                "Blood Pressure Range" = "bp_range", 
@@ -72,7 +71,7 @@ ui <- fluidPage(
                                                                                "Coefficient of Variation (CV)" = "cv",
                                                                                "Measures of Center" = "bp_center", 
                                                                                "Morning Blood Pressure Surge" = "mbps", 
-                                                                               
+                                                                               "Nocturnal Blood Pressure Dipping Calculation" = "dip_calc", 
                                                                                "Successive Variation (SV)" = "sv", 
                                                                                "Weighted Standard Deviation" = "w_sd"
                                                                                
