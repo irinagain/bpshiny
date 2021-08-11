@@ -320,9 +320,11 @@ shinyServer(function(input,output,session) {
     if(!is.null(input$eodarg) | isFALSE(input$optional_arg)){
       inp1 <- as.numeric(input$eodarg)
       min <- inp1 %% 100
+      max <- as.numeric(substr(inp1,1,2))
       validate(
         need(nchar(input$eodarg) == 4, "EOD Argument must be atleast four digits that and lie within 0-24 hour interval"),
-        need(min >= 0 && min <= 59, 'EOD minute argument cannot be less than 0 or exceed 59' )
+        need(min >= 0 && min <= 59, 'EOD minute argument cannot be less than 0 or exceed 59' ),
+        need(max >= 0 && max <=23, 'EOD hour argument cannot be greater than 23 or less than 00')
       )
       return(input$eodarg)
     }
@@ -528,7 +530,7 @@ shinyServer(function(input,output,session) {
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                   ToD_int = todint_value(), eod = eod_value(),
-                                  #agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                  agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
                                   chron_order = chronorder_value())
       if(isFALSE(input$date1)){
         bpdata_final
@@ -647,7 +649,7 @@ shinyServer(function(input,output,session) {
                                 hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                 bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                 ToD_int = todint_value(), eod = eod_value(), 
-                                #agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
                                 chron_order = chronorder_value())
     if(isFALSE(input$date1)){
       bpdata_final
