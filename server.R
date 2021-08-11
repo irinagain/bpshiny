@@ -1267,11 +1267,24 @@ shinyServer(function(input,output,session) {
       validate(
         need(input$id != '', label = "To specify subject(s) in plotting, 'ID' on Data tab")
       )
-      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input$id)))), selected = NULL, multiple = T)
+      validate(
+        need(input$dataview == "proc_data", label = "Select 'Processed Data' on Data Tab, a processed data set is needed for subject identification")
+      )
+      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data1()$ID)))), selected = NULL, multiple = T)
     }
     
-    if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
-      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
+    if(input$fileselect != "bpchildren_data"){
+      if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
+        selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
+      }
+      else{NULL}
+    }
+    
+    else if(input$fileselect == "bpchildren_data"){
+      if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
+        selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.numeric(levels(factor(children_data1()$ID)))), selected = NULL, multiple = T)
+      }
+      else{NULL}
     }
     else{NULL}
   })
@@ -1448,6 +1461,14 @@ shinyServer(function(input,output,session) {
       checkboxInput(inputId = "rotate_xlab_for_ts", label = "Rotate x-axis labels", value = F)
     }
     else{NULL}
+  })
+  
+  output$bp_ts_view <- renderUI({
+    if (plottype() == "bp_ts_plots"){
+      selectInput(inputId = "bp_ts_view", label = NULL, choices = c(`Plot View 1` = "1",
+                                                                    `Plot View 2` = "2"),
+                  selected = 1, size = 1, selectize = F)
+    }
   })
   
   #there are multiple plots to view with bp_hist, this lets user choose which plot to view
@@ -1685,14 +1706,97 @@ shinyServer(function(input,output,session) {
       validate(
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       ) 
-      bp_ts_plots(data = user_data(),
+      
+      validate(
+        need(expr = length(input$subj_for_plots) == 1, message = "Please specifty 1 subject")
+      )
+      
+      if(input$fileselect == "hypnos_data"){
+        bp_ts_plots(data = {hypnos_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "ghana_data"){
+        validate(
+          need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        bp_ts_plots(data = {ghana_data1()},
                   subj = input$subj_for_plots,
                   wrap_var = input$wrap_var_for_ts, 
                   index = input$index_for_ts, 
                   first_hour = input$first_hour_for_ts,
                   rotate_xlab = input$rotate_xlab_for_ts,
                   wrap_row = input$wrap_row_for_ts, 
-                  wrap_col = input$wrap_col_for_ts)
+                  wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "jhsproc_data"){
+        
+        bp_ts_plots(data = {jhs_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "bpchildren_data"){
+        validate(
+          need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        bp_ts_plots(data = {children_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "bppreg_data"){
+        validate(
+          need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        bp_ts_plots(data = {preg_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+        
+      }
+      else if(input$fileselect == "input_data"){
+        if(!is.null(input$date)){
+          bp_ts_plots(data = {user_data()},
+                      subj = input$subj_for_plots,
+                      wrap_var = input$wrap_var_for_ts, 
+                      index = input$index_for_ts, 
+                      first_hour = input$first_hour_for_ts,
+                      rotate_xlab = input$rotate_xlab_for_ts,
+                      wrap_row = input$wrap_row_for_ts, 
+                      wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+        }
+        else{
+          validate(
+            need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+          )
+          bp_ts_plots(data = {user_data()},
+                      subj = input$subj_for_plots,
+                      wrap_var = input$wrap_var_for_ts, 
+                      index = input$index_for_ts, 
+                      first_hour = input$first_hour_for_ts,
+                      rotate_xlab = input$rotate_xlab_for_ts,
+                      wrap_row = input$wrap_row_for_ts, 
+                      wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+        }
+      }
       
     }
     

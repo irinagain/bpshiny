@@ -145,6 +145,7 @@ ui <- fluidPage(
                  #draw the plot
                  mainPanel(
                           uiOutput("bp_hist_view"),
+                          uiOutput("bp_ts_view"),
                           hr(),
                           plotOutput("plot"),
                            #line break
