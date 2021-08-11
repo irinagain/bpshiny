@@ -21,6 +21,7 @@ ui <- fluidPage(
                  uiOutput('file_input'),
                  uiOutput('sys_input'),
                  uiOutput('dias_input'),
+                 uiOutput('bptype_input'),
                  uiOutput('date_checkbox'),
                  uiOutput('dateinput'),
                  uiOutput('id_checkbox'),
