@@ -61,6 +61,7 @@ ui <- fluidPage(
                
                
              )),
+    ### metrics tab
     tabPanel("Metrics", fluid = T, 
              sidebarLayout(
                sidebarPanel(selectInput('metric', 'Choose Metric', choices = c("Aggregated BP Summary Statistics" = "bp_stats", 
@@ -81,6 +82,7 @@ ui <- fluidPage(
                uiOutput("select_ext_parameter"),
                uiOutput("help_text")
                ),
+               # output regarding which metric was chosen (one_table(1 table), bp_tables_tables(16 tables), dip_calc_tables(2 tables))
                mainPanel(conditionalPanel(condition = "output.one_table",
                                           DT::dataTableOutput("metric_table")),
                          conditionalPanel(condition = "output.bp_tables_tables",
@@ -104,10 +106,7 @@ ui <- fluidPage(
                          conditionalPanel(condition = "output.dip_calc_tables", 
                                           DT::dataTableOutput("metric_dip_calc_1"), 
                                           DT::dataTableOutput("metric_dip_calc_2"))
-               )
-               
-               #mainPanel(DT::dataTableOutput("metric")))
-             )),
+               ))),
     
     
     #tab panel for PLOTS

@@ -688,58 +688,63 @@ shinyServer(function(input,output,session) {
   
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
-    #metric is considered as parameter type "none" if it only requires data as a parameter
+    #metric is considered as parameter type "none" if it only requires data as a parameter (no additional user input)
     if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_tables", "cv", "sv")){
       return("none")
     }
+    #dip_calc function requires user to input 2 additional parameters (dipping threshold and extreme threshold)
     if(input$metric %in% c("dip_calc")){
       return("dip_calc")
     }
   })
   
   output_type <- reactive({
+    #these functions output 1 table
     if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")){
       return("none")
     }
+    #bp_tables function needs to render 16 tables separately
     if(input$metric == "bp_tables"){
       return("tables") 
     }
+    #dip_calc function needs to render 2 tables separately
     if(input$metric == "dip_calc"){
       return("dip_calc")
     }
     
   })
-  #specify first parameter and the default values
+  #specify dip_calc parameters and the default values
   output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
+      #dipping threshold, default is  0.1
       numericInput("parameter1", "Specify extreme dipping threshold",value = 0.1, step = 0.05)
     }
   })
   
   output$select_ext_parameter <- renderUI({
     if(input$metric == "dip_calc"){
+      #extreme threshold, default if 0.2
       numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05)
     }
   })
 
   
-  #add description of first parameter
-  
+  #add description of parameters (help text)
   output$help_text <- renderUI ({
     parameter_type = parameter_type()
     
     if(parameter_type == "none"){
+      #no parameter
       helpText("No parameters need to be specified.")
     }
     else if(parameter_type == "dip_calc"){
-      helpText("Enter the dip and extreme thresholds. ") 
-      # if (input$parameter1 >= input$parameter2){
-      #   helpText("Enter a dipping threshold less than extreme dipping threshold. ")   #add warning message if dip_thres >= ext_thres
-      # }
+      #parameters for dip_calc
+      helpText("Enter the dip and extreme thresholds.") 
     }
   })
 
-  
+  ### metrics other than bp_tables and dip_calc
+  #parameter_type==none, output_type==none (functions that do not need additional parameters and will only output 1 table)
   metric_table <- reactive({
     parameter_type = parameter_type()
     #If/else statement that decides whether to use sample data that is processed in data tab
@@ -748,37 +753,45 @@ shinyServer(function(input,output,session) {
       data = user_data()
     }else{data = original_data()}
     output_type = output_type()
-    ## validate(need) argument, eliminates error popping up when changing parameter type
+    #validate/need argument, eliminates error popping up when changing parameter type
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "none", "output type incorrect")
     )
-    
+    #apply bp functions 
     if(parameter_type == "none" & output_type == "none"){
       string = paste("bp::", input$metric, "(data)", sep = "")
     }
     eval(parse(text = string))
   })
+  #render output from metric_table (1 table)
   output$metric_table <- DT::renderDataTable(metric_table(), extensions = "Buttons",
                                              options = list(dom = "Btip",
                                                             buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                             scrollX = TRUE))
+  
+  ### bp_tables
+  #separate the output(a list of 16 tables) into 16 reactive outputs and render them separately
+  
+  #table 1 (SBP_Counts_by_Stage)
   metric_bp_table_1 <- reactive({
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
     }else{data = original_data()}
     output_type = output_type()
+    #validate/need argument, eliminates error popping up when changing parameter type
     validate (
       need(parameter_type == "none", "parameter type incorrect"),
       need(output_type == "tables", "output type incorrect")
     )
+    #does not need additional parameters
     if(is.null(input$parameter) | (parameter_type == "none" & output_type == "tables")){
       tables_output = bp::bp_tables(data)
     }
     tables_output$SBP_Counts_by_Stage
   })
-  output$text_1 <- renderText({"Table 1. SBP Counts by Stage"})
+  output$text_1 <- renderText({"Table 1. SBP Counts by Stage"}) #act as caption for table 1
   
   metric_bp_table_2 <- reactive({
     parameter_type = parameter_type()
@@ -1068,7 +1081,7 @@ shinyServer(function(input,output,session) {
   })
   output$text_16 <- renderText({"\n Table 16. DBP_by_WAKE_perc"})
   
-  
+  #rendering the list of 16 tables one by one
   output$metric_bp_table_1 <- DT::renderDataTable(metric_bp_table_1(), extensions = "Buttons",
                                                   options = list(dom = "Btip",
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
@@ -1134,25 +1147,22 @@ shinyServer(function(input,output,session) {
                                                                   buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                                   scrollX = TRUE))
   
-  ## dip_calc
+  ### dip_calc
   metric_dip_calc_1 <- reactive({
-    req(input$parameter1, input$parameter2)
+    req(input$parameter1, input$parameter2) #make sure dip_thresh(input$parameter1) and extreme_thresh(input$parameter2) are not null
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
     }else{data = original_data()}
     output_type = output_type()
-    validate (
-      need(parameter_type == "dip_calc", "parameter type incorrect"),
-      need(output_type == "dip_calc", "output type incorrect")
-    )
+    #validate/need argument, eliminates error popping up when changing parameter type
     validate (
       need(parameter_type == "dip_calc", "parameter type incorrect"),
       need(output_type == "dip_calc", "output type incorrect")
     )
     if(parameter_type == "dip_calc" & output_type == "dip_calc"){
       dip_calc_output = bp::dip_calc(data, sleep_start_end = NULL, dip_thresh = input$parameter1, extreme_thresh = input$parameter2, 
-                                     inc_date = FALSE, subj = NULL)#data, dip_thresh = input$parameter, extreme_thresh = input$parameter2)
+                                     inc_date = FALSE, subj = NULL)
     }
     return(data.frame(dip_calc_output[1]))
   })
@@ -1174,7 +1184,7 @@ shinyServer(function(input,output,session) {
     }
     return(data.frame(dip_calc_output[2]))
   })
-  
+  #render 2 tables for dip_calc separately
   output$metric_dip_calc_1 <- DT::renderDataTable(metric_dip_calc_1(), extensions = "Buttons",
                                                   options = list(dom = "Btip",
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
@@ -1183,7 +1193,7 @@ shinyServer(function(input,output,session) {
                                                   options = list(dom = "Btip",
                                                                  buttons = c("copy", "csv", "excel", "pdf", "print"),
                                                                  scrollX = TRUE))
-
+  ### 3 output conditions linked with conditionalpanels in UI. 
   output$one_table <- reactive({
     input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
   })
