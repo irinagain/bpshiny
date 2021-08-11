@@ -165,7 +165,7 @@ shinyServer(function(input,output,session) {
       selectInput('id', 'ID', names(dataset()))
     }
   })
-  
+
   #If input for the WAKE checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$wakeinput <- renderUI({
     req(input$wake1)
@@ -520,6 +520,7 @@ shinyServer(function(input,output,session) {
     jhs_proc$DATE_TIME <- as.POSIXct(jhs_proc$DATE_TIME)
     jhs_proc$DATE_TIME <- format(jhs_proc$DATE_TIME, "%m-%d-%Y %H:%M:%S")
     jhs_proc$DATE <- format(jhs_proc$DATE, "%m/%d/%Y")
+    jhs_proc <- jhs_proc%>%mutate(ID = '1')
     if(input$dataview == 'proc_data'){
       jhs_proc
     }else{
@@ -618,6 +619,9 @@ shinyServer(function(input,output,session) {
         bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m-%d-%Y %H:%M:%S")
         bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
         bpdata_final
+      }
+      if(isFALSE(input$id1)){
+        bpdata_final <- bpdata_final%>%mutate(ID = '1')
       }
     }else{
       bpdata
