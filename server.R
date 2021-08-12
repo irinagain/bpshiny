@@ -275,7 +275,128 @@ shinyServer(function(input,output,session) {
       }else{return(FALSE)}
     }
   })
+
+  ##SYSTOLIC,DIASTOLIC,AND HR UPPER/LOWER BOUNDARIES ARGUMENTS##
   
+  ##SYSTOLIC UPPER/LOWER LIMIT ARGUMENT##
+  
+  #Checkbox for SUL/SLL argument 
+  output$SBP_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check)){
+      checkboxInput('SBPcheck', 'Input Systolic Upper/Lower Limits to exclude SBP values from Data', value = FALSE)
+    }
+  })
+  #Input for SUL argument
+  output$SUL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$SBPcheck)){
+      textInput('SULinput', 'Input Systolic Upper Limit to exclude any values that exceed this threshold ', value = '240')
+    }
+  })
+  #Reactive Expression that holds the SUL value
+  SUL_value <- reactive({
+    if(is.null(input$SULinput) | isFALSE(input$SBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(240)
+    }else{
+      sul = as.numeric(input$SULinput)
+      return(sul)
+    }
+
+  })
+  #Input for SLL argument
+  output$SLL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$SBPcheck)){
+      textInput('SLLinput', 'Input Systolic Lower Limit to exclude any values that fall below this threshold ', value = '50')
+    }
+  })
+  #Reactive Expression that holds the SLL value
+  SLL_value <- reactive({
+    if(is.null(input$SLLinput) | isFALSE(input$SBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(50)
+    }else{
+      sll = as.numeric(input$SLLinput)
+      return(sll)
+    }
+
+  })
+  ##DIASTOLIC UPPER/LOWER LIMIT ARGUMENT##
+  
+  #Check box for DUL/DLL argument
+  output$DBP_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check)){
+      checkboxInput('DBPcheck', 'Input Diastolic Upper/Lower Limits to exclude DBP values from Data', value = FALSE)
+    }
+  })
+  #Input for DUL argument
+  output$DUL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$DBPcheck)){
+      textInput('DULinput', 'Input Diastolic Upper Limit to exclude any values that exceed this threshold ', value = '140')
+    }
+  })
+  #Reactive Expresion that holds the DUL value
+  DUL_value <- reactive({
+    if(is.null(input$DULinput) | isFALSE(input$DBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(140)
+    }else{
+      dul = as.numeric(input$DULinput)
+      return(dul)
+    }
+
+  })
+  #Input for DLL argument
+  output$DLL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$DBPcheck)){
+      textInput('DLLinput', 'Input Diastolic Lower Limit to exclude any values that fall below this threshold ', value = '50')
+    }
+  })
+  #Reactive Expression that holds the DLL value
+  DLL_value <- reactive({
+    if(is.null(input$DLLinput) | isFALSE(input$DBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(50)
+    }else{
+      dll = as.numeric(input$DLLinput)
+      return(dll)
+    }
+
+  })
+  
+  ##HR UPPER/LOWER LIMIT ARGUMENT##
+  
+  #Checkbox for HRUL/HRLL ARGUMENT
+  output$HR_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check)){
+      checkboxInput('HRcheck', 'Input HR Upper/Lower Limits to exclude HR values from Data', value = FALSE)
+    }
+  })
+  #Input for HRUL argument
+  output$HRUL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$HRcheck)){
+      textInput('HRULinput', 'Input HR Upper Limit to exclude any values that exceed this threshold ', value = '220')
+    }
+  })
+  #Reactive Expression that holds HRUL argument
+  HRUL_value <- reactive({
+    if(is.null(input$HRULinput) | isFALSE(input$HRcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(220)
+    }else{
+      hrul = as.numeric(input$HRULinput)
+      return(hrul)
+    }
+  })
+  #Input for HRLL argument
+  output$HRLL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$HRcheck)){
+      textInput('HRLLinput', 'Input HR Lower Limit to exclude any values that fall below this threshold ', value = '27')
+    }
+  })
+  #Reactive Expression that holds HRLL argument
+  HRLL_value <- reactive({
+    if(is.null(input$HRLLinput) | isFALSE(input$HRcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(27)
+    }else{
+      hrll = as.numeric(input$HRLLinput)
+      return(hrll)
+    }
+  })
   ##INC_LOW ARGUMENT##
   
   #checkboxInput() for INC_LOW will appear if optional argument checkbox (input$optional_arg) is True 
@@ -613,6 +734,7 @@ shinyServer(function(input,output,session) {
     if(input$dataview == 'proc_data'){
       bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                  SUL = SUL_value(), SLL = SLL_value(),DUL = DUL_value(), DLL = DLL_value(), HRUL = HRUL_value(), HRLL = HRLL_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                   ToD_int = todint_value(), eod = eod_value(),
                                   agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
