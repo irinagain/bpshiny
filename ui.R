@@ -82,7 +82,7 @@ ui <- fluidPage(
                                                                                "Coefficient of Variation (CV)" = "cv",
                                                                                "Measures of Center" = "bp_center", 
                                                                                "Nocturnal Blood Pressure Dipping Calculation" = "dip_calc", 
-                                                                               "Successive Variation (SV)" = "sv", 
+                                                                               "Successive Variation (SV)" = "sv"
 
                                                                                
                )),
