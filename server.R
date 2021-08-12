@@ -929,14 +929,14 @@ shinyServer(function(input,output,session) {
   output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #dipping threshold, default is  0.1
-      numericInput("parameter1", "Specify extreme dipping threshold",value = 0.1, step = 0.05, min = 0)
+      numericInput("parameter1", "Specify dipping threshold",value = 0.1, step = 0.05, min = 0, max = 1)
     }
   })
   
   output$select_ext_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #extreme threshold, default if 0.2
-      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05, min = 0)
+      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05, min = 0, max = 1)
     }
   })
   
@@ -951,7 +951,7 @@ shinyServer(function(input,output,session) {
     }
     else if(parameter_type == "dip_calc"){
       #parameters for dip_calc
-      helpText("Enter the dip and extreme thresholds.") 
+      helpText("Enter the dipping and extreme dipping thresholds between 0 and 1. ")
     }
   })
   
