@@ -2000,6 +2000,9 @@ shinyServer(function(input,output,session) {
       )
       
       if(input$fileselect == "hypnos_data"){
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
         bp_ts_plots(data = {hypnos_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2013,6 +2016,9 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
         )
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
         bp_ts_plots(data = {ghana_data1()},
                   subj = input$subj_for_plots,
                   wrap_var = input$wrap_var_for_ts, 
@@ -2023,7 +2029,9 @@ shinyServer(function(input,output,session) {
                   wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
       }
       else if(input$fileselect == "jhsproc_data"){
-        
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
         bp_ts_plots(data = {jhs_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2037,6 +2045,9 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
         )
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
         bp_ts_plots(data = {children_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2049,6 +2060,9 @@ shinyServer(function(input,output,session) {
       else if(input$fileselect == "bppreg_data"){
         validate(
           need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
         )
         bp_ts_plots(data = {preg_data1()},
                     subj = input$subj_for_plots,
@@ -2069,6 +2083,9 @@ shinyServer(function(input,output,session) {
           need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
         )
         if(!is.null(input$date)){
+          validate(
+            need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+          )
           bp_ts_plots(data = {input_data1()},
                       subj = input$subj_for_plots,
                       wrap_var = input$wrap_var_for_ts, 
@@ -2081,6 +2098,9 @@ shinyServer(function(input,output,session) {
         else{
           validate(
             need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
+          )
+          validate(
+            need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
           )
           
           bp_ts_plots(data = {input_data1()},
