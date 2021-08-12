@@ -588,7 +588,12 @@ shinyServer(function(input,output,session) {
     date = input$date
     if(input$date1 == FALSE){date = NULL}
     id = input$id
-    if(input$id1 == FALSE){id = NULL}
+    #If ID checkbox is not selected, a column will be generated called 'ID' consisiting of the number 1
+    #Resolves Issue with Plots Tab
+    if(input$id1 == FALSE){
+      id = NULL
+      bpdata <- bpdata%>%mutate(ID = '1')
+    }
     wake = input$wake
     if(input$wake1 == FALSE){wake = NULL}
     visit = input$visit
@@ -619,9 +624,6 @@ shinyServer(function(input,output,session) {
         bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m-%d-%Y %H:%M:%S")
         bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
         bpdata_final
-      }
-      if(isFALSE(input$id1)){
-        bpdata_final <- bpdata_final%>%mutate(ID = '1')
       }
     }else{
       bpdata
