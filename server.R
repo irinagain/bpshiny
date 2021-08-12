@@ -153,13 +153,17 @@ shinyServer(function(input,output,session) {
   #If input for the DATE/TIME checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$dateinput <- renderUI({
     req(input$date1)
-    selectInput('date', 'Date', names(dataset()))
+    if(input$date1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('date', 'Date', names(dataset()))
+    }
   })
   
   #If input for the ID checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$idinput <- renderUI({
     req(input$id1)
-    if(input$id1 == FALSE){
+    if(input$id1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('id', 'ID', names(dataset()))
@@ -169,7 +173,7 @@ shinyServer(function(input,output,session) {
   #If input for the WAKE checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$wakeinput <- renderUI({
     req(input$wake1)
-    if(input$wake1 == FALSE){
+    if(input$wake1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('wake', 'Wake', names(dataset()))
@@ -179,7 +183,7 @@ shinyServer(function(input,output,session) {
   #If input for the VISIT checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$visitinput <- renderUI({
     req(input$visit1)
-    if(input$visit1 == FALSE){
+    if(input$visit1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('visit', 'Visit', names(dataset()))
@@ -189,7 +193,7 @@ shinyServer(function(input,output,session) {
   #If input for the HR checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$heartinput <- renderUI({
     req(input$heart1)
-    if(input$heart1 == FALSE){
+    if(input$heart1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('hr', 'Heart Rate', names(dataset()))
@@ -199,7 +203,7 @@ shinyServer(function(input,output,session) {
   #If input for the PP checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$ppinput <- renderUI ({
     req(input$pp1)
-    if(input$pp1 == FALSE){
+    if(input$pp1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('pp', 'Pulse Pressure', names(dataset()))
@@ -209,7 +213,7 @@ shinyServer(function(input,output,session) {
   #If input for the MAP checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$mapinput <- renderUI({
     req(input$map1)
-    if(input$map1 == FALSE){
+    if(input$map1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('map', 'Mean Arterial Pressure', names(dataset()))
@@ -219,7 +223,7 @@ shinyServer(function(input,output,session) {
   #If input for the RPP checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$rppinput <- renderUI({
     req(input$rpp1)
-    if(input$rpp1 == FALSE){
+    if(input$rpp1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('rpp', 'Rate Pulse Pressure', names(dataset()))
@@ -229,7 +233,7 @@ shinyServer(function(input,output,session) {
   #If input for the DOW checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$dowinput <- renderUI({
     req(input$dow1)
-    if(input$dow1 == FALSE){
+    if(input$dow1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
       selectInput('dow', 'Day of the Week', names(dataset()))
