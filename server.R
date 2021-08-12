@@ -1298,13 +1298,13 @@ shinyServer(function(input,output,session) {
   
   ######PLOT######
   
-  #Get name of dataset
+  #Get name of dataset store name in output$plotName
   plotName <- eventReactive(input$plot_update, {input$fileselect})
-  
   output$plotName <- plotName
   
   #Get the type of plot the user wants to render
-  plottype <- reactive({  # wrap plottype input in a reactive for rendering UI and Plot
+  #Wrap plottype input in a reactive for rendering UI and Plot
+  plottype <- reactive({
     if(input$plottype == "bp_scatter"){
       return("bp_scatter")
     }
@@ -1322,7 +1322,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #get the name of the type of plot the user wants to render
+  #get the name of the type of plot the user wants to render & store it in output$plot_type_text
   plot_type_text <- eventReactive(input$plot_update, {
     if(input$plottype == "bp_scatter"){
       return("bp_scatter")
@@ -1493,7 +1493,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
-  
+  ### If user wants to have wrapping argument in time series plot, additional arguments need to be provided by user
   output$wrap_rowcol_for_ts <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1527,6 +1527,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  #First hour argument for time series plot
   output$first_hour_for_ts <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1537,6 +1538,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  #rotate x axis label argument for time series plot
   output$rotate_xlab_for_ts <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1547,6 +1549,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  #the time series plot produces a list of 2 plots (sometimes), this lets user switch between the two plots
   output$bp_ts_view <- renderUI({
     if (plottype() == "bp_ts_plots"){
       
@@ -1599,11 +1602,7 @@ shinyServer(function(input,output,session) {
         
         bp_hist(data = input_data1(), 
                 subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
-      }
-      #if the user wants to do bp_hist on data that isn't unprocessed jhs/hypnos/ghana/children/preg
-      else if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data") && !(input$fileselect == "ghana_data") && !(input$fileselect == "bpchildren_data") && !(input$fileselect == "bppreg_data")) {
-        bp_hist(data = user_data(), subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
-      }
+      } 
       #if the user wants to do bp_hist on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
         bp_hist(data = {jhs_data1()},
@@ -1669,16 +1668,7 @@ shinyServer(function(input,output,session) {
       
       }
       
-      #if the user wants to bp_scatter() data that isn't unprocessed jhs or unprocessed hypnos
-      else if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        bp_scatter(data = user_data(),
-                   plot_type = input$plot_type_for_scatter,
-                   subj = input$subj_for_plots,
-                   group_var = input$group_var_for_scatter_and_report,
-                   wrap_var = input$wrap_var_for_scatter,
-                   inc_crisis = input$inc_crisis_T_or_F, 
-                   inc_low = input$inc_low_T_or_F)
-      }
+   
       #if the user wants to use bp_scatter on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
         bp_scatter(data = {jhs_data1()}, 
@@ -1817,8 +1807,6 @@ shinyServer(function(input,output,session) {
     }
     
     #if the user wants to render the dow_tod_plots() 
-    
-    
     else if(plottype == "dow_tod_plots"){
       
       #Makes sure a data set has been uploaded/selected
