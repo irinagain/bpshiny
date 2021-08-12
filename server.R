@@ -929,14 +929,14 @@ shinyServer(function(input,output,session) {
   output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #dipping threshold, default is  0.1
-      numericInput("parameter1", "Specify extreme dipping threshold",value = 0.1, step = 0.05)
+      numericInput("parameter1", "Specify extreme dipping threshold",value = 0.1, step = 0.05, min = 0)
     }
   })
   
   output$select_ext_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #extreme threshold, default if 0.2
-      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05)
+      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05, min = 0)
     }
   })
 
