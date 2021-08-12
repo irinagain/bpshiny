@@ -1830,6 +1830,13 @@ shinyServer(function(input,output,session) {
       
       #if the user wants to dow_tod_plots an uploaded dataset
       if(input$fileselect == "input_data") {
+        validate(
+          need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+          need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
         dow_tod_plots_out <- dow_tod_plots(data = input_data1(),
                                            subj = input$subj_for_plots)
       }
@@ -1940,6 +1947,13 @@ shinyServer(function(input,output,session) {
         
       }
       else if(input$fileselect == "input_data"){
+        validate(
+          need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+          need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
         if(!is.null(input$date)){
           bp_ts_plots(data = {input_data1()},
                       subj = input$subj_for_plots,
