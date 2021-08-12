@@ -1348,11 +1348,9 @@ shinyServer(function(input,output,session) {
     if (input$fileselect == "input_data"){
       req(input$datafile)
       
+      
       validate(
-        need(input$id != '', label = "To specify subject(s) in plotting, 'ID' on Data tab")
-      )
-      validate(
-        need(input$dataview == "proc_data", label = "Select 'Processed Data' on Data Tab, a processed data set ")
+        need(input$dataview == "proc_data", message = "No subject 'ID' column is found, select Processed Data on 'Data' Tab if necessary")
       )
       selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data1()$ID)))), selected = NULL, multiple = T)
     }
@@ -1388,7 +1386,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
-  ### Get wrap_var argument for bp_scattter & bp_ts_plots
+  ### Get wrap_var argument for bp_scattter 
   output$wrap_var_for_scatter <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1549,6 +1547,7 @@ shinyServer(function(input,output,session) {
   
   output$bp_ts_view <- renderUI({
     if (plottype() == "bp_ts_plots"){
+      
       selectInput(inputId = "bp_ts_view", label = NULL, choices = c(`Plot View 1` = "1",
                                                                     `Plot View 2` = "2"),
                   selected = 1, size = 1, selectize = F)
@@ -1584,11 +1583,16 @@ shinyServer(function(input,output,session) {
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       )
       
+      
+      
       #if the user uploads their own data, this makes sure they've entered systolic and diastolic information, and then casts plotFunc() properly
       if (input$fileselect == "input_data"){
         validate(
           need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
           need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
         )
         
         bp_hist(data = input_data1(), 
@@ -1650,6 +1654,9 @@ shinyServer(function(input,output,session) {
           need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
           need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
         )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
         bp_scatter(data = original_data(),
                    plot_type = input$plot_type_for_scatter,
                    subj = input$subj_for_plots,
@@ -1703,8 +1710,64 @@ shinyServer(function(input,output,session) {
         need(expr = length(input$group_var_for_scatter_and_report) <= 1, message = "Ensure there is only one (1) entry for Grouping Variable")
       )
       #If the user wants to user wants to use bp_report for data that isn't unprocessed jhs or unprocessed hypnos
-      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        bp_report(data = user_data(),
+      if(input$fileselect == "input_data") {
+        validate(
+          need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+          need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
+        # 
+        bp_report(data = {tibble::as_data_frame(input_data1())},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      
+      else if (input$fileselect == "ghana_data"){
+        bp_report(data = {process_data(data = bp::bp_ghana, sbp = "SBP", dbp = "DBP")},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      
+      else if(input$fileselect == "bpchildren_data"){
+        bp_report(data = {children_data1()},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      
+      else if(input$fileselect == "bppreg_data"){
+        bp_report(data = {preg_data1()},
                   subj = input$subj_for_plots,
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
@@ -1761,11 +1824,29 @@ shinyServer(function(input,output,session) {
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       )
       
-      #if the user wants to dow_tod_plots a dataset that isn't unprocessedd hypnos or unprocessed jhs
-      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        dow_tod_plots_out <- dow_tod_plots(data = user_data(),
+      
+      
+      #if the user wants to dow_tod_plots an uploaded dataset
+      if(input$fileselect == "input_data") {
+        dow_tod_plots_out <- dow_tod_plots(data = input_data1(),
                                            subj = input$subj_for_plots)
       }
+      
+      else if(input$fileselect == "ghana_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {ghana_data1()},
+                                           subj = input$subj_for_plots)
+      }
+      
+      else if(input$fileselect == "bppreg_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
+                                           subj = input$subj_for_plots)
+      }
+      
+      else if(input$fileselect == "bpchildren_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
+                                          subj = input$subj_for_plots)
+      }
+      
       #if the user wants to dow_tod_plots the jhs data
       else if (input$fileselect == "jhsproc_data") {
         dow_tod_plots_out <- dow_tod_plots(data = {jhs_data1()},
@@ -1792,7 +1873,7 @@ shinyServer(function(input,output,session) {
       ) 
       
       validate(
-        need(expr = length(input$subj_for_plots) == 1, message = "Please specifty 1 subject")
+        need(expr = length(input$subj_for_plots) == 1, message = "Please specifty 1 subject, if necessary process the data in the 'Data' tab")
       )
       
       if(input$fileselect == "hypnos_data"){
@@ -1858,7 +1939,7 @@ shinyServer(function(input,output,session) {
       }
       else if(input$fileselect == "input_data"){
         if(!is.null(input$date)){
-          bp_ts_plots(data = {user_data()},
+          bp_ts_plots(data = {input_data1()},
                       subj = input$subj_for_plots,
                       wrap_var = input$wrap_var_for_ts, 
                       index = input$index_for_ts, 
@@ -1869,9 +1950,9 @@ shinyServer(function(input,output,session) {
         }
         else{
           validate(
-            need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+            need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
           )
-          bp_ts_plots(data = {user_data()},
+          bp_ts_plots(data = {input_data1()},
                       subj = input$subj_for_plots,
                       wrap_var = input$wrap_var_for_ts, 
                       index = input$index_for_ts, 
@@ -1895,7 +1976,10 @@ shinyServer(function(input,output,session) {
   
  
   #output the plot
-  output$plot <- renderPlot({plotFunc()})
+  output$plot <- renderPlot({
+    
+    plotFunc()
+    })
   
   #download handler
   output$downloadPlot <- downloadHandler(
