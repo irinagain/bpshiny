@@ -863,7 +863,7 @@ shinyServer(function(input,output,session) {
       bpdata_final
     }else{
       bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%Y/%m/%d %H:%M:%S")
       bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
       bpdata_final
     }
@@ -2082,6 +2082,7 @@ shinyServer(function(input,output,session) {
           validate(
             need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
           )
+          
           bp_ts_plots(data = {input_data1()},
                       subj = input$subj_for_plots,
                       wrap_var = input$wrap_var_for_ts, 
