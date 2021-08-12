@@ -21,6 +21,7 @@ ui <- fluidPage(
                  uiOutput('file_input'),
                  uiOutput('sys_input'),
                  uiOutput('dias_input'),
+                 uiOutput('bptype_input'),
                  uiOutput('date_checkbox'),
                  uiOutput('dateinput'),
                  uiOutput('id_checkbox'),
@@ -42,6 +43,15 @@ ui <- fluidPage(
                  uiOutput('optionallabel'),
                  uiOutput('optional_arguments'),
                  uiOutput('data_screen_check'),
+                 uiOutput('SBP_check'),
+                 uiOutput('SUL_input'),
+                 uiOutput('SLL_input'),
+                 uiOutput('DBP_check'),
+                 uiOutput('DUL_input'),
+                 uiOutput('DLL_input'),
+                 uiOutput('HR_check'),
+                 uiOutput('HRUL_input'),
+                 uiOutput('HRLL_input'),
                  uiOutput('bp_type_check'),
                  uiOutput('bp_type_arg'),
                  uiOutput('inc_low_check'),
@@ -143,6 +153,7 @@ ui <- fluidPage(
                  #draw the plot
                  mainPanel(
                           uiOutput("bp_hist_view"),
+                          uiOutput("bp_ts_view"),
                           hr(),
                           plotOutput("plot"),
                            #line break

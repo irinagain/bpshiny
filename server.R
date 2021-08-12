@@ -15,14 +15,16 @@
 shinyServer(function(input,output,session) {
   ######DATA######
   
-  #Creates fileInput() if User Datafile is selected
+  ####DATA INPUT/STORAGE####
+  
+  #Creates fileInput() which will accept a .csv file if User Datafile is selected
   output$file_input <- renderUI({
     if(input$fileselect == 'input_data'){
       fileInput("datafile", "Choose a CSV File", multiple = FALSE, accept = ".csv")
     }
   })  
   
-  #Reactive function to read datafile
+  #Reactive function that will read data file and store User Inputted data
   dataset <- reactive({
     inFile <- input$datafile
     if(is.null(inFile)){
@@ -30,185 +32,41 @@ shinyServer(function(input,output,session) {
     }
     read.csv(inFile$datapath, header = T)
   })
-  #Updates selectInput() value 
-  observe({
-    updateSelectInput(session,'sys', choices = names(dataset()))
-    updateSelectInput(session, 'dias', choices = names(dataset()))
-  })
   
   
-  #Creates Systolic/Diastolic text boxes if user datafile is selected
+  ####INPUT FOR COLUMN NAMES OF REQUIRED VARIABLES: SYSTOLIC,DIASTOLIC,BP_TYPE####
+  
+  #Creates selectInput() of all column names in User Inputted Data, and will store the selected column name corresponding to Systolic  to 'input$sys'
   output$sys_input <- renderUI({
     if(input$fileselect == 'input_data'){
       selectInput('sys', 'Systolic', '')
     }
   })
   
+  #Creates selectInput() of all column names in User Inputted Data, and will store the selected column name corresponding to Diastolic  to 'input$dias'
   output$dias_input <- renderUI({
     if(input$fileselect == 'input_data'){
       selectInput('dias', 'Diastolic', '')
     }
   })
   
+  #Updates Systolic and Diastolic selectInput()'s to the corresponding column names of the User Inputted data 
+  observe({
+    updateSelectInput(session,'sys', choices = names(dataset()))
+    updateSelectInput(session, 'dias', choices = names(dataset()))
+  })
   
-  #Creates checkbox based on if User Datafile is selected
-  output$date_checkbox <- renderUI({
+  #Creates selectInput() of all column names in User Inputted Data, and will store the selected column name corresponding to Blood Pressure Type  to 'input$bptype_arg'
+  output$bptype_input <- renderUI({
     if(input$fileselect == 'input_data'){
-      checkboxInput('date1', 'Date/Time')
+      selectInput('bptype_arg', 'Blood Pressure Type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
     }
   })
-  
-  output$id_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('id1', 'ID')
-    }
-  })
-  
-  output$wake_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('wake1', 'Wake')
-    }
-  })
-  
-  output$visit_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('visit1', 'Visit')
-    }
-  })
-  
-  output$hr_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('heart1', 'Heart Rate')
-    }
-  })
-  
-  output$pp_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('pp1','Pulse Pressure')
-    }
-  })
-  
-  output$map_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('map1','Mean Arterial Pressure')
-    }
-  })
-  
-  output$rpp_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('rpp1','Rate Pulse Pressure')
-    }
-  })
-  
-  output$dow_checkbox <- renderUI({
-    if(input$fileselect == 'input_data'){
-      checkboxInput('dow1','Day of the Week')
-    }
-  })
-  
-  
-  #Creates dropdown based on what column names were selected 
-  output$dateinput <- renderUI({
-    req(input$date1)
-    selectInput('date', 'Date', names(dataset()))
-  })
-  output$idinput <- renderUI({
-    req(input$id1)
-    if(input$id1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('id', 'ID', names(dataset()))
-    }
-  })
-  output$wakeinput <- renderUI({
-    req(input$wake1)
-    if(input$wake1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('wake', 'Wake', names(dataset()))
-    }
-  })
-  output$visitinput <- renderUI({
-    req(input$visit1)
-    if(input$visit1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('visit', 'Visit', names(dataset()))
-    }
-  })
-  output$heartinput <- renderUI({
-    req(input$heart1)
-    if(input$heart1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('hr', 'Heart Rate', names(dataset()))
-    }
-  })
-  output$ppinput <- renderUI ({
-    req(input$pp1)
-    if(input$pp1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('pp', 'Pulse Pressure', names(dataset()))
-    }
-  })
-  output$mapinput <- renderUI({
-    req(input$map1)
-    if(input$map1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('map', 'Mean Arterial Pressure', names(dataset()))
-    }
-  })
-  output$rppinput <- renderUI({
-    req(input$rpp1)
-    if(input$rpp1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('rpp', 'Rate Pulse Pressure', names(dataset()))
-    }
-  })
-  output$dowinput <- renderUI({
-    req(input$dow1)
-    if(input$dow1 == FALSE){
-      return(NULL)
-    }else{
-      selectInput('dow', 'Day of the Week', names(dataset()))
-    }
-  })
-  
-  output$optional_arguments <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      checkboxInput('optional_arg', 'Display Optional Arguments')
-    }
-  })
-  
-  #Label for Optional Arguments
-  output$optionallabel <- renderUI({
-    if(input$fileselect %in% c('input_data')){
-      h5('Optional Arguments')
-    }
-  })
-  
-  
-  #Select for bp_type argument
-  output$bp_type_check <- renderUI({
-    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
-      checkboxInput('bptype_check', 'Blood Presure Data Type')
-    }
-  })
-  
-  output$bp_type_arg <- renderUI({
-    req(input$bptype_check)
-    if(input$bptype_check == FALSE | isFALSE(input$optional_arg)){
-      return(NULL)
-    }else{
-      selectInput('bptype_arg', 'Select the corresponding blood pressure data type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
-    }
-  })
-  
+
+  #Stores Blood Pressure Type value into a reactive function for data processing
+  #If sample data  was chosen, this value wil default to 'HBPM' otherwise it will take the value of the bp_type selectInput()
   bptype_value <- reactive({
-    if(isFALSE(input$optional_arg) | isFALSE(input$bptype_check)){
+    if(input$fileselect != 'input_data'){
       return('HBPM')
     }
     req(input$bptype_arg)
@@ -221,13 +79,197 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Toggle for data_screen argument 
+  
+  ####INPUTS FOR ALL OTHER COLUMN NAMES OF OPTIONAL VARIABLES####
+  
+  ##If user inputted data is selected, ccheckboxInput()s for all optional variables will be made##
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the DATE/TIME variable 
+  output$date_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('date1', 'Date/Time')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the ID variable 
+  output$id_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('id1', 'ID')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the WAKE variable 
+  output$wake_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('wake1', 'Wake')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the VISIT variable 
+  output$visit_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('visit1', 'Visit')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the HR variable 
+  output$hr_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('heart1', 'Heart Rate')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the PP variable 
+  output$pp_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('pp1','Pulse Pressure')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the mAP variable 
+  output$map_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('map1','Mean Arterial Pressure')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the RPP variable 
+  output$rpp_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('rpp1','Rate Pulse Pressure')
+    }
+  })
+  
+  #Creates a checkboxInput() if user wants to assign a column name for the DayOfWeek variable 
+  output$dow_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('dow1','Day of the Week')
+    }
+  })
+  
+  ###If checkboxInput() for a given variable is TRUE, a selectInput() will appear below with column names of inputted dataset##
+  
+  
+  #If input for the DATE/TIME checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$dateinput <- renderUI({
+    req(input$date1)
+    if(input$date1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('date', 'Date', names(dataset()))
+    }
+  })
+  
+  #If input for the ID checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$idinput <- renderUI({
+    req(input$id1)
+    if(input$id1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('id', 'ID', names(dataset()))
+    }
+  })
+
+  #If input for the WAKE checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$wakeinput <- renderUI({
+    req(input$wake1)
+    if(input$wake1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('wake', 'Wake', names(dataset()))
+    }
+  })
+  
+  #If input for the VISIT checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$visitinput <- renderUI({
+    req(input$visit1)
+    if(input$visit1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('visit', 'Visit', names(dataset()))
+    }
+  })
+  
+  #If input for the HR checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$heartinput <- renderUI({
+    req(input$heart1)
+    if(input$heart1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('hr', 'Heart Rate', names(dataset()))
+    }
+  })
+  
+  #If input for the PP checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$ppinput <- renderUI ({
+    req(input$pp1)
+    if(input$pp1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('pp', 'Pulse Pressure', names(dataset()))
+    }
+  })
+  
+  #If input for the MAP checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$mapinput <- renderUI({
+    req(input$map1)
+    if(input$map1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('map', 'Mean Arterial Pressure', names(dataset()))
+    }
+  })
+  
+  #If input for the RPP checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$rppinput <- renderUI({
+    req(input$rpp1)
+    if(input$rpp1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('rpp', 'Rate Pulse Pressure', names(dataset()))
+    }
+  })
+  
+  #If input for the DOW checkbox is true, a selectInput() will appear below with column names of inputted dataset
+  output$dowinput <- renderUI({
+    req(input$dow1)
+    if(input$dow1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('dow', 'Day of the Week', names(dataset()))
+    }
+  })
+  
+  
+  ####INPUTS FOR ALL OPTIONAL ARGUMENTS####
+  
+  ##DISPLAY FOR OPTIONAL ARGUMENTS##
+  
+  #If User Inputted data is selected, will display a checkbox with option to add optional arguments 
+  output$optional_arguments <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      checkboxInput('optional_arg', 'Display Optional Arguments')
+    }
+  })
+  
+  #Label to differentiate variable name and optional argument checkboxes
+  output$optionallabel <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      h5('Optional Arguments')
+    }
+  })
+
+  ##DATA_SCREEN ARGUMENT##
+  
+  
+  #checkboxInput() for datascreen will appear if optional argument checkbox (input$optional_arg) is True 
   output$data_screen_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('datascreen_check', 'Screen for extreme values in data for both SBP and DBP. Default is True', value = TRUE)
     }
   })
   
+  #Reactive expression that stores data_screen() argument value of either TRUE/FALSE
   datascreen_value <- reactive ({
     if(isFALSE(input$optional_arg)){
       return(TRUE)
@@ -237,14 +279,138 @@ shinyServer(function(input,output,session) {
       }else{return(FALSE)}
     }
   })
+
+  ##SYSTOLIC,DIASTOLIC,AND HR UPPER/LOWER BOUNDARIES ARGUMENTS##
   
-  #Toggle for inc_low argument
+  ##SYSTOLIC UPPER/LOWER LIMIT ARGUMENT##
+  
+  #Checkbox for SUL/SLL argument 
+  output$SBP_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check)){
+      checkboxInput('SBPcheck', 'Input Systolic Upper/Lower Limits to exclude SBP values from Data', value = FALSE)
+    }
+  })
+  #Input for SUL argument
+  output$SUL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$SBPcheck)){
+      textInput('SULinput', 'Input Systolic Upper Limit to exclude any values that exceed this threshold ', value = '240')
+    }
+  })
+  #Reactive Expression that holds the SUL value
+  SUL_value <- reactive({
+    if(is.null(input$SULinput) | isFALSE(input$SBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(240)
+    }else{
+      sul = as.numeric(input$SULinput)
+      return(sul)
+    }
+
+  })
+  #Input for SLL argument
+  output$SLL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$SBPcheck)){
+      textInput('SLLinput', 'Input Systolic Lower Limit to exclude any values that fall below this threshold ', value = '50')
+    }
+  })
+  #Reactive Expression that holds the SLL value
+  SLL_value <- reactive({
+    if(is.null(input$SLLinput) | isFALSE(input$SBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(50)
+    }else{
+      sll = as.numeric(input$SLLinput)
+      return(sll)
+    }
+
+  })
+  ##DIASTOLIC UPPER/LOWER LIMIT ARGUMENT##
+  
+  #Check box for DUL/DLL argument
+  output$DBP_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check)){
+      checkboxInput('DBPcheck', 'Input Diastolic Upper/Lower Limits to exclude DBP values from Data', value = FALSE)
+    }
+  })
+  #Input for DUL argument
+  output$DUL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$DBPcheck)){
+      textInput('DULinput', 'Input Diastolic Upper Limit to exclude any values that exceed this threshold ', value = '140')
+    }
+  })
+  #Reactive Expresion that holds the DUL value
+  DUL_value <- reactive({
+    if(is.null(input$DULinput) | isFALSE(input$DBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(140)
+    }else{
+      dul = as.numeric(input$DULinput)
+      return(dul)
+    }
+
+  })
+  #Input for DLL argument
+  output$DLL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$DBPcheck)){
+      textInput('DLLinput', 'Input Diastolic Lower Limit to exclude any values that fall below this threshold ', value = '50')
+    }
+  })
+  #Reactive Expression that holds the DLL value
+  DLL_value <- reactive({
+    if(is.null(input$DLLinput) | isFALSE(input$DBPcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(50)
+    }else{
+      dll = as.numeric(input$DLLinput)
+      return(dll)
+    }
+
+  })
+  
+  ##HR UPPER/LOWER LIMIT ARGUMENT##
+  
+  #Checkbox for HRUL/HRLL ARGUMENT
+  output$HR_check <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check)){
+      checkboxInput('HRcheck', 'Input HR Upper/Lower Limits to exclude HR values from Data', value = FALSE)
+    }
+  })
+  #Input for HRUL argument
+  output$HRUL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$HRcheck)){
+      textInput('HRULinput', 'Input HR Upper Limit to exclude any values that exceed this threshold ', value = '220')
+    }
+  })
+  #Reactive Expression that holds HRUL argument
+  HRUL_value <- reactive({
+    if(is.null(input$HRULinput) | isFALSE(input$HRcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(220)
+    }else{
+      hrul = as.numeric(input$HRULinput)
+      return(hrul)
+    }
+  })
+  #Input for HRLL argument
+  output$HRLL_input <- renderUI({
+    if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$datascreen_check) & isTRUE(input$HRcheck)){
+      textInput('HRLLinput', 'Input HR Lower Limit to exclude any values that fall below this threshold ', value = '27')
+    }
+  })
+  #Reactive Expression that holds HRLL argument
+  HRLL_value <- reactive({
+    if(is.null(input$HRLLinput) | isFALSE(input$HRcheck) | isFALSE(input$optional_arg) | isFALSE(input$datascreen_check)){
+      return(27)
+    }else{
+      hrll = as.numeric(input$HRLLinput)
+      return(hrll)
+    }
+  })
+  ##INC_LOW ARGUMENT##
+  
+  #checkboxInput() for INC_LOW will appear if optional argument checkbox (input$optional_arg) is True 
   output$inc_low_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('inclow_check', 'Include low category for BP classification column. Default is True', value = TRUE)
     }
   })
   
+  #Reactive expression that stores inc_low() argument value of either TRUE/FALSE
   inclow_value <- reactive({
     if(isFALSE(input$optional_arg)){
       return(TRUE)
@@ -255,13 +421,16 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Toggle for the inc_crisis argument
+  ##INC_CRISIS ARGUMENT##
+  
+  #checkboxInput() for INC_CRISIS will appear if optional argument checkbox (input$optional_arg) is True 
   output$inc_crisis_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('inccrisis_check', 'Include crisis category for BP classification column. Default is True', value = TRUE)
     }
   })
   
+  #Reactive expression that stores inc_crisis() argument value as either TRUE/FALSE
   inccrisis_value <- reactive({
     if(isFALSE(input$optional_arg)){
       return(TRUE)
@@ -272,13 +441,17 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Input for tod_int argument
+  ##TOD_INT ARGUMENT##
+  
+  #checkboxInput() for TOD_INT will appear if optional argument checkbox (input$optional_arg) is True 
   output$tod_int_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('todint_check', 'Override the default interval for the Time-of-Day periods')
     }
   })
   
+  
+  #Will create a textInput() for TOD_INT argument if input of the tod_int checkbox is true
   output$tod_int_arg <- renderUI({
     req(input$todint_check)
     if(input$todint_check == FALSE | isFALSE(input$optional_arg)){
@@ -289,6 +462,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Reactive expression that stores TOD_INT() argument value AS a vector of four numbers
   todint_value <- reactive({
     if(is.null(input$todint_arg) | isFALSE(input$todint_check)){
       return(c(6,12,18,0))
@@ -304,13 +478,16 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Input for eod argument
+  ##EOD ARGUMENT##
+  
+  #checkboxInput() for EOD will appear if optional argument checkbox (input$optional_arg) is True 
   output$eod_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('eodcheck', 'Adjust the delineation of the end of day')
     }
   })
   
+  #Will create a textInput() for eod argument if input of the eod checkbox is true
   output$eod_arg <- renderUI({
     req(input$eodcheck)
     if(input$eodcheck == FALSE | isFALSE(input$optional_arg)){
@@ -321,6 +498,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Reactive expression that stores EOD argument value AS a four digit numeric
   eod_value <- reactive({
     if(is.null(input$eodarg) | isFALSE(input$optional_arg) | isFALSE(input$eodcheck)){
       return(NULL)
@@ -329,21 +507,26 @@ shinyServer(function(input,output,session) {
     if(!is.null(input$eodarg) | isFALSE(input$optional_arg)){
       inp1 <- as.numeric(input$eodarg)
       min <- inp1 %% 100
+      max <- as.numeric(substr(inp1,1,2))
       validate(
         need(nchar(input$eodarg) == 4, "EOD Argument must be atleast four digits that and lie within 0-24 hour interval"),
-        need(min >= 0 && min <= 59, 'EOD minute argument cannot be less than 0 or exceed 59' )
+        need(min >= 0 && min <= 59, 'EOD minute argument cannot be less than 0 or exceed 59' ),
+        need(max >= 0 && max <=23, 'EOD hour argument cannot be greater than 23 or less than 00')
       )
       return(input$eodarg)
     }
   })
   
-  #Input for agg argument 
+  ##AGGREGATE/COLLAPSE_DF ARGUMENTS###
+  
+  #checkboxInput() for AGG will appear if optional argument checkbox (input$optional_arg) is True 
   output$agg_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('aggcheck', 'Aggregate the data based on the amount of time between observations. Default is False', value = FALSE)
     }
   })
   
+  #Reactive expression that stores agg argument value AS a TRUE/FALSE
   agg_value <- reactive({
     if(isFALSE(input$optional_arg)){
       return(FALSE)
@@ -354,6 +537,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Will create a textInput() for agg_adj argument if input of the agg checkbox is true
   output$agg_thresh_arg <- renderUI({
     req(input$aggcheck)
     if(isFALSE(input$aggcheck) | isFALSE(input$optional_arg)){
@@ -363,6 +547,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Reactive expression that stores agg_adj argument value AS a numeric
   aggthresh_value <- reactive ({
     if(isFALSE(input$aggcheck) | isFALSE(input$optional_arg)){
       return(NULL)
@@ -373,13 +558,14 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Input for collapse_df argument
+  #Will create a checkboxInput() for collapse_df argument if input of the agg checkbox is true
   output$collapse_df_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg) & isTRUE(input$aggcheck)){
       checkboxInput('collapsedf_check', 'Argument that collapses data to eliminate repeating rows after aggregation. Default is False.', value = FALSE)
     }
   })
   
+  #Reactive expression that stores collapse_df argument value AS a TRUE/FALSE
   collapse_value <- reactive ({
     if(isFALSE(input$optional_arg) | isFALSE(input$aggcheck)){
       return(FALSE)
@@ -390,7 +576,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Input for chron_order argument
+  #checkboxInput() for chron_order() will appear if optional argument checkbox (input$optional_arg) is True
   output$chronorder_check <- renderUI({
     if(input$fileselect %in% c('input_data') & isTRUE(input$optional_arg)){
       checkboxInput('chron_order_check', 'Specify whether to to order the data in chronological order or reverse chronological order. Default is False which
@@ -398,6 +584,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Reactive expression that stores chron_order argument value AS a TRUE/FALSE
   chronorder_value <- reactive({
     if(isFALSE(input$optional_arg)){
       return(FALSE)
@@ -409,12 +596,15 @@ shinyServer(function(input,output,session) {
   })
   
   
-  #Toggle between original and processed data
+  #Radio button that will give the option of the data to display the original data or processed data. 
   output$dataviewer <- renderUI(
     radioButtons('dataview', label = 'View Data', choices = c('Original Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
   )
   
-  #Reactive Expression if users selects hypnos_data
+  ##SAMPLE DATASETS PROCESSING##
+  
+  #Reactive Expression for processed/orginial hypnos data
+  #Will contain original or processed data depending on what the input$dataviewer is 
   hypnos_data <- reactive({
     bp_hypnos <- bp::bp_hypnos
     hypnos_proc <- process_data(bp_hypnos,
@@ -439,7 +629,8 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Reactive Expression if users selects jhs_data
+  #Reactive Expression for processed/orginial jhs data
+  #Will contain original or processed data depending on what the input$dataviewer is 
   jhs_data <- reactive ({
     bp_jhs <- bp::bp_jhs
     date11 = as.character(bp_jhs$DateTime)
@@ -454,6 +645,7 @@ shinyServer(function(input,output,session) {
     jhs_proc$DATE_TIME <- as.POSIXct(jhs_proc$DATE_TIME)
     jhs_proc$DATE_TIME <- format(jhs_proc$DATE_TIME, "%m-%d-%Y %H:%M:%S")
     jhs_proc$DATE <- format(jhs_proc$DATE, "%m/%d/%Y")
+    jhs_proc <- jhs_proc%>%mutate(ID = '1')
     if(input$dataview == 'proc_data'){
       jhs_proc
     }else{
@@ -461,7 +653,8 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Reactive Expression if user selects bp_children
+  #Reactive Expression for processed/orginial children data
+  #Will contain original or processed data depending on what the input$dataviewer is 
   children_data <- reactive({
     bp_children <- bp::bp_children
     children_proc <- process_data(bp_children, 
@@ -474,7 +667,8 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #Reactive Expression if user selects bp_preg
+  #Reactive Expression for processed/orginial bp_preg data
+  #Will contain original or processed data depending on what the input$dataviewer is 
   preg_data <- reactive({
     bp_preg <- bp::bp_preg
     bppreg_proc <- process_data(bp_preg, sbp = 'SBP', dbp = 'DBP',
@@ -486,6 +680,8 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Reactive Expression for processed/orginial ghana data
+  #Will contain original or processed data depending on what the input$dataviewer is 
   ghana_data <- reactive({
     bp_ghana <- bp::bp_ghana
     bpghana_proc <- process_data(bp_ghana, sbp = 'SBP', dbp = 'DBP', id = 'ID')
@@ -496,8 +692,10 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  ##USER INPUTTED DATA PROCESSING##
   
-  #Reactive Expression if user inputs their own data
+  
+  #Reactive Expression that contains user-inputted data
   input_data <- reactive({
     file <- input$datafile
     
@@ -515,7 +713,12 @@ shinyServer(function(input,output,session) {
     date = input$date
     if(input$date1 == FALSE){date = NULL}
     id = input$id
-    if(input$id1 == FALSE){id = NULL}
+    #If ID checkbox is not selected, a column will be generated called 'ID' consisiting of the number 1
+    #Resolves Issue with Plots Tab
+    if(input$id1 == FALSE){
+      id = NULL
+      bpdata <- bpdata%>%mutate(ID = '1')
+    }
     wake = input$wake
     if(input$wake1 == FALSE){wake = NULL}
     visit = input$visit
@@ -531,13 +734,14 @@ shinyServer(function(input,output,session) {
     dow = input$dow
     if(input$dow1 == FALSE){dow = NULL}
     
-    #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
+    #Will either display original or processed data depending on what the input$dataviewer is 
     if(input$dataview == 'proc_data'){
       bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                  SUL = SUL_value(), SLL = SLL_value(),DUL = DUL_value(), DLL = DLL_value(), HRUL = HRUL_value(), HRLL = HRLL_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                   ToD_int = todint_value(), eod = eod_value(),
-                                  #agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                  agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
                                   chron_order = chronorder_value())
       if(isFALSE(input$date1)){
         bpdata_final
@@ -553,12 +757,9 @@ shinyServer(function(input,output,session) {
     
   })
   
-  #switch() function that will output table according to selected dataset 
-  user_data <- reactive ({
-    datachoice = input$fileselect
-    switch(datachoice,'ghana_data' = ghana_data(), 'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'bpchildren_data' = children_data(),
-           'bppreg_data' = preg_data(), 'input_data' = input_data())
-  })
+  
+  ##DATA TO BE USED WHEN PROCESSED DATA IS NOT SELECTED##
+  ##VERY SIMILAR TO PROCESSING ABOVE, EXCEPT DOES NOT DEPEND ON WHETHER THE USER HAS CHOSEN ORIGINAL/PROCESSED DATA##
   
   #Expression containg processed jhs data
   jhs_data1 <- reactive({
@@ -656,26 +857,37 @@ shinyServer(function(input,output,session) {
                                 hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                 bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                 ToD_int = todint_value(), eod = eod_value(), 
-                                #agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
                                 chron_order = chronorder_value())
     if(isFALSE(input$date1)){
       bpdata_final
     }else{
       bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m/%d/%Y %H:%M:%S")
+      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%Y/%m/%d %H:%M:%S")
       bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
       bpdata_final
     }
 
   })
   
-  #Switch function that will contain data that does not need to be processed further. Can be used regardless input$dataview
+  #Reactive Expression that contains processed data. Can be used regardless input$dataview
   original_data <- reactive({
     datachoice = input$fileselect
     switch(datachoice,'ghana_data' = ghana_data1(), 'hypnos_data' = hypnos_data1(), 'jhsproc_data' = jhs_data1(), 'bpchildren_data' = children_data1(),
            'bppreg_data' = preg_data1(), 'input_data' = input_data1())
   })
   
+  
+  
+  ##FINAL DATA DISPLAY##
+  
+  #Reactive Expression that will either display the sample dataset, or the user inputted data
+  #Depends on what dataset was selected
+  user_data <- reactive ({
+    datachoice = input$fileselect
+    switch(datachoice,'ghana_data' = ghana_data(), 'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'bpchildren_data' = children_data(),
+           'bppreg_data' = preg_data(), 'input_data' = input_data())
+  })
   
   output$contents <- renderTable({
     user_data()
@@ -1212,13 +1424,13 @@ shinyServer(function(input,output,session) {
   
   ######PLOT######
   
-  #Get name of dataset
+  #Get name of dataset store name in output$plotName
   plotName <- eventReactive(input$plot_update, {input$fileselect})
-  
   output$plotName <- plotName
   
   #Get the type of plot the user wants to render
-  plottype <- reactive({  # wrap plottype input in a reactive for rendering UI and Plot
+  #Wrap plottype input in a reactive for rendering UI and Plot
+  plottype <- reactive({
     if(input$plottype == "bp_scatter"){
       return("bp_scatter")
     }
@@ -1236,7 +1448,7 @@ shinyServer(function(input,output,session) {
     }
   })
   
-  #get the name of the type of plot the user wants to render
+  #get the name of the type of plot the user wants to render & store it in output$plot_type_text
   plot_type_text <- eventReactive(input$plot_update, {
     if(input$plottype == "bp_scatter"){
       return("bp_scatter")
@@ -1264,14 +1476,25 @@ shinyServer(function(input,output,session) {
     if (input$fileselect == "input_data"){
       req(input$datafile)
       
+      
       validate(
-        need(input$id != '', label = "To specify subject(s) in plotting, 'ID' on Data tab")
+        need(input$dataview == "proc_data", message = "No subject 'ID' column is found, select Processed Data on 'Data' Tab if necessary")
       )
-      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input$id)))), selected = NULL, multiple = T)
+      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data1()$ID)))), selected = NULL, multiple = T)
     }
     
-    if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
-      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
+    if(input$fileselect != "bpchildren_data"){
+      if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
+        selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(user_data()$ID)))), selected = NULL, multiple = T)
+      }
+      else{NULL}
+    }
+    
+    else if(input$fileselect == "bpchildren_data"){
+      if((plottype == "bp_scatter") | (plottype == "bp_hist") | (plottype == "bp_report") | (plottype == "dow_tod_plots") | (plottype == "bp_ts_plots")){
+        selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.numeric(levels(factor(children_data1()$ID)))), selected = NULL, multiple = T)
+      }
+      else{NULL}
     }
     else{NULL}
   })
@@ -1291,7 +1514,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
-  ### Get wrap_var argument for bp_scattter & bp_ts_plots
+  ### Get wrap_var argument for bp_scattter 
   output$wrap_var_for_scatter <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1396,7 +1619,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
-  
+  ### If user wants to have wrapping argument in time series plot, additional arguments need to be provided by user
   output$wrap_rowcol_for_ts <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1430,6 +1653,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  #First hour argument for time series plot
   output$first_hour_for_ts <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1440,6 +1664,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
+  #rotate x axis label argument for time series plot
   output$rotate_xlab_for_ts <- renderUI({
     plottype = plottype()
     req(input$fileselect)
@@ -1448,6 +1673,16 @@ shinyServer(function(input,output,session) {
       checkboxInput(inputId = "rotate_xlab_for_ts", label = "Rotate x-axis labels", value = F)
     }
     else{NULL}
+  })
+  
+  #the time series plot produces a list of 2 plots (sometimes), this lets user switch between the two plots
+  output$bp_ts_view <- renderUI({
+    if (plottype() == "bp_ts_plots"){
+      
+      selectInput(inputId = "bp_ts_view", label = NULL, choices = c(`Plot View 1` = "1",
+                                                                    `Plot View 2` = "2"),
+                  selected = 1, size = 1, selectize = F)
+    }
   })
   
   #there are multiple plots to view with bp_hist, this lets user choose which plot to view
@@ -1479,20 +1714,21 @@ shinyServer(function(input,output,session) {
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       )
       
+      
+      
       #if the user uploads their own data, this makes sure they've entered systolic and diastolic information, and then casts plotFunc() properly
       if (input$fileselect == "input_data"){
         validate(
           need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
           need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
         )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
         
         bp_hist(data = input_data1(), 
                 subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
-      }
-      #if the user wants to do bp_hist on data that isn't unprocessed jhs/hypnos/ghana/children/preg
-      else if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data") && !(input$fileselect == "ghana_data") && !(input$fileselect == "bpchildren_data") && !(input$fileselect == "bppreg_data")) {
-        bp_hist(data = user_data(), subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
-      }
+      } 
       #if the user wants to do bp_hist on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
         bp_hist(data = {jhs_data1()},
@@ -1545,6 +1781,9 @@ shinyServer(function(input,output,session) {
           need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
           need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
         )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
         bp_scatter(data = original_data(),
                    plot_type = input$plot_type_for_scatter,
                    subj = input$subj_for_plots,
@@ -1555,16 +1794,7 @@ shinyServer(function(input,output,session) {
       
       }
       
-      #if the user wants to bp_scatter() data that isn't unprocessed jhs or unprocessed hypnos
-      else if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        bp_scatter(data = user_data(),
-                   plot_type = input$plot_type_for_scatter,
-                   subj = input$subj_for_plots,
-                   group_var = input$group_var_for_scatter_and_report,
-                   wrap_var = input$wrap_var_for_scatter,
-                   inc_crisis = input$inc_crisis_T_or_F, 
-                   inc_low = input$inc_low_T_or_F)
-      }
+   
       #if the user wants to use bp_scatter on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
         bp_scatter(data = {jhs_data1()}, 
@@ -1598,8 +1828,64 @@ shinyServer(function(input,output,session) {
         need(expr = length(input$group_var_for_scatter_and_report) <= 1, message = "Ensure there is only one (1) entry for Grouping Variable")
       )
       #If the user wants to user wants to use bp_report for data that isn't unprocessed jhs or unprocessed hypnos
-      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        bp_report(data = user_data(),
+      if(input$fileselect == "input_data") {
+        validate(
+          need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+          need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
+        # 
+        bp_report(data = {tibble::as_data_frame(input_data1())},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      
+      else if (input$fileselect == "ghana_data"){
+        bp_report(data = {process_data(data = bp::bp_ghana, sbp = "SBP", dbp = "DBP")},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      
+      else if(input$fileselect == "bpchildren_data"){
+        bp_report(data = {children_data1()},
+                  subj = input$subj_for_plots,
+                  inc_low = input$inc_low_T_or_F,
+                  inc_crisis = input$inc_crisis_T_or_F,
+                  group_var = input$group_var_for_scatter_and_report,
+                  #save_report = input$save_report_for_report,
+                  path = NULL,
+                  filename = "bp_report",
+                  width = 12,
+                  height = 8.53,
+                  filetype = "pdf",
+                  units = input$units_for_report,
+                  scale = 1)
+      }
+      
+      else if(input$fileselect == "bppreg_data"){
+        bp_report(data = {preg_data1()},
                   subj = input$subj_for_plots,
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
@@ -1647,8 +1933,6 @@ shinyServer(function(input,output,session) {
     }
     
     #if the user wants to render the dow_tod_plots() 
-    
-    
     else if(plottype == "dow_tod_plots"){
       
       #Makes sure a data set has been uploaded/selected
@@ -1656,11 +1940,36 @@ shinyServer(function(input,output,session) {
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       )
       
-      #if the user wants to dow_tod_plots a dataset that isn't unprocessedd hypnos or unprocessed jhs
-      if(!(input$fileselect == "jhsproc_data") && !(input$fileselect == "hypnos_data")) {
-        dow_tod_plots_out <- dow_tod_plots(data = user_data(),
+      
+      
+      #if the user wants to dow_tod_plots an uploaded dataset
+      if(input$fileselect == "input_data") {
+        validate(
+          need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+          need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
+        dow_tod_plots_out <- dow_tod_plots(data = input_data1(),
                                            subj = input$subj_for_plots)
       }
+      
+      else if(input$fileselect == "ghana_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {ghana_data1()},
+                                           subj = input$subj_for_plots)
+      }
+      
+      else if(input$fileselect == "bppreg_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
+                                           subj = input$subj_for_plots)
+      }
+      
+      else if(input$fileselect == "bpchildren_data"){
+        dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
+                                          subj = input$subj_for_plots)
+      }
+      
       #if the user wants to dow_tod_plots the jhs data
       else if (input$fileselect == "jhsproc_data") {
         dow_tod_plots_out <- dow_tod_plots(data = {jhs_data1()},
@@ -1685,14 +1994,125 @@ shinyServer(function(input,output,session) {
       validate(
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       ) 
-      bp_ts_plots(data = user_data(),
+      
+      validate(
+        need(expr = length(input$subj_for_plots) == 1, message = "Please specifty 1 subject, if necessary process the data in the 'Data' tab")
+      )
+      
+      if(input$fileselect == "hypnos_data"){
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
+        bp_ts_plots(data = {hypnos_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "ghana_data"){
+        validate(
+          need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
+        bp_ts_plots(data = {ghana_data1()},
                   subj = input$subj_for_plots,
                   wrap_var = input$wrap_var_for_ts, 
                   index = input$index_for_ts, 
                   first_hour = input$first_hour_for_ts,
                   rotate_xlab = input$rotate_xlab_for_ts,
                   wrap_row = input$wrap_row_for_ts, 
-                  wrap_col = input$wrap_col_for_ts)
+                  wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "jhsproc_data"){
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
+        bp_ts_plots(data = {jhs_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "bpchildren_data"){
+        validate(
+          need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
+        bp_ts_plots(data = {children_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+      }
+      else if(input$fileselect == "bppreg_data"){
+        validate(
+          need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+        )
+        validate(
+          need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
+        bp_ts_plots(data = {preg_data1()},
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+        
+      }
+      else if(input$fileselect == "input_data"){
+        validate(
+          need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+          need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+        )
+        validate(
+          need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
+        if(!is.null(input$date)){
+          validate(
+            need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+          )
+          bp_ts_plots(data = {input_data1()},
+                      subj = input$subj_for_plots,
+                      wrap_var = input$wrap_var_for_ts, 
+                      index = input$index_for_ts, 
+                      first_hour = input$first_hour_for_ts,
+                      rotate_xlab = input$rotate_xlab_for_ts,
+                      wrap_row = input$wrap_row_for_ts, 
+                      wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+        }
+        else{
+          validate(
+            need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
+          )
+          validate(
+            need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+          )
+          
+          bp_ts_plots(data = {input_data1()},
+                      subj = input$subj_for_plots,
+                      wrap_var = input$wrap_var_for_ts, 
+                      index = input$index_for_ts, 
+                      first_hour = input$first_hour_for_ts,
+                      rotate_xlab = input$rotate_xlab_for_ts,
+                      wrap_row = input$wrap_row_for_ts, 
+                      wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+        }
+      }
       
     }
     
@@ -1707,7 +2127,10 @@ shinyServer(function(input,output,session) {
   
  
   #output the plot
-  output$plot <- renderPlot({plotFunc()})
+  output$plot <- renderPlot({
+    
+    plotFunc()
+    })
   
   #download handler
   output$downloadPlot <- downloadHandler(
