@@ -62,7 +62,7 @@ shinyServer(function(input,output,session) {
       selectInput('bptype_arg', 'Blood Pressure Type. Default is set to HBPM', c('HBPM' ='hbpm', 'ABPM' = 'abpm', 'AP' = 'ap'))
     }
   })
-
+  
   #Stores Blood Pressure Type value into a reactive function for data processing
   #If sample data  was chosen, this value wil default to 'HBPM' otherwise it will take the value of the bp_type selectInput()
   bptype_value <- reactive({
@@ -169,7 +169,7 @@ shinyServer(function(input,output,session) {
       selectInput('id', 'ID', names(dataset()))
     }
   })
-
+  
   #If input for the WAKE checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$wakeinput <- renderUI({
     req(input$wake1)
@@ -258,7 +258,7 @@ shinyServer(function(input,output,session) {
       h5('Optional Arguments')
     }
   })
-
+  
   ##DATA_SCREEN ARGUMENT##
   
   
@@ -279,7 +279,7 @@ shinyServer(function(input,output,session) {
       }else{return(FALSE)}
     }
   })
-
+  
   ##SYSTOLIC,DIASTOLIC,AND HR UPPER/LOWER BOUNDARIES ARGUMENTS##
   
   ##SYSTOLIC UPPER/LOWER LIMIT ARGUMENT##
@@ -304,7 +304,7 @@ shinyServer(function(input,output,session) {
       sul = as.numeric(input$SULinput)
       return(sul)
     }
-
+    
   })
   #Input for SLL argument
   output$SLL_input <- renderUI({
@@ -320,7 +320,7 @@ shinyServer(function(input,output,session) {
       sll = as.numeric(input$SLLinput)
       return(sll)
     }
-
+    
   })
   ##DIASTOLIC UPPER/LOWER LIMIT ARGUMENT##
   
@@ -344,7 +344,7 @@ shinyServer(function(input,output,session) {
       dul = as.numeric(input$DULinput)
       return(dul)
     }
-
+    
   })
   #Input for DLL argument
   output$DLL_input <- renderUI({
@@ -360,7 +360,7 @@ shinyServer(function(input,output,session) {
       dll = as.numeric(input$DLLinput)
       return(dll)
     }
-
+    
   })
   
   ##HR UPPER/LOWER LIMIT ARGUMENT##
@@ -850,7 +850,7 @@ shinyServer(function(input,output,session) {
     dow = input$dow
     if(input$dow1 == FALSE){dow = NULL}
     
-
+    
     #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
     
     bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
@@ -867,7 +867,7 @@ shinyServer(function(input,output,session) {
       bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
       bpdata_final
     }
-
+    
   })
   
   #Reactive Expression that contains processed data. Can be used regardless input$dataview
@@ -929,17 +929,17 @@ shinyServer(function(input,output,session) {
   output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #dipping threshold, default is  0.1
-      numericInput("parameter1", "Specify dipping threshold",value = 0.1, step = 0.05)
+      numericInput("parameter1", "Specify extreme dipping threshold",value = 0.1, step = 0.05, min = 0)
     }
   })
   
   output$select_ext_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #extreme threshold, default if 0.2
-      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05)
+      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05, min = 0)
     }
   })
-
+  
   
   #add description of parameters (help text)
   output$help_text <- renderUI ({
@@ -951,10 +951,10 @@ shinyServer(function(input,output,session) {
     }
     else if(parameter_type == "dip_calc"){
       #parameters for dip_calc
-      helpText("Enter the dip and extreme thresholds, values between 0 and 1, extreme dipping threshold larger than dipping threshold. ") 
+      helpText("Enter the dip and extreme thresholds.") 
     }
   })
-
+  
   ### metrics other than bp_tables and dip_calc
   #parameter_type==none, output_type==none (functions that do not need additional parameters and will only output 1 table)
   metric_table <- reactive({
@@ -1554,15 +1554,15 @@ shinyServer(function(input,output,session) {
     }
     
     if (!(is.null(input$plot_type_for_scatter))){
-  
-  
-    
-    plot_type_for_scatter = input$plot_type_for_scatter
-    
-    if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")) {
-      checkboxInput(inputId = "inc_crisis_T_or_F",label = "Include Hypersensitive Crisis", value = T)
-    }
-    else{NULL}
+      
+      
+      
+      plot_type_for_scatter = input$plot_type_for_scatter
+      
+      if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")) {
+        checkboxInput(inputId = "inc_crisis_T_or_F",label = "Include Hypersensitive Crisis", value = T)
+      }
+      else{NULL}
     }
     else{NULL}
   })
@@ -1576,17 +1576,17 @@ shinyServer(function(input,output,session) {
     
     plottype = plottype()
     if (!(is.null(input$plot_type_for_scatter))){
-    
-    
-    plot_type_for_scatter = input$plot_type_for_scatter
-    
-    if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")){
-      checkboxInput(inputId = "inc_low_T_or_F",label = "Include Low Hypotension", value = T)
+      
+      
+      plot_type_for_scatter = input$plot_type_for_scatter
+      
+      if ((plottype == "bp_scatter" & plot_type_for_scatter == "stages2020") | (plottype == "bp_report")){
+        checkboxInput(inputId = "inc_low_T_or_F",label = "Include Low Hypotension", value = T)
+      }
+      else{NULL}
     }
     else{NULL}
-    }
-    else{NULL}
-    })
+  })
   
   #Get argument "Save Report" used in the bp_report() function
   #output$save_report_for_report <- renderUI({
@@ -1748,7 +1748,7 @@ shinyServer(function(input,output,session) {
       
       else if (input$fileselect == "bpchildren_data"){
         bp_hist(data = {
-         children_data1()
+          children_data1()
         }, subj = input$subj_for_plots)[as.numeric(input$bp_hist_view)]
       }
       
@@ -1791,10 +1791,10 @@ shinyServer(function(input,output,session) {
                    wrap_var = input$wrap_var_for_scatter,
                    inc_crisis = input$inc_crisis_T_or_F, 
                    inc_low = input$inc_low_T_or_F)
-      
+        
       }
       
-   
+      
       #if the user wants to use bp_scatter on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
         bp_scatter(data = {jhs_data1()}, 
@@ -1967,7 +1967,7 @@ shinyServer(function(input,output,session) {
       
       else if(input$fileselect == "bpchildren_data"){
         dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
-                                          subj = input$subj_for_plots)
+                                           subj = input$subj_for_plots)
       }
       
       #if the user wants to dow_tod_plots the jhs data
@@ -2020,13 +2020,13 @@ shinyServer(function(input,output,session) {
           need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
         )
         bp_ts_plots(data = {ghana_data1()},
-                  subj = input$subj_for_plots,
-                  wrap_var = input$wrap_var_for_ts, 
-                  index = input$index_for_ts, 
-                  first_hour = input$first_hour_for_ts,
-                  rotate_xlab = input$rotate_xlab_for_ts,
-                  wrap_row = input$wrap_row_for_ts, 
-                  wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                    subj = input$subj_for_plots,
+                    wrap_var = input$wrap_var_for_ts, 
+                    index = input$index_for_ts, 
+                    first_hour = input$first_hour_for_ts,
+                    rotate_xlab = input$rotate_xlab_for_ts,
+                    wrap_row = input$wrap_row_for_ts, 
+                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
       }
       else if(input$fileselect == "jhsproc_data"){
         validate(
@@ -2123,14 +2123,14 @@ shinyServer(function(input,output,session) {
   
   
   
-
   
- 
+  
+  
   #output the plot
   output$plot <- renderPlot({
     
     plotFunc()
-    })
+  })
   
   #download handler
   output$downloadPlot <- downloadHandler(
