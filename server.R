@@ -160,6 +160,27 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #If input for DATE/TIME checkbox is true, a textbox() will appear with dt_format() options
+  output$date_adjust <- renderUI({
+    req(input$date1)
+    if(input$date1 == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      textInput('date_adj', "Specify the date/time format. Default set to 'ymd HMS'", value = 'ymd HMS')
+    }
+  })
+  
+  #Value for dt_format() argument
+  date_format <- reactive({
+    if(input$date1 == FALSE | is.null(input$date_adj)){
+      return('ymd HMS')
+    }else{
+      adj = input$date_adj
+      adj = as.character(adj)
+      return(adj)
+    }
+  })
+  
   #If input for the ID checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$idinput <- renderUI({
     req(input$id1)
@@ -742,7 +763,7 @@ shinyServer(function(input,output,session) {
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                   ToD_int = todint_value(), eod = eod_value(),
                                   agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
-                                  chron_order = chronorder_value())
+                                  chron_order = chronorder_value(), dt_fmt = date_format())
       if(isFALSE(input$date1)){
         bpdata_final
       }else{
@@ -858,7 +879,7 @@ shinyServer(function(input,output,session) {
                                 bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
                                 ToD_int = todint_value(), eod = eod_value(), 
                                 agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
-                                chron_order = chronorder_value())
+                                chron_order = chronorder_value(), dt_fmt = date_format())
     if(isFALSE(input$date1)){
       bpdata_final
     }else{

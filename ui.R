@@ -24,6 +24,7 @@ ui <- fluidPage(
                  uiOutput('bptype_input'),
                  uiOutput('date_checkbox'),
                  uiOutput('dateinput'),
+                 uiOutput('date_adjust'),
                  uiOutput('id_checkbox'),
                  uiOutput('idinput'),
                  uiOutput('wake_checkbox'),
