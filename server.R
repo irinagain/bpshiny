@@ -158,6 +158,13 @@ shinyServer(function(input,output,session) {
   ###If checkboxInput() for a given variable is TRUE, a selectInput() will appear below with column names of inputted dataset##
   
   
+  #Telling User to input both Date and Date/Timme
+  output$datetimelabel <- renderUI({
+    if(input$fileselect %in% c('input_data')){
+      h6('If Date/Time and Date are both included in dataset, please specify both below with their corresponding format. Can take any format specified by the lubridate package.')
+    }
+  })
+  
   #If input for the DATE/TIME checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$dateinput <- renderUI({
     req(input$date1)

@@ -68,7 +68,8 @@ ui <- fluidPage(
                  uiOutput('agg_thresh_arg'),
                  uiOutput('collapse_df_check'),
                  uiOutput('chronorder_check'),
-                 uiOutput('dataviewer')
+                 uiOutput('dataviewer'),
+                 uiOutput('datetimelabel')
                ),
                mainPanel(tableOutput("contents"))
                
