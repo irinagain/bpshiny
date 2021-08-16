@@ -16,7 +16,8 @@ shinyServer(function(input,output,session) {
   ######DATA######
   
   ####DATA INPUT/STORAGE####
-  
+  library(lubridate)
+  library(dplyr)
   #Creates fileInput() which will accept a .csv file if User Datafile is selected
   output$file_input <- renderUI({
     if(input$fileselect == 'input_data'){
@@ -91,6 +92,13 @@ shinyServer(function(input,output,session) {
     }
   })
   
+  #Creates a checkboxInput() if user wants to assign a column name for the DATE variable 
+  output$dateonly_checkbox <- renderUI({
+    if(input$fileselect == 'input_data'){
+      checkboxInput('dateonly', 'Date')
+    }
+  })
+  
   #Creates a checkboxInput() if user wants to assign a column name for the ID variable 
   output$id_checkbox <- renderUI({
     if(input$fileselect == 'input_data'){
@@ -156,7 +164,7 @@ shinyServer(function(input,output,session) {
     if(input$date1 == FALSE || input$fileselect != 'input_data'){
       return(NULL)
     }else{
-      selectInput('date', 'Date', names(dataset()))
+      selectInput('datetime', 'Date/Time', names(dataset()))
     }
   })
   
@@ -180,6 +188,38 @@ shinyServer(function(input,output,session) {
       return(adj)
     }
   })
+  
+  #If input for DATE checkbox is true, a selctInput() will appear below with column names of inputted dataset
+  output$dateonlyinput <- renderUI({
+    req(input$dateonly)
+    if(input$dateonly == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      selectInput('dateonly_input', 'Date', names(dataset()))
+    }
+  })
+  
+  #If input for DATE checkbox is true, a textbox() will appear with dt_format() options
+  output$dateonly_adjust <- renderUI({
+    req(input$dateonly)
+    if(input$dateonly == FALSE || input$fileselect != 'input_data'){
+      return(NULL)
+    }else{
+      textInput('dateonly_adj', "Specify the date format. Default set to 'ymd'", value = 'ymd')
+    }
+  })
+  
+  #Value for format of Date 
+  dateonly_format <- reactive({
+    if(input$dateonly== FALSE | is.null(input$dateonly_adj)){
+      return('ymd')
+    }else{
+      adj1 = input$dateonly_adj
+      adj1 = as.character(adj1)
+      return(adj1)
+    }
+  })
+  
   
   #If input for the ID checkbox is true, a selectInput() will appear below with column names of inputted dataset
   output$idinput <- renderUI({
@@ -731,8 +771,19 @@ shinyServer(function(input,output,session) {
     #Transforming Variable names to usable form 
     sys = input$sys
     dias = input$dias
-    date = input$date
-    if(input$date1 == FALSE){date = NULL}
+    
+    #DATE_TIME VALUE
+    datetime1 = input$datetime
+    if(input$date1 == FALSE){
+      datetime1 = NULL
+    }
+    
+    #DATE VALUE
+    date = input$dateonly_input
+    if(input$dateonly == FALSE){
+      date = NULL
+    }
+    
     id = input$id
     #If ID checkbox is not selected, a column will be generated called 'ID' consisiting of the number 1
     #Resolves Issue with Plots Tab
@@ -740,6 +791,7 @@ shinyServer(function(input,output,session) {
       id = NULL
       bpdata <- bpdata%>%mutate(ID = '1')
     }
+    
     wake = input$wake
     if(input$wake1 == FALSE){wake = NULL}
     visit = input$visit
@@ -757,7 +809,18 @@ shinyServer(function(input,output,session) {
     
     #Will either display original or processed data depending on what the input$dataviewer is 
     if(input$dataview == 'proc_data'){
-      bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
+      bpdata1 <- bpdata
+      if(input$dateonly == TRUE){
+        date_rev <- subset(bpdata1, select = input$dateonly_input)[,1]
+        date_rev <- parse_date_time(date_rev, orders = dateonly_format())
+        bpdata1$date <- date_rev
+      }
+      if(input$date1 == TRUE){
+        datetime_rev <- subset(bpdata1, select = input$datetime)[,1]
+        datetime_rev <- parse_date_time(datetime_rev, orders = date_format())
+        bpdata1$datetime1 <- datetime_rev
+      }
+      bpdata_final = process_data(data = bpdata1, sbp = input$sys, dbp = input$dias,date_time = datetime1, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   SUL = SUL_value(), SLL = SLL_value(),DUL = DUL_value(), DLL = DLL_value(), HRUL = HRUL_value(), HRLL = HRLL_value(),
                                   bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
@@ -768,8 +831,8 @@ shinyServer(function(input,output,session) {
         bpdata_final
       }else{
         bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%m-%d-%Y %H:%M:%S")
-        bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
+        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%Y-%m-%d %H:%M:%S")
+        bpdata_final$DATE <- format(bpdata_final$DATE, "%Y/%m/%d")
         bpdata_final
       }
     }else{
@@ -852,10 +915,27 @@ shinyServer(function(input,output,session) {
     #Transforming Variable names to usable form 
     sys = input$sys
     dias = input$dias
-    date = input$date
-    if(input$date1 == FALSE){date = NULL}
+    
+    #DATE_TIME VALUE
+    datetime1 = input$datetime
+    if(input$date1 == FALSE){
+      datetime1 = NULL
+    }
+    
+    #DATE VALUE
+    date = input$dateonly_input
+    if(input$dateonly == FALSE){
+      date = NULL
+    }
+    
     id = input$id
-    if(input$id1 == FALSE){id = NULL}
+    #If ID checkbox is not selected, a column will be generated called 'ID' consisiting of the number 1
+    #Resolves Issue with Plots Tab
+    if(input$id1 == FALSE){
+      id = NULL
+      bpdata <- bpdata%>%mutate(ID = '1')
+    }
+    
     wake = input$wake
     if(input$wake1 == FALSE){wake = NULL}
     visit = input$visit
@@ -871,24 +951,34 @@ shinyServer(function(input,output,session) {
     dow = input$dow
     if(input$dow1 == FALSE){dow = NULL}
     
-    
-    #Displays original dataframe until submit button is pushed and creates new processed data frame with variable name 'bpdata.final'
-    
-    bpdata_final = process_data(data = bpdata, sbp = input$sys, dbp = input$dias,date_time = date, id = id, wake = wake, visit = visit,
-                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
-                                bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
-                                ToD_int = todint_value(), eod = eod_value(), 
-                                agg = agg_value(),agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
-                                chron_order = chronorder_value(), dt_fmt = date_format())
-    if(isFALSE(input$date1)){
-      bpdata_final
-    }else{
-      bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
-      bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%Y/%m/%d %H:%M:%S")
-      bpdata_final$DATE <- format(bpdata_final$DATE, "%m/%d/%Y")
-      bpdata_final
+    #Will either display original or processed data depending on what the input$dataviewer is 
+    bpdata1 <- bpdata
+    if(input$dateonly == TRUE){
+      date_rev <- subset(bpdata1, select = input$dateonly_input)[,1]
+      date_rev <- parse_date_time(date_rev, orders = dateonly_format())
+      bpdata1$date <- date_rev
+      }
+    if(input$date1 == TRUE){
+      datetime_rev <- subset(bpdata1, select = input$datetime)[,1]
+      datetime_rev <- parse_date_time(datetime_rev, orders = date_format())
+      bpdata1$datetime1 <- datetime_rev
     }
-    
+
+    bpdata_final = process_data(data = bpdata1, sbp = input$sys, dbp = input$dias,date_time = datetime1, id = id, wake = wake, visit = visit,
+                                hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
+                                SUL = SUL_value(), SLL = SLL_value(),DUL = DUL_value(), DLL = DLL_value(), HRUL = HRUL_value(), HRLL = HRLL_value(),
+                                bp_type = bptype_value(), inc_low = inclow_value(), inc_crisis = inccrisis_value(),
+                                ToD_int = todint_value(), eod = eod_value(),
+                                agg = agg_value(), agg_thresh = aggthresh_value(), collapse_df = collapse_value(), 
+                                chron_order = chronorder_value(), dt_fmt = date_format())
+      if(isFALSE(input$date1)){
+        bpdata_final
+      }else{
+        bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
+        bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%Y-%m-%d %H:%M:%S")
+        bpdata_final$DATE <- format(bpdata_final$DATE, "%Y/%m/%d")
+        bpdata_final
+      }
   })
   
   #Reactive Expression that contains processed data. Can be used regardless input$dataview
@@ -2117,9 +2207,9 @@ shinyServer(function(input,output,session) {
                       wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
         }
         else{
-          validate(
-            need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
-          )
+          #validate(
+           # need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
+          #)
           validate(
             need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
           )
