@@ -666,7 +666,7 @@ shinyServer(function(input,output,session) {
   
   #Radio button that will give the option of the data to display the original data or processed data. 
   output$dataviewer <- renderUI(
-    radioButtons('dataview', label = 'View Data', choices = c('Original Data' = 'unproc_data', 'Processed Data' = 'proc_data'), selected = 'unproc_data')
+    radioButtons('dataview', label = "", choices = c('Original Data' = 'unproc_data', 'Process Data' = 'proc_data'), selected = 'unproc_data', inline = T)
   )
   
   ##SAMPLE DATASETS PROCESSING##
@@ -1586,19 +1586,31 @@ shinyServer(function(input,output,session) {
   })
   output$plot_type_text <- renderText(plot_type_text())
   
+ 
   #Get the subject arguments that is used in all plot types 
   output$subj_for_plots<- renderUI({
     plottype = plottype()
     req(input$fileselect)
     
+    
+    
     if (input$fileselect == "input_data"){
       req(input$datafile)
       
+        validate(
+          need(input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+        )
       
       validate(
-        need(input$dataview == "proc_data", message = "No subject 'ID' column is found, select Processed Data on 'Data' Tab if necessary")
+        need(expr = (!is.null(input_data1()$ID) || !is.null(input_data()$ID)), message = "No subject 'ID' column is found, select Processed Data on 'Data' Tab if necessary")
       )
-      selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data1()$ID)))), selected = NULL, multiple = T)
+      if (!is.null(input_data1()$ID)){
+        selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data1()$ID)))), selected = NULL, multiple = T)
+      }
+      else if (!is.null(input_data()$ID)){
+        selectizeInput(inputId = "subj_for_plots", label = "Subject:", choices = c("", as.character(levels(factor(input_data()$ID)))), selected = NULL, multiple = T)
+      }
+      
     }
     
     if(input$fileselect != "bpchildren_data"){
@@ -1627,7 +1639,7 @@ shinyServer(function(input,output,session) {
     }
     
     if((plottype == "bp_scatter") | (plottype == "bp_report") ){
-      selectInput(inputId = "group_var_for_scatter_and_report", label = "Grouping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])),selected = NULL, multiple = T)
+      selectInput(inputId = "group_var_for_scatter_and_report", label = "Grouping Variable:", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])),selected = NULL, multiple = T)
     }
     else{NULL}
   })
@@ -1642,7 +1654,7 @@ shinyServer(function(input,output,session) {
     }
     
     if((plottype == "bp_scatter")){
-      selectInput(inputId = "wrap_var_for_scatter", label = "Wrapping Variable (1):", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])), selected = NULL, multiple = T)
+      selectInput(inputId = "wrap_var_for_scatter", label = "Wrapping Variable:", choices = c("", names(user_data()[,which(user_data() %>% summarise_all(n_distinct) <= 10)])), selected = NULL, multiple = T)
     }
     else{NULL}
   })
@@ -1732,7 +1744,7 @@ shinyServer(function(input,output,session) {
     }
     
     if(plottype == "bp_ts_plots"){
-      selectInput(inputId = "wrap_var_for_ts", label = "Wrapping Variable (1):", choices = c("", names(user_data())), selected = NULL, multiple = T)
+      selectInput(inputId = "wrap_var_for_ts", label = "Wrapping Variable:", choices = c("", names(user_data())), selected = NULL, multiple = T)
     }
     else{NULL}
   })
@@ -1776,6 +1788,11 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     req(input$fileselect)
     
+    if (input$fileselect == "input_data"){
+      req(input$datafile)
+    }
+    
+    
     if(plottype == "bp_ts_plots"){
       numericInput(inputId = "first_hour_for_ts", label = "First Hour (0-23):", value = 0, min = 0, max = 23)
     }
@@ -1787,6 +1804,11 @@ shinyServer(function(input,output,session) {
     plottype = plottype()
     req(input$fileselect)
     
+    if (input$fileselect == "input_data"){
+      req(input$datafile)
+    }
+    
+    
     if (plottype == "bp_ts_plots"){
       checkboxInput(inputId = "rotate_xlab_for_ts", label = "Rotate x-axis labels", value = F)
     }
@@ -1794,14 +1816,15 @@ shinyServer(function(input,output,session) {
   })
   
   #the time series plot produces a list of 2 plots (sometimes), this lets user switch between the two plots
-  output$bp_ts_view <- renderUI({
-    if (plottype() == "bp_ts_plots"){
+  #output$bp_ts_view <- renderUI({
+   # if (plottype() == "bp_ts_plots"){
       
-      selectInput(inputId = "bp_ts_view", label = NULL, choices = c(`Plot View 1` = "1",
-                                                                    `Plot View 2` = "2"),
-                  selected = 1, size = 1, selectize = F)
-    }
-  })
+      
+    #  selectInput(inputId = "bp_ts_view", label = NULL, choices = c(`Plot View 1` = "1",
+     #                                                               `Plot View 2` = "2"),
+      #            selected = 1, size = 1, selectize = F)
+    #}
+  #})
   
   #there are multiple plots to view with bp_hist, this lets user choose which plot to view
   output$bp_hist_view <- renderUI(
@@ -2058,6 +2081,8 @@ shinyServer(function(input,output,session) {
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       )
       
+     
+      
       
       
       #if the user wants to dow_tod_plots an uploaded dataset
@@ -2069,6 +2094,12 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
         )
+        
+        validate(
+          need(expr = (input$dow != '' || input$datetime != ''), message = "No Day of Week column found in processed data")
+        )
+       
+        
         dow_tod_plots_out <- dow_tod_plots(data = input_data1(),
                                            subj = input$subj_for_plots)
       }
@@ -2121,6 +2152,10 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
         )
+        
+        validate(
+          need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+        )
         bp_ts_plots(data = {hypnos_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2128,7 +2163,7 @@ shinyServer(function(input,output,session) {
                     first_hour = input$first_hour_for_ts,
                     rotate_xlab = input$rotate_xlab_for_ts,
                     wrap_row = input$wrap_row_for_ts, 
-                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                    wrap_col = input$wrap_col_for_ts)[1]
       }
       else if(input$fileselect == "ghana_data"){
         validate(
@@ -2137,6 +2172,10 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
         )
+        
+        validate(
+          need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+        )
         bp_ts_plots(data = {ghana_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2144,11 +2183,15 @@ shinyServer(function(input,output,session) {
                     first_hour = input$first_hour_for_ts,
                     rotate_xlab = input$rotate_xlab_for_ts,
                     wrap_row = input$wrap_row_for_ts, 
-                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                    wrap_col = input$wrap_col_for_ts)[1]
       }
       else if(input$fileselect == "jhsproc_data"){
         validate(
           need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+        )
+        
+        validate(
+          need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
         )
         bp_ts_plots(data = {jhs_data1()},
                     subj = input$subj_for_plots,
@@ -2157,7 +2200,7 @@ shinyServer(function(input,output,session) {
                     first_hour = input$first_hour_for_ts,
                     rotate_xlab = input$rotate_xlab_for_ts,
                     wrap_row = input$wrap_row_for_ts, 
-                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                    wrap_col = input$wrap_col_for_ts)[1]
       }
       else if(input$fileselect == "bpchildren_data"){
         validate(
@@ -2166,6 +2209,10 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
         )
+        
+        validate(
+          need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+        )
         bp_ts_plots(data = {children_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2173,7 +2220,7 @@ shinyServer(function(input,output,session) {
                     first_hour = input$first_hour_for_ts,
                     rotate_xlab = input$rotate_xlab_for_ts,
                     wrap_row = input$wrap_row_for_ts, 
-                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                    wrap_col = input$wrap_col_for_ts)[1]
       }
       else if(input$fileselect == "bppreg_data"){
         validate(
@@ -2182,6 +2229,10 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
         )
+        
+        validate(
+          need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+        )
         bp_ts_plots(data = {preg_data1()},
                     subj = input$subj_for_plots,
                     wrap_var = input$wrap_var_for_ts, 
@@ -2189,7 +2240,7 @@ shinyServer(function(input,output,session) {
                     first_hour = input$first_hour_for_ts,
                     rotate_xlab = input$rotate_xlab_for_ts,
                     wrap_row = input$wrap_row_for_ts, 
-                    wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                    wrap_col = input$wrap_col_for_ts)[1]
         
       }
       else if(input$fileselect == "input_data"){
@@ -2200,7 +2251,12 @@ shinyServer(function(input,output,session) {
         validate(
           need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
         )
-        if(!is.null(input$date)){
+        
+        validate(
+          need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+        )
+        
+        if((!is.null(input$date)) || (!is.null(input$datetime)) ){
           validate(
             need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
           )
@@ -2211,12 +2267,12 @@ shinyServer(function(input,output,session) {
                       first_hour = input$first_hour_for_ts,
                       rotate_xlab = input$rotate_xlab_for_ts,
                       wrap_row = input$wrap_row_for_ts, 
-                      wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                      wrap_col = input$wrap_col_for_ts)[1]
         }
         else{
-          #validate(
-           # need(expr = length(input$index_for_ts) == 1, message = "No Date/Time data provided in uploaded data set. Please specify Index")
-          #)
+          validate(
+            need(expr = length(input$index_for_ts) == 1, message = "Uploaded data sets require specified Index for Time Series plotting")
+          )
           validate(
             need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
           )
@@ -2228,33 +2284,179 @@ shinyServer(function(input,output,session) {
                       first_hour = input$first_hour_for_ts,
                       rotate_xlab = input$rotate_xlab_for_ts,
                       wrap_row = input$wrap_row_for_ts, 
-                      wrap_col = input$wrap_col_for_ts)[as.numeric(input$bp_ts_view)]
+                      wrap_col = input$wrap_col_for_ts)[1]
         }
       }
-      
     }
     
     
   })
   
+ second_plot_for_ts <- eventReactive(input$plot_update, {
+  
+   if(input$plottype == "bp_ts_plots"){
+    #Makes sure a data set has been uploaded/selected
+   validate(
+     need(expr = input$fileselect != '', message = "Please upload/select a data set")
+   ) 
+   
+   validate(
+     need(expr = length(input$subj_for_plots) == 1, message = "Please specifty 1 subject, if necessary process the data in the 'Data' tab")
+   )
+   
+   if(input$fileselect == "hypnos_data"){
+     validate(
+       need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+     )
+     
+     validate(
+       need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+     )
+     bp_ts_plots(data = {hypnos_data1()},
+                 subj = input$subj_for_plots,
+                 wrap_var = input$wrap_var_for_ts, 
+                 index = input$index_for_ts, 
+                 first_hour = input$first_hour_for_ts,
+                 rotate_xlab = input$rotate_xlab_for_ts,
+                 wrap_row = input$wrap_row_for_ts, 
+                 wrap_col = input$wrap_col_for_ts)[2]
+   }
+   else if(input$fileselect == "ghana_data"){
+     validate(
+       need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+     )
+     validate(
+       need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+     )
+     
+     validate(
+       need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+     )
+     bp_ts_plots(data = {ghana_data1()},
+                 subj = input$subj_for_plots,
+                 wrap_var = input$wrap_var_for_ts, 
+                 index = input$index_for_ts, 
+                 first_hour = input$first_hour_for_ts,
+                 rotate_xlab = input$rotate_xlab_for_ts,
+                 wrap_row = input$wrap_row_for_ts, 
+                 wrap_col = input$wrap_col_for_ts)[2]
+   }
+   else if(input$fileselect == "jhsproc_data"){
+     validate(
+       need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+     )
+     
+     validate(
+       need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+     )
+     bp_ts_plots(data = {jhs_data1()},
+                 subj = input$subj_for_plots,
+                 wrap_var = input$wrap_var_for_ts, 
+                 index = input$index_for_ts, 
+                 first_hour = input$first_hour_for_ts,
+                 rotate_xlab = input$rotate_xlab_for_ts,
+                 wrap_row = input$wrap_row_for_ts, 
+                 wrap_col = input$wrap_col_for_ts)[2]
+   }
+   else if(input$fileselect == "bpchildren_data"){
+     validate(
+       need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+     )
+     validate(
+       need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+     )
+     
+     validate(
+       need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+     )
+     bp_ts_plots(data = {children_data1()},
+                 subj = input$subj_for_plots,
+                 wrap_var = input$wrap_var_for_ts, 
+                 index = input$index_for_ts, 
+                 first_hour = input$first_hour_for_ts,
+                 rotate_xlab = input$rotate_xlab_for_ts,
+                 wrap_row = input$wrap_row_for_ts, 
+                 wrap_col = input$wrap_col_for_ts)[2]
+   }
+   else if(input$fileselect == "bppreg_data"){
+     validate(
+       need(expr = length(input$index_for_ts) == 1, message = "Please specify Index")
+     )
+     validate(
+       need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+     )
+     
+     validate(
+       need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+     )
+     bp_ts_plots(data = {preg_data1()},
+                 subj = input$subj_for_plots,
+                 wrap_var = input$wrap_var_for_ts, 
+                 index = input$index_for_ts, 
+                 first_hour = input$first_hour_for_ts,
+                 rotate_xlab = input$rotate_xlab_for_ts,
+                 wrap_row = input$wrap_row_for_ts, 
+                 wrap_col = input$wrap_col_for_ts)[2]
+     
+   }
+   else if(input$fileselect == "input_data"){
+     validate(
+       need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+       need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+     )
+     validate(
+       need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+     )
+     
+     validate(
+       need(expr = length(input$wrap_rowcol_for_ts) < 2, message = "Ensure only 1 Wrapping Variable is given")
+     )
+     if((!is.null(input$date)) || (!is.null(input$datetime)) ){
+       validate(
+         need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+       )
+       bp_ts_plots(data = {input_data1()},
+                   subj = input$subj_for_plots,
+                   wrap_var = input$wrap_var_for_ts, 
+                   index = input$index_for_ts, 
+                   first_hour = input$first_hour_for_ts,
+                   rotate_xlab = input$rotate_xlab_for_ts,
+                   wrap_row = input$wrap_row_for_ts, 
+                   wrap_col = input$wrap_col_for_ts)[2]
+     }
+     else{
+       validate(
+         need(expr = length(input$index_for_ts) == 1, message = "Uploaded data sets require specified Index for Time Series plotting")
+       )
+       validate(
+         need(expr = length(input$index_for_ts) < 2, message = "Ensure only 1 Index value is given")
+       )
+       
+       bp_ts_plots(data = {input_data1()},
+                   subj = input$subj_for_plots,
+                   wrap_var = input$wrap_var_for_ts, 
+                   index = input$index_for_ts, 
+                   first_hour = input$first_hour_for_ts,
+                   rotate_xlab = input$rotate_xlab_for_ts,
+                   wrap_row = input$wrap_row_for_ts, 
+                   wrap_col = input$wrap_col_for_ts)[2]
+     }
+   }
+   }
+   else{NULL}
+ })
+ 
+ 
   output$plot_length <- renderText(length(plotFunc()))
   
   
-  
-  
-  
-  
-  #output the plot
+  #output the plot(s)
   output$plot <- renderPlot({
-    
     plotFunc()
   })
   
-  #download handler
-  output$downloadPlot <- downloadHandler(
-    filename = function() {paste(input$fileselect, '.png', sep = '')},
-    content = function(file) {
-      ggplot2::ggsave(file, print(plotFunc()))
-    }
-  )
+  output$second_plot_for_ts <- renderPlot({
+    second_plot_for_ts()
+  })
+ 
 })

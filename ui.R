@@ -68,10 +68,14 @@ ui <- fluidPage(
                  uiOutput('agg_thresh_arg'),
                  uiOutput('collapse_df_check'),
                  uiOutput('chronorder_check'),
-                 uiOutput('dataviewer'),
                  uiOutput('datetimelabel')
                ),
-               mainPanel(tableOutput("contents"))
+               
+               mainPanel(
+                 uiOutput('dataviewer'),
+                 hr(),
+                 tableOutput("contents")
+                 )
                
                
                
@@ -153,18 +157,21 @@ ui <- fluidPage(
                  uiOutput("include_low_stages2020")),
                #uiOutput("units_for_report")),
                #uiOutput("save_report_for_report")),
+               
                #configure main panel 
                mainPanel = 
                  #draw the plot
                  mainPanel(
                           uiOutput("bp_hist_view"),
-                          uiOutput("bp_ts_view"),
+                          #uiOutput("bp_ts_view"),
                           hr(),
                           plotOutput("plot"),
+                          conditionalPanel(condition = "'input.plottype' == 'bp_ts_plots",
+                                           plotOutput("second_plot_for_ts")),
                            #line break
                            hr(),
                            #Download button
-                           downloadButton(outputId = "downloadPlot", label = "Download"),
+                           #downloadButton(outputId = "pdfButton", label = "PDF"),
                            #give data used and type of plot
                            textOutput(outputId = "plotName"),
                            textOutput(outputId = "plot_type_text"))
