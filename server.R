@@ -1062,14 +1062,14 @@ shinyServer(function(input,output,session) {
   output$select_dip_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #dipping threshold, default is  0.1
-      numericInput("parameter1", "Specify dipping threshold",value = 0.1, step = 0.05, min = 0, max = 1)
+      numericInput("parameter1", "Specify dipping threshold",value = 0.1, step = 0.05, min = 0, max = .95)
     }
   })
   
   output$select_ext_parameter <- renderUI({
     if(input$metric == "dip_calc"){
       #extreme threshold, default if 0.2
-      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05, min = 0, max = 1)
+      numericInput("parameter2", "Specify extreme dipping threshold",value = 0.2, step = 0.05, min = input$parameter1 + .05, max = 1)
     }
   })
   
@@ -1749,6 +1749,7 @@ shinyServer(function(input,output,session) {
   metric_dip_calc_1 <- reactive({
     req(input$parameter1, input$parameter2) #make sure dip_thresh(input$parameter1) and extreme_thresh(input$parameter2) are not null
     parameter_type = parameter_type()
+    
     if(input$dataview == 'proc_data'){
       data = user_data()
     }else{data = original_data()}
@@ -1758,6 +1759,30 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "dip_calc", "parameter type incorrect"),
       need(output_type == "dip_calc", "output type incorrect")
     )
+    
+    validate(
+      need(input$parameter1 < input$parameter2, message = "Ensure Dipping Threshold is less than Extreme Dipping Threshold")
+    )
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+      
+      validate(
+        need(expr = any(c("DATE_TIME", "WAKE") %in% names(data)), message = "DATE_TIME or WAKE column is needed for Noctural Blood Pressure Dipping Calculation. A processed data set may be required."  )
+      )
+    }
+    
+    
     if(parameter_type == "dip_calc" & output_type == "dip_calc"){
       dip_calc_output = bp::dip_calc(data, sleep_start_end = NULL, dip_thresh = input$parameter1, extreme_thresh = input$parameter2, 
                                      inc_date = FALSE, subj = NULL)
@@ -1766,6 +1791,26 @@ shinyServer(function(input,output,session) {
   })
   
   metric_dip_calc_2 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+      
+      validate(
+        need(expr = any(c("DATE_TIME", "WAKE") %in% names(data)), message = "DATE_TIME or WAKE column is needed for Noctural Blood Pressure Dipping Calculation. A processed data set may be required."  )
+      )
+    
+    }
+    
     req(input$parameter1, input$parameter2)
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
@@ -1776,6 +1821,11 @@ shinyServer(function(input,output,session) {
       need(parameter_type == "dip_calc", "parameter type incorrect"),
       need(output_type == "dip_calc", "output type incorrect")
     )
+    
+    validate(
+      need(input$parameter1 < input$parameter2, message = "Ensure Dipping Threshold is less than Extreme Dipping Threshold")
+    )
+    
     if(parameter_type == "dip_calc" & output_type == "dip_calc"){
       dip_calc_output = bp::dip_calc(data, sleep_start_end = NULL, dip_thresh = input$parameter1, extreme_thresh = input$parameter2, 
                                      inc_date = FALSE, subj = NULL)
