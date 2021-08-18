@@ -155,8 +155,6 @@ ui <- fluidPage(
                  uiOutput("rotate_xlab_for_ts"),
                  uiOutput("include_crisis_stages2020"),
                  uiOutput("include_low_stages2020")),
-               #uiOutput("units_for_report")),
-               #uiOutput("save_report_for_report")),
                
                #configure main panel 
                mainPanel = 
