@@ -1717,23 +1717,7 @@ shinyServer(function(input,output,session) {
     }
     else{NULL}
   })
-  
-  #Get argument "Save Report" used in the bp_report() function
-  #output$save_report_for_report <- renderUI({
-  #plottype = plottype()
-  #if (plottype == "bp_report"){
-  #checkboxInput(inputId = "save_report_for_report", label = "Save Report", value = F)
-  #}
-  #else{NULL}
-  #})
-  
-  #Get the argument "units" used in the bp_report() function
-  #output$units_for_report <- renderUI({
-  # plottype = plottype()
-  #if (plottype == "bp_report"){
-  # selectInput(inputId = "units_for_report", label = "Units", choices = c(`Inches (in)` = "in", `Centimeters (cm)` = "cm", `Millimeters (mm)` = "mm"), selected = "in")
-  #}
-  #})
+
   
   ### Arguments for bp_ts_plots
   output$wrap_var_for_ts <- renderUI({
@@ -1815,16 +1799,7 @@ shinyServer(function(input,output,session) {
     else{NULL}
   })
   
-  #the time series plot produces a list of 2 plots (sometimes), this lets user switch between the two plots
-  #output$bp_ts_view <- renderUI({
-   # if (plottype() == "bp_ts_plots"){
-      
-      
-    #  selectInput(inputId = "bp_ts_view", label = NULL, choices = c(`Plot View 1` = "1",
-     #                                                               `Plot View 2` = "2"),
-      #            selected = 1, size = 1, selectize = F)
-    #}
-  #})
+ 
   
   #there are multiple plots to view with bp_hist, this lets user choose which plot to view
   output$bp_hist_view <- renderUI(
@@ -1983,14 +1958,7 @@ shinyServer(function(input,output,session) {
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
                   group_var = input$group_var_for_scatter_and_report,
-                  #save_report = input$save_report_for_report,
-                  path = NULL,
-                  filename = "bp_report",
-                  width = 12,
-                  height = 8.53,
-                  filetype = "pdf",
-                  units = input$units_for_report,
-                  scale = 1)
+                  scale = .75)
       }
       
       else if (input$fileselect == "ghana_data"){
@@ -1999,14 +1967,7 @@ shinyServer(function(input,output,session) {
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
                   group_var = input$group_var_for_scatter_and_report,
-                  #save_report = input$save_report_for_report,
-                  path = NULL,
-                  filename = "bp_report",
-                  width = 12,
-                  height = 8.53,
-                  filetype = "pdf",
-                  units = input$units_for_report,
-                  scale = 1)
+                  scale = .75)
       }
       
       else if(input$fileselect == "bpchildren_data"){
@@ -2015,14 +1976,7 @@ shinyServer(function(input,output,session) {
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
                   group_var = input$group_var_for_scatter_and_report,
-                  #save_report = input$save_report_for_report,
-                  path = NULL,
-                  filename = "bp_report",
-                  width = 12,
-                  height = 8.53,
-                  filetype = "pdf",
-                  units = input$units_for_report,
-                  scale = 1)
+                  scale = .75)
       }
       
       else if(input$fileselect == "bppreg_data"){
@@ -2031,14 +1985,7 @@ shinyServer(function(input,output,session) {
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
                   group_var = input$group_var_for_scatter_and_report,
-                  #save_report = input$save_report_for_report,
-                  path = NULL,
-                  filename = "bp_report",
-                  width = 12,
-                  height = 8.53,
-                  filetype = "pdf",
-                  units = input$units_for_report,
-                  scale = 1)
+                  scale = .75)
       }
       #if the user wants to use bp_report on unprocessed jhs data
       else if (input$fileselect == "jhsproc_data") {
@@ -2047,14 +1994,7 @@ shinyServer(function(input,output,session) {
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
                   group_var = input$group_var_for_scatter_and_report,
-                  #save_report = input$save_report_for_report,
-                  path = NULL,
-                  filename = "bp_report",
-                  width = 12,
-                  height = 8.53,
-                  filetype = "pdf",
-                  units = input$units_for_report,
-                  scale = 1)
+                  scale = .75)
       }
       #if the user wants to use bp_report on unprocessed hypnos data
       else if (input$fileselect == "hypnos_data"){
@@ -2063,13 +2003,7 @@ shinyServer(function(input,output,session) {
                   inc_low = input$inc_low_T_or_F,
                   inc_crisis = input$inc_crisis_T_or_F,
                   group_var = input$group_var_for_scatter_and_report,
-                  #save_report = input$save_report_for_report,
-                  path = NULL,
-                  filename = "bp_report",
-                  width = 12,
-                  height = 8.53,
-                  filetype = "pdf",
-                  scale = 1)
+                  scale = .75)
       }
     }
     
@@ -2096,7 +2030,7 @@ shinyServer(function(input,output,session) {
         )
         
         validate(
-          need(expr = (input$dow != '' || input$datetime != ''), message = "No Day of Week column found in processed data")
+          need(expr = (input$dow != '' || input$datetime != ''), message = "Please specify Day of Week and/or Date/Time Column in Data Tab")
         )
        
         
