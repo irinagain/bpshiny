@@ -1002,6 +1002,21 @@ shinyServer(function(input,output,session) {
   #Reactive Expression that will either display the sample dataset, or the user inputted data
   #Depends on what dataset was selected
   user_data <- reactive ({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Uploaded Data will be seen here")
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic data is entered properly")
+      )
+    }
+    
     datachoice = input$fileselect
     switch(datachoice,'ghana_data' = ghana_data(), 'hypnos_data' = hypnos_data(), 'jhsproc_data' = jhs_data(), 'bpchildren_data' = children_data(),
            'bppreg_data' = preg_data(), 'input_data' = input_data())
@@ -1076,6 +1091,19 @@ shinyServer(function(input,output,session) {
   ### metrics other than bp_tables and dip_calc
   #parameter_type==none, output_type==none (functions that do not need additional parameters and will only output 1 table)
   metric_table <- reactive({
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
     parameter_type = parameter_type()
     #If/else statement that decides whether to use sample data that is processed in data tab
     #Or if original data is still selected, it will use the pre-proccessed sample data
@@ -1105,6 +1133,21 @@ shinyServer(function(input,output,session) {
   
   #table 1 (SBP_Counts_by_Stage)
   metric_bp_table_1 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1124,6 +1167,21 @@ shinyServer(function(input,output,session) {
   output$text_1 <- renderText({"Table 1. SBP Counts by Stage"}) #act as caption for table 1
   
   metric_bp_table_2 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1141,6 +1199,21 @@ shinyServer(function(input,output,session) {
   output$text_2 <- renderText({"\n Table 2. DBP Counts by Stage"})
   
   metric_bp_table_3 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1158,6 +1231,21 @@ shinyServer(function(input,output,session) {
   output$text_3 <- renderText({"\n Table 3. CLASS Counts"})
   
   metric_bp_table_4 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1175,6 +1263,21 @@ shinyServer(function(input,output,session) {
   output$text_4 <- renderText({"\n Table 4. All BP Stage Combinations"})
   
   metric_bp_table_5 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1192,6 +1295,21 @@ shinyServer(function(input,output,session) {
   output$text_5 <- renderText({"\n Table 5. BP_contingency_count"})
   
   metric_bp_table_6 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1209,6 +1327,21 @@ shinyServer(function(input,output,session) {
   output$text_6 <- renderText({"\n Table 6. BP_contingency_percent"})
   
   metric_bp_table_7 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1230,6 +1363,21 @@ shinyServer(function(input,output,session) {
   output$text_7 <- renderText({"\n Table 7. SBP_by_Day_of_Week"})
   
   metric_bp_table_8 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1250,6 +1398,21 @@ shinyServer(function(input,output,session) {
   output$text_8 <- renderText({"\n Table 8. DBP_by_Day_of_Week"})
   
   metric_bp_table_9 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1270,6 +1433,21 @@ shinyServer(function(input,output,session) {
   output$text_9 <- renderText({"\n Table 9. CLASS_Day_of_Week"})
   
   metric_bp_table_10 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1291,6 +1469,21 @@ shinyServer(function(input,output,session) {
   output$text_10 <- renderText({"\n Table 10. SBP_by_Time_of_Day"})
   
   metric_bp_table_11 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1311,6 +1504,21 @@ shinyServer(function(input,output,session) {
   output$text_11 <- renderText({"\n Table 11. DBP_by_Time_of_Day"})
   
   metric_bp_table_12 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1331,6 +1539,21 @@ shinyServer(function(input,output,session) {
   output$text_12 <- renderText({"\n Table 12. CLASS_Time_of_Day"})
   
   metric_bp_table_13 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1352,6 +1575,21 @@ shinyServer(function(input,output,session) {
   output$text_13 <- renderText({"\n Table 13. SBP_by_WAKE_status \n"})
   
   metric_bp_table_14 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1372,6 +1610,21 @@ shinyServer(function(input,output,session) {
   output$text_14 <- renderText(paste("Table 14. DBP_by_WAKE_status", "", sep = "\n"))
   
   metric_bp_table_15 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
@@ -1392,6 +1645,21 @@ shinyServer(function(input,output,session) {
   output$text_15 <- renderText({"\n Table 15. SBP_by_WAKE_perc \n"})
   
   metric_bp_table_16 <- reactive({
+    
+    #This if statement prevents error message that occurs when data isn't properly entered in Data Tab
+    if(input$fileselect == "input_data") {
+      validate(
+        need(expr = !is.null(input$datafile), message = "Ensure Data has been uploaded in Data Tab"  )
+      )
+      validate(
+        need(expr = input$sys != '', message = "Enter Systolic Information in Data Tab"),
+        need(expr = input$dias != '', message = "Enter Diastolic Information in Data Tab")
+      )
+      validate(
+        need(expr = input$sys != input$dias, message = "Ensure Systolic and Diastolic information provided in the 'Data' tab are different")
+      )
+    }
+    
     parameter_type = parameter_type()
     if(input$dataview == 'proc_data'){
       data = user_data()
