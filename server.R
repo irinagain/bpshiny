@@ -820,11 +820,13 @@ shinyServer(function(input,output,session) {
       if(input$dateonly == TRUE){
         date_rev <- subset(bpdata1, select = input$dateonly_input)[,1]
         date_rev <- parse_date_time(date_rev, orders = dateonly_format())
+        validate(need(!is.na(date_rev), 'Please ensure Date Format is Correct'))
         bpdata1$date <- date_rev
       }
       if(input$date1 == TRUE){
         datetime_rev <- subset(bpdata1, select = input$datetime)[,1]
         datetime_rev <- parse_date_time(datetime_rev, orders = date_format())
+        validate(need(!is.na(datetime_rev), 'Please ensure Date/Time Format is Correct'))
         bpdata1$datetime1 <- datetime_rev
       }
       bpdata_final = process_data(data = bpdata1, sbp = input$sys, dbp = input$dias,date_time = datetime1, id = id, wake = wake, visit = visit,
