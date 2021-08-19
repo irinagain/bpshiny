@@ -171,9 +171,10 @@ ui <- fluidPage(
                            #Download button
                            #downloadButton(outputId = "pdfButton", label = "PDF"),
                            #give data used and type of plot
-                           textOutput(outputId = "plotName"),
-                           textOutput(outputId = "plot_type_text"))
-                           #textOutput(outputId = "plot_length"))
+                           #textOutput(outputId = "plotName"),
+                           #textOutput(outputId = "plot_type_text")
+                           #textOutput(outputId = "plot_length")
+                          )
                
              )
     )
