@@ -2436,9 +2436,10 @@ shinyServer(function(input,output,session) {
         need(expr = input$fileselect != '', message = "Please upload/select a data set")
       )
       
-     
-      
-      
+      #dow_tod_plots() does not support preg, ghana, or children data set
+      validate(
+        need(expr = !(any((input$fileselect == "ghana_data"),(input$fileselect == "bppreg_data"),(input$fileselect == "bpchildren_data"))), message = "Day of Week/Time of Day plot is not supported for selected data set")
+      )
       
       #if the user wants to dow_tod_plots an uploaded dataset, stores plots in dow_tod_plots_out locally
       if(input$fileselect == "input_data") {
@@ -2456,22 +2457,6 @@ shinyServer(function(input,output,session) {
        
         
         dow_tod_plots_out <- dow_tod_plots(data = input_data1(),
-                                           subj = input$subj_for_plots)
-      }
-      
-      #if the user wants to dow_tod_plots an ghana dataset, stores plots in dow_tod_plots_out locally
-      else if(input$fileselect == "ghana_data"){
-        dow_tod_plots_out <- dow_tod_plots(data = {ghana_data1()},
-                                           subj = input$subj_for_plots)
-      }
-      #if the user wants to dow_tod_plots an pregnant dataset, stores plots in dow_tod_plots_out locally
-      else if(input$fileselect == "bppreg_data"){
-        dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
-                                           subj = input$subj_for_plots)
-      }
-      #if the user wants to dow_tod_plots an children dataset, stores plots in dow_tod_plots_out locally
-      else if(input$fileselect == "bpchildren_data"){
-        dow_tod_plots_out <- dow_tod_plots(data = {preg_data1()},
                                            subj = input$subj_for_plots)
       }
       
