@@ -877,6 +877,8 @@ shinyServer(function(input,output,session) {
         bpdata_final$DATE_TIME <- as.POSIXct(bpdata_final$DATE_TIME)
         bpdata_final$DATE_TIME <- format(bpdata_final$DATE_TIME, "%Y-%m-%d %H:%M:%S")
         bpdata_final$DATE <- format(bpdata_final$DATE, "%Y/%m/%d")
+        bpdata_final$MONTH <- as.integer(bpdata_final$MONTH)
+        bpdata_final$YEAR <- as.integer(bpdata_final$YEAR)
         bpdata_final
       }
     }else{
