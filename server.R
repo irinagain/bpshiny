@@ -829,6 +829,41 @@ shinyServer(function(input,output,session) {
         validate(need(!is.na(datetime_rev), 'Please ensure Date/Time Format is Correct'))
         bpdata1$datetime1 <- datetime_rev
       }
+      
+      #Validate(need()) statements for SUL/SLL arguments
+      syscol <- subset(bpdata1, select = input$sys)[,1]
+      sysmin <- min(syscol)
+      sysmax <- max(syscol)
+      if(isTRUE(input$SBPcheck)){
+        validate(
+          need(SUL_value() > sysmin, 'Ensure SUL value is greater than the minimum value of systolic column'),
+          need(SLL_value() < sysmax, 'Ensure SLL value is less than the maximum value of systolic column')
+        )
+      }
+      
+      #Validate(need()) statements for DULL/DLL arguments
+      dbpcol <- subset(bpdata1, select = input$dias)[,1]
+      dbpmin <- min(dbpcol)
+      dbpmax <- max(dbpcol)
+      if(isTRUE(input$DBPcheck)){
+        validate(
+          need(DUL_value() > dbpmin, 'Ensure DUL value is greater than the minimum value of Diastolic column'),
+          need(DLL_value() < dbpmax, 'Ensure DLL value is less than the maximum value of Diastolic column')
+        )
+      }
+      
+      #Validate(need()) statements for HULL/HRLL arguments
+      if(isTRUE(input$HRcheck)){
+        hrcol <- subset(bpdata1, select = input$hr)[,1]
+        hrmin <- min(hrcol)
+        hrmax <- max(hrcol)
+        validate(
+          need(HRUL_value() > hrmin, 'Ensure HRUL value is greater than the minimum value of HR column'),
+          need(HRLL_value() < hrmax, 'Ensure HRLL value is less than the maximum value of HR column')
+        )
+      }
+      
+      
       bpdata_final = process_data(data = bpdata1, sbp = input$sys, dbp = input$dias,date_time = datetime1, id = id, wake = wake, visit = visit,
                                   hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
                                   SUL = SUL_value(), SLL = SLL_value(),DUL = DUL_value(), DLL = DLL_value(), HRUL = HRUL_value(), HRLL = HRLL_value(),
@@ -972,6 +1007,40 @@ shinyServer(function(input,output,session) {
       datetime_rev <- parse_date_time(datetime_rev, orders = date_format())
       bpdata1$datetime1 <- datetime_rev
     }
+    
+    #Validate(need()) statements for SUL/SLL arguments
+    syscol <- subset(bpdata1, select = input$sys)[,1]
+    sysmin <- min(syscol)
+    sysmax <- max(syscol)
+    if(isTRUE(input$SBPcheck)){
+      validate(
+        need(SUL_value() > sysmin, 'Ensure SUL value is greater than the minimum value of systolic column'),
+        need(SLL_value() < sysmax, 'Ensure SLL value is less than the maximum value of systolic column')
+      )
+    }
+    
+    #Validate(need()) statements for DULL/DLL arguments
+    dbpcol <- subset(bpdata1, select = input$dias)[,1]
+    dbpmin <- min(dbpcol)
+    dbpmax <- max(dbpcol)
+    if(isTRUE(input$DBPcheck)){
+      validate(
+        need(DUL_value() > dbpmin, 'Ensure DUL value is greater than the minimum value of Diastolic column'),
+        need(DLL_value() < dbpmax, 'Ensure DLL value is less than the maximum value of Diastolic column')
+      )
+    }
+    
+    #Validate(need()) statements for HULL/HRLL arguments
+    if(isTRUE(input$HRcheck)){
+      hrcol <- subset(bpdata1, select = input$hr)[,1]
+      hrmin <- min(hrcol)
+      hrmax <- max(hrcol)
+      validate(
+        need(HRUL_value() > hrmin, 'Ensure HRUL value is greater than the minimum value of HR column'),
+        need(HRLL_value() < hrmax, 'Ensure HRLL value is less than the maximum value of HR column')
+      )
+    }
+    
 
     bpdata_final = process_data(data = bpdata1, sbp = input$sys, dbp = input$dias,date_time = datetime1, id = id, wake = wake, visit = visit,
                                 hr=hr, pp=pp, map=map,rpp=rpp, DoW=dow, data_screen = datascreen_value(),
