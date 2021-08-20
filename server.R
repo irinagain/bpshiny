@@ -1107,7 +1107,7 @@ shinyServer(function(input,output,session) {
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter (no additional user input)
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_tables", "cv", "sv")){
+    if(input$metric %in% c("bp_arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_tables", "bp_cv", "bp_sv")){
       return("none")
     }
     #dip_calc function requires user to input 2 additional parameters (dipping threshold and extreme threshold)
@@ -1118,7 +1118,7 @@ shinyServer(function(input,output,session) {
   
   output_type <- reactive({
     #these functions output 1 table
-    if(input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")){
+    if(input$metric %in% c("bp_arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_cv", "bp_sv")){
       return("none")
     }
     #bp_tables function needs to render 16 tables separately
@@ -1912,7 +1912,7 @@ shinyServer(function(input,output,session) {
                                                                  scrollX = TRUE))
   ### 3 output conditions linked with conditionalpanels in UI. 
   output$one_table <- reactive({
-    input$metric %in% c("arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "cv", "sv")
+    input$metric %in% c("bp_arv", "bp_center", "bp_mag", "bp_range", "bp_stats", "bp_cv", "bp_sv")
   })
   outputOptions(output, 'one_table', suspendWhenHidden = FALSE)
   
